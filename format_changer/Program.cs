@@ -5,7 +5,7 @@ public class Program
 {
     public static void ChangeHeading1()
     {
-        string filePath = "../../../test.docx";
+        string filePath = "../../../data/test.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -63,7 +63,7 @@ public class Program
 
     public static void ChangeHeading2()
     {
-        string filePath = "../../../test.docx";
+        string filePath = "../../../data/test.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -119,7 +119,7 @@ public class Program
 
     public static void ChangeHeading3()
     {
-        string filePath = "../../../test.docx";
+        string filePath = "../../../data/test.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -175,7 +175,7 @@ public class Program
 
     public static void ChangeHeading4()
     {
-        string filePath = "../../../test.docx";
+        string filePath = "../../../data/test.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -231,7 +231,7 @@ public class Program
 
     public static void ChangeHeading5()
     {
-        string filePath = "../../../test.docx";
+        string filePath = "../../../data/test.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -287,7 +287,7 @@ public class Program
 
     public static void ChangeNormal()
     {
-        string filePath = "../../../test.docx";
+        string filePath = "../../../data/test.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -335,7 +335,7 @@ public class Program
 
     public static void ChangeListItem()
     {
-        string filePath = "../../../test.docx";
+        string filePath = "../../../data/test.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -391,7 +391,7 @@ public class Program
 
     public static void ChangeImage()
     {
-        string filePath = "../../../test.docx";
+        string filePath = "../../../data/test.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -472,7 +472,7 @@ public class Program
 
     public static void ChangeImageSignature()
     {
-        string filePath = "../../../test.docx";
+        string filePath = "../../../data/test.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -547,7 +547,7 @@ public class Program
 
     public static void ChangeTableSignature()
     {
-        string filePath = "../../../test.docx";
+        string filePath = "../../../data/test.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -605,7 +605,7 @@ public class Program
 
     public static void GetProperty()
     {
-        string filePath = "../../../test.docx";
+        string filePath = "../../../data/test.docx";
 
         using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(filePath, false))
         {
