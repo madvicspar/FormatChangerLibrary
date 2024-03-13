@@ -42,3 +42,4 @@ D:\vikto\source\repos\format_changer\format_changer\obj\Debug\net6.0\ref\format_
 D:\vikto\source\repos\format_changer\format_changer\bin\Debug\net6.0\DocumentFormat.OpenXml.dll
 D:\vikto\source\repos\format_changer\format_changer\bin\Debug\net6.0\DocumentFormat.OpenXml.Framework.dll
 D:\vikto\source\repos\format_changer\format_changer\bin\Debug\net6.0\System.IO.Packaging.dll
+D:\vikto\source\repos\format_changer\format_changer\obj\Debug\net6.0\format_changer.sourcelink.json
