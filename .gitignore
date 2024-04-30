@@ -1,2 +1,4 @@
 .vs/
 format_changer/data/
+format_changer/bin/
+format_changer/obj/
