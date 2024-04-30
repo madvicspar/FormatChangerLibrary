@@ -3,9 +3,10 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 public class Program
 {
+    bool isPictureSignature = true;
     public static void ChangeHeading1()
     {
-        string filePath = "../../../data/test.docx";
+        string filePath = "../../../data/Заголовок первого уровня.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -22,13 +23,21 @@ public class Program
 
                     if (heading1Style != null)
                     {
-                        // Изменяем свойства стиля
-                        heading1Style.Descendants<Name>().FirstOrDefault()?.Remove();
-                        heading1Style.Descendants<Italic>().FirstOrDefault()?.Remove();
-                        heading1Style.Descendants<Bold>().FirstOrDefault()?.Remove();
+                        // Удаляем все свойства стиля
+                        heading1Style.RemoveAllChildren<StyleParagraphProperties>();
+                        heading1Style.RemoveAllChildren<StyleRunProperties>();
+                        // изменяем свойства
+                        heading1Style.AppendChild(
+                            new StyleRunProperties(
+                                new RunFonts { Ascii = "Times New Roman", HighAnsi = "Times New Roman" },
+                                new Color { Val = "000000" },
+                                new Bold { Val = true },
+                                new Italic { Val = false },
+                                new Underline { Val = UnderlineValues.None },
+                                new FontSize { Val = "32" }));
                         heading1Style.AppendChild(
                             new StyleParagraphProperties(
-                                new SpacingBetweenLines { Line = "240", LineRule = LineSpacingRuleValues.Auto, Before = "0",  After = "240" },
+                                new SpacingBetweenLines { Line = "240", LineRule = LineSpacingRuleValues.Auto, Before = "0", After = "240" },
                                 new Indentation { Left = "0", Right = "0", FirstLine = "0" },
                                 new Justification { Val = JustificationValues.Center },
                                 new PageBreakBefore(),
@@ -38,18 +47,9 @@ public class Program
                                 {
                                     NumberingId = new NumberingId() { Val = 6 },
                                     NumberingLevelReference = new NumberingLevelReference() { Val = 0 },
-                                    
                                 },
                                 new NumberingFormat { Format = "decimal" })
                             );
-                        heading1Style.AppendChild(
-                            new StyleRunProperties(
-                                new RunFonts { Ascii = "Times New Roman", HighAnsi = "Times New Roman" },
-                                new Color { Val = "000000" },
-                                new Bold { Val = true },
-                                new Italic { Val = false },
-                                new Underline { Val = UnderlineValues.None },
-                                new FontSize { Val = "32" }));
                         Console.WriteLine("Style 'Heading1' modified successfully.");
                     }
                     else
@@ -58,12 +58,13 @@ public class Program
                     }
                 }
             }
+            doc.Save();
         }
     }
 
     public static void ChangeHeading2()
     {
-        string filePath = "../../../data/test.docx";
+        string filePath = "../../../data/Заголовок первого уровня.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -75,15 +76,23 @@ public class Program
 
                 if (styles != null)
                 {
-                    // Найдем стиль "Heading1"
+                    // Найдем стиль "Heading2"
                     Style heading1Style = styles.Elements<Style>().FirstOrDefault(style => style.StyleId == "2");
 
                     if (heading1Style != null)
                     {
-                        // Изменяем свойства стиля
-                        heading1Style.Descendants<Name>().FirstOrDefault()?.Remove();
-                        heading1Style.Descendants<Italic>().FirstOrDefault()?.Remove();
-                        heading1Style.Descendants<Bold>().FirstOrDefault()?.Remove();
+                        // Удаляем все свойства стиля
+                        heading1Style.RemoveAllChildren<StyleParagraphProperties>();
+                        heading1Style.RemoveAllChildren<StyleRunProperties>();
+                        // изменяем свойства
+                        heading1Style.AppendChild(
+                            new StyleRunProperties(
+                                new RunFonts { Ascii = "Times New Roman", HighAnsi = "Times New Roman" },
+                                new Color { Val = "000000" },
+                                new Bold { Val = true },
+                                new Italic { Val = false },
+                                new Underline { Val = UnderlineValues.None },
+                                new FontSize { Val = "28" }));
                         heading1Style.AppendChild(
                             new StyleParagraphProperties(
                                 new SpacingBetweenLines { Line = "240", LineRule = LineSpacingRuleValues.Auto, Before = "240", After = "120" },
@@ -94,32 +103,25 @@ public class Program
                                 new NumberingProperties
                                 {
                                     NumberingId = new NumberingId() { Val = 6 },
-                                    NumberingLevelReference = new NumberingLevelReference() { Val = 1 }
+                                    NumberingLevelReference = new NumberingLevelReference() { Val = 0 },
                                 },
-                                new NumberingFormat { Format = NumberFormatValues.Decimal.ToString() }
-                            ));
-                        heading1Style.AppendChild(
-                            new StyleRunProperties(
-                                new RunFonts { Ascii = "Times New Roman", HighAnsi = "Times New Roman" },
-                                new Color { Val = "000000" },
-                                new Bold { Val = true },
-                                new Italic { Val = false },
-                                new Underline { Val = UnderlineValues.None },
-                                new FontSize { Val = "28" }));
-                        Console.WriteLine("Style 'Heading1' modified successfully.");
+                                new NumberingFormat { Format = "decimal" })
+                            );
+                        Console.WriteLine("Style 'Heading2' modified successfully.");
                     }
                     else
                     {
-                        Console.WriteLine("Style 'Heading1' not found.");
+                        Console.WriteLine("Style 'Heading2' not found.");
                     }
                 }
             }
+            doc.Save();
         }
     }
 
     public static void ChangeHeading3()
     {
-        string filePath = "../../../data/test.docx";
+        string filePath = "../../../data/Заголовок первого уровня.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -131,15 +133,23 @@ public class Program
 
                 if (styles != null)
                 {
-                    // Найдем стиль "Heading1"
+                    // Найдем стиль "Heading3"
                     Style heading1Style = styles.Elements<Style>().FirstOrDefault(style => style.StyleId == "3");
 
                     if (heading1Style != null)
                     {
-                        // Изменяем свойства стиля
-                        heading1Style.Descendants<Name>().FirstOrDefault()?.Remove();
-                        heading1Style.Descendants<Italic>().FirstOrDefault()?.Remove();
-                        heading1Style.Descendants<Bold>().FirstOrDefault()?.Remove();
+                        // Удаляем все свойства стиля
+                        heading1Style.RemoveAllChildren<StyleParagraphProperties>();
+                        heading1Style.RemoveAllChildren<StyleRunProperties>();
+                        // изменяем свойства
+                        heading1Style.AppendChild(
+                            new StyleRunProperties(
+                                new RunFonts { Ascii = "Times New Roman", HighAnsi = "Times New Roman" },
+                                new Color { Val = "000000" },
+                                new Bold { Val = true },
+                                new Italic { Val = false },
+                                new Underline { Val = UnderlineValues.None },
+                                new FontSize { Val = "26" }));
                         heading1Style.AppendChild(
                             new StyleParagraphProperties(
                                 new SpacingBetweenLines { Line = "240", LineRule = LineSpacingRuleValues.Auto, Before = "160", After = "80" },
@@ -150,29 +160,23 @@ public class Program
                                 new NumberingProperties
                                 {
                                     NumberingId = new NumberingId() { Val = 6 },
-                                    NumberingLevelReference = new NumberingLevelReference() { Val = 2 }
+                                    NumberingLevelReference = new NumberingLevelReference() { Val = 0 },
                                 },
-                                new NumberingFormat { Format = NumberFormatValues.Decimal.ToString() }
-                            ));
-                        heading1Style.AppendChild(
-                            new StyleRunProperties(
-                                new RunFonts { Ascii = "Times New Roman", HighAnsi = "Times New Roman" },
-                                new Color { Val = "000000" },
-                                new Bold { Val = true },
-                                new Italic { Val = false },
-                                new Underline { Val = UnderlineValues.None },
-                                new FontSize { Val = "26" }));
-                        Console.WriteLine("Style 'Heading1' modified successfully.");
+                                new NumberingFormat { Format = "decimal" })
+                            );
+                        Console.WriteLine("Style 'Heading3' modified successfully.");
                     }
                     else
                     {
-                        Console.WriteLine("Style 'Heading1' not found.");
+                        Console.WriteLine("Style 'Heading3' not found.");
                     }
                 }
             }
+            doc.Save();
         }
     }
 
+    // поменять
     public static void ChangeHeading4()
     {
         string filePath = "../../../data/test.docx";
@@ -229,6 +233,7 @@ public class Program
         }
     }
 
+    // поменять
     public static void ChangeHeading5()
     {
         string filePath = "../../../data/test.docx";
@@ -304,10 +309,10 @@ public class Program
 
                     if (heading1Style != null)
                     {
-                        // Изменяем свойства стиля
-                        heading1Style.Descendants<Name>().FirstOrDefault()?.Remove();
-                        heading1Style.Descendants<Italic>().FirstOrDefault()?.Remove();
-                        heading1Style.Descendants<Bold>().FirstOrDefault()?.Remove();
+                        // Удаляем все свойства стиля
+                        heading1Style.RemoveAllChildren<StyleParagraphProperties>();
+                        heading1Style.RemoveAllChildren<StyleRunProperties>();
+                        // изменяем свойства
                         heading1Style.AppendChild(
                             new StyleParagraphProperties(
                                 new SpacingBetweenLines { Line = "360", LineRule = LineSpacingRuleValues.Auto, Before = "0", After = "0" },
@@ -335,6 +340,7 @@ public class Program
 
     public static void ChangeListItem()
     {
+        // не учитывается немаркированный список, и вообще нужно хорошенько потестить
         string filePath = "../../../data/test.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
@@ -352,10 +358,10 @@ public class Program
 
                     if (heading1Style != null)
                     {
-                        // Изменяем свойства стиля
-                        heading1Style.Descendants<Name>().FirstOrDefault()?.Remove();
-                        heading1Style.Descendants<Italic>().FirstOrDefault()?.Remove();
-                        heading1Style.Descendants<Bold>().FirstOrDefault()?.Remove();
+                        // Удаляем все свойства стиля
+                        heading1Style.RemoveAllChildren<StyleParagraphProperties>();
+                        heading1Style.RemoveAllChildren<StyleRunProperties>();
+                        // изменяем свойства
                         heading1Style.AppendChild(
                             new StyleParagraphProperties(
                                 new SpacingBetweenLines { Line = "360", LineRule = LineSpacingRuleValues.Auto, Before = "0", After = "0" },
@@ -470,6 +476,9 @@ public class Program
         }
     }
 
+
+    // Добавить логику проверки наличия подписи под рисунком и если ее нет - добавить и уведомить пользователя, что нужно изменить название
+
     public static void ChangeImageSignature()
     {
         string filePath = "../../../data/test.docx";
@@ -544,6 +553,9 @@ public class Program
             }
         }
     }
+
+
+    // с таблицей вообще страшно работать
 
     public static void ChangeTableSignature()
     {
@@ -649,8 +661,5 @@ public class Program
         //ChangeImage();
         //ChangeImageSignature();
         //GetProperty();
-
-
-        // когда на заголовке первого уровня уже была нумерация - ничего не менялось вообще
     }
 }
