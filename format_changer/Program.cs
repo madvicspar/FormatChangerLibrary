@@ -1,12 +1,13 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using format_changer;
 
 public class Program
 {
     bool isPictureSignature = true;
     public static void ChangeHeading1()
     {
-        string filePath = "../../../data/Заголовок первого уровня.docx";
+        string filePath = "../../../data/temp.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -23,33 +24,13 @@ public class Program
 
                     if (heading1Style != null)
                     {
+                        Heading h1 = GetHeading1();
                         // Удаляем все свойства стиля
                         heading1Style.RemoveAllChildren<StyleParagraphProperties>();
                         heading1Style.RemoveAllChildren<StyleRunProperties>();
                         // изменяем свойства
-                        heading1Style.AppendChild(
-                            new StyleRunProperties(
-                                new RunFonts { Ascii = "Times New Roman", HighAnsi = "Times New Roman" },
-                                new Color { Val = "000000" },
-                                new Bold { Val = true },
-                                new Italic { Val = false },
-                                new Underline { Val = UnderlineValues.None },
-                                new FontSize { Val = "32" }));
-                        heading1Style.AppendChild(
-                            new StyleParagraphProperties(
-                                new SpacingBetweenLines { Line = "240", LineRule = LineSpacingRuleValues.Auto, Before = "0", After = "240" },
-                                new Indentation { Left = "0", Right = "0", FirstLine = "0" },
-                                new Justification { Val = JustificationValues.Center },
-                                new PageBreakBefore(),
-                                new Tabs(
-                                    new TabStop() { Val = TabStopValues.Left, Position = 360, Leader = TabStopLeaderCharValues.None }),
-                                new NumberingProperties
-                                {
-                                    NumberingId = new NumberingId() { Val = 6 },
-                                    NumberingLevelReference = new NumberingLevelReference() { Val = 0 },
-                                },
-                                new NumberingFormat { Format = "decimal" })
-                            );
+                        heading1Style.AppendChild(h1.GetRunProperties());
+                        heading1Style.AppendChild(h1.GetParagraphProperties());
                         Console.WriteLine("Style 'Heading1' modified successfully.");
                     }
                     else
@@ -646,6 +627,12 @@ public class Program
                 }
             }
         }
+    }
+
+    public static Heading GetHeading1()
+    {
+        return new Heading(new RunFonts() { Ascii = "Times New Roman", HighAnsi = "Times New Roman" }, new Color() { Val = "000" },
+        true, false, UnderlineValues.None, "32", "240", "0", "240", JustificationValues.Center, true, true, 6, 0, 0, 0, 0);
     }
 
     private static void Main(string[] args)
