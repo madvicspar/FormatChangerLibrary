@@ -1,7 +1,8 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
+using format_changer.Utilities;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace format_changer
+namespace format_changer.Models
 {
     public class Heading
     {
@@ -38,7 +39,7 @@ namespace format_changer
             LineSpacing = float.Parse(lineSpacing);
             BeforeSpacing = float.Parse(beforeSpacing);
             AfterSpacing = float.Parse(afterSpacing);
-            Justification = Parse(justification);
+            Justification = JustificationConverter.Parse(justification);
             IsPageBreakBefore = isPageBreakBefore;
             IsNumbered = isNumbered;
             NumberingId = numberingId;
@@ -67,7 +68,7 @@ namespace format_changer
             var paragraphProperties = new ParagraphProperties(
                 new SpacingBetweenLines { Line = LineSpacing.ToString(), LineRule = LineSpacingRuleValues.Auto, Before = BeforeSpacing.ToString(), After = AfterSpacing.ToString() },
                 new Indentation { Left = Left.ToString(), Right = Right.ToString(), FirstLine = FirstLine.ToString() },
-                new Justification { Val = Parse(Justification) }
+                new Justification { Val = JustificationConverter.Parse(Justification) }
             );
 
             if (IsPageBreakBefore)
@@ -82,16 +83,6 @@ namespace format_changer
             }
 
             return paragraphProperties;
-        }
-
-        public JustificationValues Parse(string value)
-        {
-            return value.ToLower() == "center" ? JustificationValues.Center : value.ToLower() == "left" ? JustificationValues.Left : value.ToLower() == "right" ? JustificationValues.Right : JustificationValues.Both;
-        }
-
-        public string Parse(JustificationValues value)
-        {
-            return value == JustificationValues.Center ? "center" : value == JustificationValues.Left ? "left" : value == JustificationValues.Right ? "right" : "both";
         }
     }
 }

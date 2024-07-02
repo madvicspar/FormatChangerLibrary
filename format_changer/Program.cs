@@ -1,6 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using format_changer;
+using format_changer.Models;
 
 public class Program
 {
@@ -632,7 +632,7 @@ public class Program
     public static Heading GetHeading1()
     {
         return new Heading("Times New Roman", new Color() { Val = "000" },
-        true, false, UnderlineValues.None, "32", "240", "0", "240", JustificationValues.Center, true, true, 6, 0, 0, 0, 0);
+        true, false, UnderlineValues.None, "32", "240", "0", "240", JustificationValues.Both, true, true, 6, 0, 0, 0, 0);
     }
 
     private static void Main(string[] args)
