@@ -1,29 +1,31 @@
-﻿using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Wordprocessing;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace format_changer
 {
     public class Heading
     {
-        public RunFonts Font { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+        public string Font { get; set; }
         public Color Color { get; set; }
         public bool Bold { get; set; }
         public bool Italic { get; set; }
-        public UnderlineValues Underline { get; set; }
-        public string FontSize { get; set; }
-        public string LineSpacing { get; set; }
-        public string BeforeSpacing { get; set; }
-        public string AfterSpacing { get; set; }
-        public JustificationValues Justification { get; set; }
+        public bool IsUnderscore { get; set; }
+        public float FontSize { get; set; }
+        public float LineSpacing { get; set; }
+        public float BeforeSpacing { get; set; }
+        public float AfterSpacing { get; set; }
+        public string Justification { get; set; }
         public bool IsPageBreakBefore { get; set; }
         public bool IsNumbered { get; set; }
         public int NumberingId { get; set; }
         public int NumberingLevelReference { get; set; }
-        public int Left { get; set; }
-        public int Right { get; set; }
-        public int FirstLine { get; set; }
+        public float Left { get; set; }
+        public float Right { get; set; }
+        public float FirstLine { get; set; }
 
-        public Heading(RunFonts font, Color color, bool bold, bool italic, UnderlineValues underline,
+        public Heading(string font, Color color, bool bold, bool italic, UnderlineValues underline,
             string fontSize, string lineSpacing, string beforeSpacing, string afterSpacing, JustificationValues justification,
             bool isPageBreakBefore, bool isNumbered, int numberingId, int numberingLevelReference, int left, int right, int firstLine)
         {
@@ -31,12 +33,12 @@ namespace format_changer
             Color = color;
             Bold = bold;
             Italic = italic;
-            Underline = underline;
-            FontSize = fontSize;
-            LineSpacing = lineSpacing;
-            BeforeSpacing = beforeSpacing;
-            AfterSpacing = afterSpacing;
-            Justification = justification;
+            IsUnderscore = underline != UnderlineValues.None;
+            FontSize = float.Parse(fontSize);
+            LineSpacing = float.Parse(lineSpacing);
+            BeforeSpacing = float.Parse(beforeSpacing);
+            AfterSpacing = float.Parse(afterSpacing);
+            Justification = Parse(justification);
             IsPageBreakBefore = isPageBreakBefore;
             IsNumbered = isNumbered;
             NumberingId = numberingId;
@@ -49,12 +51,12 @@ namespace format_changer
         public RunProperties GetRunProperties()
         {
             var runProperties = new RunProperties(
-                new RunFonts { Ascii = Font.Ascii, HighAnsi = Font.HighAnsi },
+                new RunFonts { Ascii = Font, HighAnsi = Font },
                 new Color { Val = Color.Val },
                 new Bold { Val = Bold },
                 new Italic { Val = Italic },
-                new Underline { Val = new EnumValue<UnderlineValues>(Underline) },
-                new FontSize { Val = FontSize }
+                new Underline { Val = IsUnderscore ? UnderlineValues.Single : UnderlineValues.None },
+                new FontSize { Val = FontSize.ToString() }
             );
 
             return runProperties;
@@ -63,9 +65,9 @@ namespace format_changer
         public ParagraphProperties GetParagraphProperties()
         {
             var paragraphProperties = new ParagraphProperties(
-                new SpacingBetweenLines { Line = LineSpacing, LineRule = LineSpacingRuleValues.Auto, Before = BeforeSpacing, After = AfterSpacing },
+                new SpacingBetweenLines { Line = LineSpacing.ToString(), LineRule = LineSpacingRuleValues.Auto, Before = BeforeSpacing.ToString(), After = AfterSpacing.ToString() },
                 new Indentation { Left = Left.ToString(), Right = Right.ToString(), FirstLine = FirstLine.ToString() },
-                new Justification { Val = Justification }
+                new Justification { Val = Parse(Justification) }
             );
 
             if (IsPageBreakBefore)
@@ -80,6 +82,16 @@ namespace format_changer
             }
 
             return paragraphProperties;
+        }
+
+        public JustificationValues Parse(string value)
+        {
+            return value.ToLower() == "center" ? JustificationValues.Center : value.ToLower() == "left" ? JustificationValues.Left : value.ToLower() == "right" ? JustificationValues.Right : JustificationValues.Both;
+        }
+
+        public string Parse(JustificationValues value)
+        {
+            return value == JustificationValues.Center ? "center" : value == JustificationValues.Left ? "left" : value == JustificationValues.Right ? "right" : "both";
         }
     }
 }

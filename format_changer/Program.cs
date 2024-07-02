@@ -631,7 +631,7 @@ public class Program
 
     public static Heading GetHeading1()
     {
-        return new Heading(new RunFonts() { Ascii = "Times New Roman", HighAnsi = "Times New Roman" }, new Color() { Val = "000" },
+        return new Heading("Times New Roman", new Color() { Val = "000" },
         true, false, UnderlineValues.None, "32", "240", "0", "240", JustificationValues.Center, true, true, 6, 0, 0, 0, 0);
     }
 
