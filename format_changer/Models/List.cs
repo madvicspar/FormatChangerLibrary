@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace format_changer.Models
 {
-    public class Normal
+    public class List
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -21,10 +21,16 @@ namespace format_changer.Models
         public float Left { get; set; }
         public float Right { get; set; }
         public float FirstLine { get; set; }
+        // public bool IsKeepWithNext { get; set; }
+        // + уровень вложенности
+        public bool IsNumbered { get; set; }
+        public int NumberingId { get; set; }
+        public int NumberingLevelReference { get; set; }
 
-        public Normal(string font, Color color, bool isBold, bool isItalic, UnderlineValues underline,
+        public List(string font, Color color, bool isBold, bool isItalic, UnderlineValues underline,
             string fontSize, string lineSpacing, string beforeSpacing, string afterSpacing, JustificationValues justification,
-            float left, float right, float firstLine)
+            bool isNumbered, int numberingId, int numberingLevelReference,
+            int left, int right, int firstLine)
         {
             Font = font;
             Color = color;
@@ -34,8 +40,11 @@ namespace format_changer.Models
             FontSize = float.Parse(fontSize);
             LineSpacing = float.Parse(lineSpacing);
             BeforeSpacing = float.Parse(beforeSpacing);
-            AfterSpacing = float.Parse(afterSpacing);
+            AfterSpacing = float.Parse(afterSpacing); 
             Justification = JustificationConverter.Parse(justification);
+            IsNumbered = isNumbered;
+            NumberingId = numberingId;
+            NumberingLevelReference = numberingLevelReference;
             Left = left;
             Right = right;
             FirstLine = firstLine;
@@ -57,7 +66,7 @@ namespace format_changer.Models
 
         public ParagraphProperties GetParagraphProperties()
         {
-            return new ParagraphProperties(
+            var paragraphProperties = new ParagraphProperties(
                 new SpacingBetweenLines
                 {
                     Line = LineSpacing.ToString(),
@@ -65,9 +74,19 @@ namespace format_changer.Models
                     Before = BeforeSpacing.ToString(),
                     After = AfterSpacing.ToString()
                 },
-                new Indentation { Left = Left.ToString(), Right = Right.ToString(), FirstLine = FirstLine.ToString() },
                 new Justification { Val = JustificationConverter.Parse(Justification) }
             );
+            if (IsNumbered)
+            {
+                paragraphProperties.AddChild(new NumberingProperties
+                {
+                    NumberingId = new NumberingId() { Val = NumberingId },
+                    NumberingLevelReference = new NumberingLevelReference() { Val = NumberingLevelReference },
+                });
+            }
+            paragraphProperties.AddChild(
+                new Indentation { Left = Left.ToString(), Right = Right.ToString(), FirstLine = FirstLine.ToString() });
+            return paragraphProperties;
         }
     }
 }
