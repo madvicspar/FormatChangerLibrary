@@ -4,16 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace format_changer.Models
 {
-    public class Normal
+    public class ImageSettings
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public string Font { get; set; }
-        public Color Color { get; set; }
-        public bool IsBold { get; set; }
-        public bool IsItalic { get; set; }
-        public bool IsUnderscore { get; set; }
-        public float FontSize { get; set; }
         public float LineSpacing { get; set; }
         public float BeforeSpacing { get; set; }
         public float AfterSpacing { get; set; }
@@ -21,17 +15,11 @@ namespace format_changer.Models
         public float Left { get; set; }
         public float Right { get; set; }
         public float FirstLine { get; set; }
+        public bool IsKeepWithNext { get; set; }
 
-        public Normal(string font, Color color, bool isBold, bool isItalic, UnderlineValues underline,
-            string fontSize, string lineSpacing, string beforeSpacing, string afterSpacing, JustificationValues justification,
-            float left, float right, float firstLine)
+        public ImageSettings(string lineSpacing, string beforeSpacing, string afterSpacing, JustificationValues justification,
+            int left, int right, int firstLine, bool isKeepWithNext)
         {
-            Font = font;
-            Color = color;
-            IsBold = isBold;
-            IsItalic = isItalic;
-            IsUnderscore = underline != UnderlineValues.None;
-            FontSize = float.Parse(fontSize);
             LineSpacing = float.Parse(lineSpacing);
             BeforeSpacing = float.Parse(beforeSpacing);
             AfterSpacing = float.Parse(afterSpacing);
@@ -39,25 +27,18 @@ namespace format_changer.Models
             Left = left;
             Right = right;
             FirstLine = firstLine;
+            IsKeepWithNext = isKeepWithNext;
         }
 
         public RunProperties GetRunProperties()
         {
-            var runProperties = new RunProperties(
-                new RunFonts { Ascii = Font, HighAnsi = Font },
-                new Color { Val = Color.Val },
-                new Bold { Val = IsBold },
-                new Italic { Val = IsItalic },
-                new Underline { Val = IsUnderscore ? UnderlineValues.Single : UnderlineValues.None },
-                new FontSize { Val = FontSize.ToString() }
-            );
-
-            return runProperties;
+            return new RunProperties();
         }
 
         public ParagraphProperties GetParagraphProperties()
         {
             return new ParagraphProperties(
+                new KeepNext { Val = IsKeepWithNext },
                 new SpacingBetweenLines
                 {
                     Line = LineSpacing.ToString(),

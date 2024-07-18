@@ -27,7 +27,7 @@ public class Program
 
                     if (heading1Style != null)
                     {
-                        Heading h1 = GetHeading1();
+                        HeadingSettings h1 = GetHeading1();
                         heading1Style.RemoveAllChildren<StyleParagraphProperties>();
                         heading1Style.RemoveAllChildren<StyleRunProperties>();
                         heading1Style.AppendChild(h1.GetRunProperties());
@@ -104,7 +104,7 @@ public class Program
 
                     if (normalStyle != null)
                     {
-                        Normal normal = GetNormal();
+                        NormalSettings normal = GetNormal();
                         // Удаляем все свойства стиля
                         normalStyle.RemoveAllChildren<StyleParagraphProperties>();
                         normalStyle.RemoveAllChildren<StyleRunProperties>();
@@ -238,7 +238,7 @@ public class Program
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
-            Image imageStyle = GetImage();
+            ImageSettings imageStyle = GetImage();
             var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().ToList();
             for (int i = 0; i < paragraphs.Count; i++)
             {
@@ -250,7 +250,7 @@ public class Program
                     {
                         // по-хорошему, надо добавить проверку на то, что следующий параграф - подпись к рисунку как-нибудь (например, по шаблону)
                         // нумерация рисунков, шаблон подписи регуляркой
-                        ImageSignature imageSignatureStyle = GetImageSignature();
+                        ImageSignatureSettings imageSignatureStyle = GetImageSignature();
                         paragraphs[i + 1].ParagraphProperties = imageSignatureStyle.GetParagraphProperties();
                         paragraphs[i + 1].Descendants<Run>().ToList().ForEach(x => x.RunProperties = imageSignatureStyle.GetRunProperties());
                     }
@@ -353,32 +353,32 @@ public class Program
         }
     }
 
-    public static Heading GetHeading1()
+    public static HeadingSettings GetHeading1()
     {
-        return new Heading("Times New Roman", new Color() { Val = "000" },
+        return new HeadingSettings("Times New Roman", new Color() { Val = "000" },
         true, false, UnderlineValues.None, "32", "240", "0", "240", JustificationValues.Both, true, true, 6, 0, 0, 0, 0, true);
     }
 
-    public static Normal GetNormal()
+    public static NormalSettings GetNormal()
     {
-        return new Normal("Times New Roman", new Color() { Val = "000" },
+        return new NormalSettings("Times New Roman", new Color() { Val = "000" },
         false, false, UnderlineValues.None, "26", "360", "0", "0", JustificationValues.Both, 0, 0, (int)Math.Round(1.25f * TWIPS / INCH / 10.0) * 10);
     }
 
-    public static List GetList()
+    public static ListSettings GetList()
     {
-        return new List("Times New Roman", new Color() { Val = "000" },
+        return new ListSettings("Times New Roman", new Color() { Val = "000" },
         false, false, UnderlineValues.None, "26", "360", "0", "0", JustificationValues.Both, true, 1, 0, 710, 0, 855);
     }
 
-    public static Image GetImage()
+    public static ImageSettings GetImage()
     {
-        return new Image("240", "120", "0", JustificationValues.Center, 0, 0, 0, IsImageSignature);
+        return new ImageSettings("240", "120", "0", JustificationValues.Center, 0, 0, 0, IsImageSignature);
     }
 
-    public static ImageSignature GetImageSignature()
+    public static ImageSignatureSettings GetImageSignature()
     {
-        return new ImageSignature("Times New Roman", new Color() { Val = "000" },
+        return new ImageSignatureSettings("Times New Roman", new Color() { Val = "000" },
         true, true, UnderlineValues.None, "24", "240", "0", "120", JustificationValues.Center, 0, 0, 0);
     }
 
