@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using format_changer.Models;
 
@@ -71,7 +70,7 @@ public class Program
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
-           
+
         }
     }
 
@@ -239,18 +238,18 @@ public class Program
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
             ImageSettings imageStyle = GetImage();
+            ImageSignatureSettings imageSignatureStyle = GetImageSignature();
             var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().ToList();
             for (int i = 0; i < paragraphs.Count; i++)
             {
                 var drawings = paragraphs[i].Descendants<Drawing>().ToList();
-                if (drawings.Any())
+                if (drawings.Count > 0)
                 {
                     paragraphs[i].ParagraphProperties = imageStyle.GetParagraphProperties();
-                    if (IsImageSignature && i + 1 < paragraphs.Count)
+                    bool isNextImageSignature = i + 1 < paragraphs.Count && true; // тут должна быть доп проверка на то, что следующий параграф - подпись к рисунку
+                    if (IsImageSignature && isNextImageSignature)
                     {
-                        // по-хорошему, надо добавить проверку на то, что следующий параграф - подпись к рисунку как-нибудь (например, по шаблону)
-                        // нумерация рисунков, шаблон подписи регуляркой
-                        ImageSignatureSettings imageSignatureStyle = GetImageSignature();
+                        // добавить нумерацию рисунков и шаблон подписи regex
                         paragraphs[i + 1].ParagraphProperties = imageSignatureStyle.GetParagraphProperties();
                         paragraphs[i + 1].Descendants<Run>().ToList().ForEach(x => x.RunProperties = imageSignatureStyle.GetRunProperties());
                     }
@@ -261,63 +260,137 @@ public class Program
         }
     }
 
-    // с таблицей вообще страшно работать
-
-    public static void ChangeTableSignature()
+    /// <summary>
+    /// Adds a table signature above the specified table in the Word document.
+    /// The paragraph preceding the table is formatted as the table caption.
+    /// </summary>
+    /// <param name="doc">The WordprocessingDocument where the table is located</param>
+    /// <param name="table">The table to which the signature will be added</param>
+    public static void AddTableSignature(WordprocessingDocument doc, Table table)
     {
-        string filePath = "../../../data/test.docx";
+        TableSignatureSettings tableSignatureSettings = GetTableSignature();
+        var tableIndex = doc.MainDocumentPart?.Document?.Body?.Elements().ToList().IndexOf(table);
+
+        Paragraph nextParagraph = doc.MainDocumentPart?.Document?.Body.Elements().Skip((int)(tableIndex - 1)).OfType<Paragraph>().FirstOrDefault();
+
+        if (nextParagraph != null)
+        {
+            nextParagraph.ParagraphProperties = tableSignatureSettings.GetParagraphProperties();
+
+            foreach (Run run in nextParagraph.Elements<Run>())
+            {
+                run.RunProperties = tableSignatureSettings.GetRunProperties();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Adds spacing before the specified table by adjusting the after spacing of the preceding paragraph
+    /// </summary>
+    /// <param name="doc">The WordprocessingDocument where the table is located</param>
+    /// <param name="table">The table to insert spacing before</param>
+    /// <param name="tableStyle">The table settings to determine the spacing</param>
+    public static void AddSpacingBeforeTable(WordprocessingDocument doc, Table table, TableSettings tableStyle)
+    {
+        var tableIndex = doc.MainDocumentPart?.Document?.Body?.Elements().ToList().IndexOf(table);
+
+        Paragraph nextParagraph = doc.MainDocumentPart?.Document?.Body.Elements().Skip((int)(tableIndex - 1)).OfType<Paragraph>().FirstOrDefault();
+
+        if (nextParagraph != null)
+        {
+            ParagraphProperties paragraphProperties;
+            if (nextParagraph.ParagraphProperties == null)
+            {
+                paragraphProperties = new ParagraphProperties();
+            }
+            else
+            {
+                paragraphProperties = (ParagraphProperties)nextParagraph.ParagraphProperties.Clone();
+            }
+            paragraphProperties.SpacingBetweenLines = new SpacingBetweenLines { After = tableStyle.BeforeSpacing.ToString() }; // adjust the after spacing value as needed
+            nextParagraph.ParagraphProperties = paragraphProperties;
+        }
+    }
+
+    /// <summary>
+    /// Adds spacing after the specified table by adjusting the before spacing of the next paragraph
+    /// </summary>
+    /// <param name="doc">The WordprocessingDocument where the table is located</param>
+    /// <param name="table">The table to insert spacing after</param>
+    /// <param name="tableStyle">The table settings to determine the spacing</param>
+    public static void AddSpacingAfterTable(WordprocessingDocument doc, Table table, TableSettings tableStyle)
+    {
+        var tableIndex = doc.MainDocumentPart?.Document?.Body?.Elements().ToList().IndexOf(table);
+
+        Paragraph nextParagraph = doc.MainDocumentPart?.Document?.Body.Elements().Skip((int)(tableIndex + 1)).OfType<Paragraph>().FirstOrDefault();
+
+        if (nextParagraph != null)
+        {
+            ParagraphProperties paragraphProperties;
+            if (nextParagraph.ParagraphProperties == null)
+            {
+                paragraphProperties = new ParagraphProperties();
+            }
+            else
+            {
+                paragraphProperties = (ParagraphProperties)nextParagraph.ParagraphProperties.Clone();
+            }
+            paragraphProperties.SpacingBetweenLines = new SpacingBetweenLines { Before = tableStyle.AfterSpacing.ToString() }; // adjust the after spacing value as needed
+            nextParagraph.ParagraphProperties = paragraphProperties;
+        }
+    }
+
+    public static void ChangeTable()
+    {
+        string filePath = "../../../data/temp.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
-            StyleDefinitionsPart stylePart = doc.MainDocumentPart.StyleDefinitionsPart;
-
-            if (stylePart != null)
+            var tables = doc.MainDocumentPart?.Document?.Body?.Descendants<Table>().ToList();
+            foreach (var table in tables)
             {
-                Styles styles = stylePart.Styles;
-
-                if (styles != null)
+                TableSettings tableStyle = GetTable();
+                TableCellsSettings tableCellsStyle = GetTableCells();
+                if (tableStyle.BeforeSpacing != 0)
                 {
-                    // Создаем новый стиль "Caption" для подписей к рисункам
-                    Style captionStyle = new Style()
-                    {
-                        Type = StyleValues.Paragraph,
-                        StyleId = "TableSignature",
-                        CustomStyle = true
-                    };
-
-                    // Добавляем новый стиль в коллекцию
-                    //styles.AppendChild(captionStyle);
-
-                    captionStyle.AppendChild(new StyleName() { Val = "TableSignature" });
-                    captionStyle.AppendChild(new Name() { Val = "TableSignature" });
-                    captionStyle.AppendChild(new BasedOn() { Val = "Normal" });
-                    captionStyle.AppendChild(new NextParagraphStyle() { Val = "NormalTable" });
-                    captionStyle.AppendChild(new UIPriority() { Val = 11 });
-
-                    captionStyle.AppendChild(
-                        new StyleParagraphProperties(
-                            new SpacingBetweenLines { Line = "240", LineRule = LineSpacingRuleValues.Auto, Before = "120", After = "0" },
-                            new Indentation { Left = "0", Right = "0", FirstLine = "0" },
-                            new Justification { Val = JustificationValues.Left }
-                        )
-                    );
-
-                    captionStyle.AppendChild(
-                        new StyleRunProperties(
-                            new RunFonts { Ascii = "Times New Roman", HighAnsi = "Times New Roman" },
-                            new Color { Val = "000000" },
-                            new Bold { Val = false },
-                            new Italic { Val = false },
-                            new Underline { Val = UnderlineValues.None },
-                            new FontSize { Val = "26" }
-                        )
-                    );
-                    styles.AppendChild(captionStyle);
-
-                    Console.WriteLine("Style 'TableSignature' created successfully.");
+                    AddSpacingBeforeTable(doc, table, tableStyle);
                 }
-                stylePart.Styles.Save();
+
+                if (tableStyle.AfterSpacing != 0)
+                {
+                    AddSpacingAfterTable(doc, table, tableStyle);
+                }
+
+                if (tableStyle.IsTableSignature)
+                {
+                    AddTableSignature(doc, table);
+                }
+
+                foreach (TableCell cell in table.Elements<TableRow>().SelectMany(row => row.Elements<TableCell>()))
+                {
+                    cell.Append(new TableCellProperties(
+                        new TableCellMargin(
+                            new TopMargin { Width = tableCellsStyle.TopMargin.ToString() },
+                            new BottomMargin { Width = tableCellsStyle.BottomMargin.ToString() },
+                            new LeftMargin { Width = tableCellsStyle.LeftMargin.ToString() },
+                            new RightMargin { Width = tableCellsStyle.RightMargin.ToString() }
+                        ),
+                        new TableCellVerticalAlignment { Val = tableCellsStyle.GetVerticalAlignment().Val }
+                    ));
+
+                    foreach (Paragraph paragraph in cell.Elements<Paragraph>())
+                    {
+                        paragraph.ParagraphProperties = tableCellsStyle.GetParagraphProperties();
+
+                        foreach (Run run in paragraph.Elements<Run>())
+                        {
+                            run.RunProperties = tableCellsStyle.GetRunProperties();
+                        }
+                    }
+                }
             }
+            Console.WriteLine("ok");
+            doc.Save();
         }
     }
 
@@ -382,6 +455,23 @@ public class Program
         true, true, UnderlineValues.None, "24", "240", "0", "120", JustificationValues.Center, 0, 0, 0);
     }
 
+    public static TableSettings GetTable()
+    {
+        return new TableSettings(true, "0", "120");
+    }
+
+    public static TableCellsSettings GetTableCells()
+    {
+        return new TableCellsSettings("Times New Roman", new Color() { Val = "000" },
+        false, false, UnderlineValues.None, "24", "240", "0", "0", JustificationValues.Both, TableVerticalAlignmentValues.Center, 0, 0, 0, 55, 55, 55, 55);
+    }
+
+    public static TableSignatureSettings GetTableSignature()
+    {
+        return new TableSignatureSettings("Times New Roman", new Color() { Val = "000" },
+        false, false, UnderlineValues.None, "26", "240", "120", "0", JustificationValues.Both, 0, 0, 0, true);
+    }
+
     private static void Main(string[] args)
     {
         //GetProperty();
@@ -394,5 +484,6 @@ public class Program
         //ChangeList();
         //ChangeImage();
         //GetProperty();
+        //ChangeTable();
     }
 }
