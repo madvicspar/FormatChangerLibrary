@@ -191,6 +191,7 @@ public class Program
             doc.Save();
         }
     }
+
     public static void GetListStyles()
     {
         string filePath = "../../../data/temp.docx";
@@ -394,6 +395,36 @@ public class Program
         }
     }
 
+    public static void AddPageNumbering()
+    {
+        string filePath = "../../../data/temp — копия.docx";
+
+        using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
+        {
+            FooterPart footerPart = doc.MainDocumentPart.AddNewPart<FooterPart>();
+            string footerPartId = doc.MainDocumentPart.GetIdOfPart(footerPart);
+
+            Footer footer = new Footer(new Paragraph(
+                            new ParagraphProperties(
+                                new ParagraphStyleId() { Val = "Footer" },
+                                new Justification() { Val = JustificationValues.Center },
+                                new Run(
+                                    new SimpleField() { Instruction = "PAGE" }))));
+            footerPart.Footer = footer;
+            IEnumerable<SectionProperties> sectionProperties =
+                                    doc.MainDocumentPart.Document.Body.Elements<SectionProperties>();
+
+            foreach (var sectionProperty in sectionProperties)
+            {
+                sectionProperty.RemoveAllChildren<FooterReference>();
+                sectionProperty.PrependChild<FooterReference>(new FooterReference()
+                {
+                    Id = footerPartId
+                });
+            }
+        }
+    }
+
     public static void GetProperty()
     {
         string filePath = "../../../data/temp.docx";
@@ -485,5 +516,6 @@ public class Program
         //ChangeImage();
         //GetProperty();
         //ChangeTable();
+        AddPageNumbering();
     }
 }
