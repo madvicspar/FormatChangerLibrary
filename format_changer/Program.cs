@@ -405,23 +405,29 @@ public class Program
             string footerPartId = doc.MainDocumentPart.GetIdOfPart(footerPart);
 
             Footer footer = new Footer(new Paragraph(
-                            new ParagraphProperties(
-                                new ParagraphStyleId() { Val = "Footer" },
-                                new Justification() { Val = JustificationValues.Center },
-                                new Run(
-                                    new SimpleField() { Instruction = "PAGE" }))));
+                new ParagraphProperties(
+                    new ParagraphStyleId() { Val = "Footer" },
+                    new Justification() { Val = JustificationValues.Center },
+                    new SpacingBetweenLines() { After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto },
+                    new Indentation { Left = "0", Right = "0", FirstLine = "0" }
+                ),
+                new Run(
+                    new SimpleField() { Instruction = "PAGE" })));
+
             footerPart.Footer = footer;
-            IEnumerable<SectionProperties> sectionProperties =
-                                    doc.MainDocumentPart.Document.Body.Elements<SectionProperties>();
+
+            IEnumerable<SectionProperties> sectionProperties = doc.MainDocumentPart.Document.Body.Elements<SectionProperties>();
 
             foreach (var sectionProperty in sectionProperties)
             {
                 sectionProperty.RemoveAllChildren<FooterReference>();
-                sectionProperty.PrependChild<FooterReference>(new FooterReference()
+                sectionProperty.PrependChild(new FooterReference()
                 {
                     Id = footerPartId
                 });
             }
+
+            doc.Save();
         }
     }
 
