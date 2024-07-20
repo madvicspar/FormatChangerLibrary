@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using format_changer.Models;
+using System.Text.RegularExpressions;
 
 public class Program
 {
@@ -234,12 +235,13 @@ public class Program
 
     public static void ChangeImage()
     {
-        string filePath = "../../../data/temp.docx";
+        string filePath = "../../../data/temp — копия.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
             ImageSettings imageStyle = GetImage();
             ImageSignatureSettings imageSignatureStyle = GetImageSignature();
+            int imageIndex = 1;
             var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().ToList();
             for (int i = 0; i < paragraphs.Count; i++)
             {
@@ -250,9 +252,19 @@ public class Program
                     bool isNextImageSignature = i + 1 < paragraphs.Count && true; // тут должна быть доп проверка на то, что следующий параграф - подпись к рисунку
                     if (IsImageSignature && isNextImageSignature)
                     {
-                        // добавить нумерацию рисунков и шаблон подписи regex
-                        paragraphs[i + 1].ParagraphProperties = imageSignatureStyle.GetParagraphProperties();
-                        paragraphs[i + 1].Descendants<Run>().ToList().ForEach(x => x.RunProperties = imageSignatureStyle.GetRunProperties());
+                        var signatureParagraph = paragraphs[i + 1];
+                        if (signatureParagraph != null)
+                        {
+                            if (!Regex.IsMatch(signatureParagraph.InnerText, imageSignatureStyle.SignatureTemplatePattern))
+                            {
+                                // добавить проверку на то, что подпись есть частично, чтобы было например "Рисунок 1 - Рисунок 1: Название рисунка"
+                                string signature = $"Рисунок {imageIndex++} – {signatureParagraph.InnerText}";
+                                signatureParagraph.RemoveAllChildren<Run>();
+                                signatureParagraph.AppendChild<Run>(new Run(new Text(signature)));
+                            }
+                        }
+                        signatureParagraph.ParagraphProperties = imageSignatureStyle.GetParagraphProperties();
+                        signatureParagraph.Descendants<Run>().ToList().ForEach(x => x.RunProperties = imageSignatureStyle.GetRunProperties());
                     }
                 }
             }
@@ -508,7 +520,7 @@ public class Program
     public static ImageSignatureSettings GetImageSignature()
     {
         return new ImageSignatureSettings("Times New Roman", new Color() { Val = "000" },
-        true, true, UnderlineValues.None, "24", "240", "0", "120", JustificationValues.Center, 0, 0, 0);
+        true, true, UnderlineValues.None, "24", "240", "0", "120", JustificationValues.Center, 0, 0, 0, @"^Рисунок \d+ – .*");
     }
 
     public static TableSettings GetTable()
@@ -544,9 +556,9 @@ public class Program
         //ChangeHeading5();
         //ChangeNormal();
         //ChangeList();
-        //ChangeImage();
+        ChangeImage();
         //GetProperty();
-        ChangeTable();
+        //ChangeTable();
         //AddPageNumbering();
     }
 }

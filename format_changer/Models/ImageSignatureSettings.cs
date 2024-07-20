@@ -21,10 +21,11 @@ namespace format_changer.Models
         public float Left { get; set; }
         public float Right { get; set; }
         public float FirstLine { get; set; }
+        public string SignatureTemplatePattern { get; set; }
 
         public ImageSignatureSettings(string font, Color color, bool isBold, bool isItalic, UnderlineValues underline,
             string fontSize, string lineSpacing, string beforeSpacing, string afterSpacing, JustificationValues justification,
-            int left, int right, int firstLine)
+            int left, int right, int firstLine, string signatureTemplatePattern)
         {
             Font = font;
             Color = color;
@@ -39,6 +40,7 @@ namespace format_changer.Models
             Left = left;
             Right = right;
             FirstLine = firstLine;
+            SignatureTemplatePattern = signatureTemplatePattern;
         }
 
         public RunProperties GetRunProperties()
