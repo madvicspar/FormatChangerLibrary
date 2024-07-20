@@ -343,7 +343,7 @@ public class Program
 
     public static void ChangeTable()
     {
-        string filePath = "../../../data/temp.docx";
+        string filePath = "../../../data/temp — копия.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -386,6 +386,25 @@ public class Program
                         foreach (Run run in paragraph.Elements<Run>())
                         {
                             run.RunProperties = tableCellsStyle.GetRunProperties();
+                        }
+                    }
+                }
+
+                if (tableStyle.IsHeading)
+                {
+                    TableHeadingSettings tableHeadingStyle = GetTableHeading();
+                    var headingRow = table.Elements<TableRow>().FirstOrDefault();
+
+                    foreach (var cell in headingRow.Elements<TableCell>())
+                    {
+                        foreach (var paragraph in cell.Elements<Paragraph>())
+                        {
+                            paragraph.ParagraphProperties = tableHeadingStyle.GetParagraphProperties();
+
+                            foreach (var run in paragraph.Elements<Run>())
+                            {
+                                run.RunProperties = tableHeadingStyle.GetRunProperties();
+                            }
                         }
                     }
                 }
@@ -494,13 +513,19 @@ public class Program
 
     public static TableSettings GetTable()
     {
-        return new TableSettings(true, "0", "120");
+        return new TableSettings(true, true, "0", "120");
+    }
+
+    public static TableHeadingSettings GetTableHeading()
+    {
+        return new TableHeadingSettings("Times New Roman", new Color() { Val = "000" },
+        true, false, UnderlineValues.None, "24", "240", "0", "0", JustificationValues.Center, false, false, 6, 0, 0, 0, 0, true);
     }
 
     public static TableCellsSettings GetTableCells()
     {
         return new TableCellsSettings("Times New Roman", new Color() { Val = "000" },
-        false, false, UnderlineValues.None, "24", "240", "0", "0", JustificationValues.Both, TableVerticalAlignmentValues.Center, 0, 0, 0, 55, 55, 55, 55);
+        false, false, UnderlineValues.None, "24", "240", "0", "0", JustificationValues.Left, TableVerticalAlignmentValues.Center, 0, 0, 0, 55, 55, 55, 55);
     }
 
     public static TableSignatureSettings GetTableSignature()
@@ -521,7 +546,7 @@ public class Program
         //ChangeList();
         //ChangeImage();
         //GetProperty();
-        //ChangeTable();
-        AddPageNumbering();
+        ChangeTable();
+        //AddPageNumbering();
     }
 }

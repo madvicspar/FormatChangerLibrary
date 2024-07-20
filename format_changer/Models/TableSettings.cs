@@ -8,13 +8,14 @@ namespace format_changer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public bool IsTableSignature { get; set; }
-        //public bool IsHeading { get; set; }
+        public bool IsHeading { get; set; }
         public float BeforeSpacing { get; set; }
         public float AfterSpacing { get; set; }
 
-        public TableSettings(bool isTableSignature, string beforeSpacing, string afterSpacing)
+        public TableSettings(bool isTableSignature, bool isHeading, string beforeSpacing, string afterSpacing)
         {
             IsTableSignature = isTableSignature;
+            IsHeading = isHeading;
             BeforeSpacing = float.Parse(beforeSpacing);
             AfterSpacing = float.Parse(afterSpacing);
         }
