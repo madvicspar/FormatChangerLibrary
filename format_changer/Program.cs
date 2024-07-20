@@ -262,9 +262,10 @@ public class Program
                                 signatureParagraph.RemoveAllChildren<Run>();
                                 signatureParagraph.AppendChild<Run>(new Run(new Text(signature)));
                             }
+
+                            signatureParagraph.ParagraphProperties = imageSignatureStyle.GetParagraphProperties();
+                            signatureParagraph.Descendants<Run>().ToList().ForEach(x => x.RunProperties = imageSignatureStyle.GetRunProperties());
                         }
-                        signatureParagraph.ParagraphProperties = imageSignatureStyle.GetParagraphProperties();
-                        signatureParagraph.Descendants<Run>().ToList().ForEach(x => x.RunProperties = imageSignatureStyle.GetRunProperties());
                     }
                 }
             }
@@ -298,10 +299,7 @@ public class Program
 
             nextParagraph.ParagraphProperties = tableSignatureSettings.GetParagraphProperties();
 
-            foreach (Run run in nextParagraph.Elements<Run>())
-            {
-                run.RunProperties = tableSignatureSettings.GetRunProperties();
-            }
+            nextParagraph.Descendants<Run>().ToList().ForEach(x => x.RunProperties = tableSignatureSettings.GetRunProperties());
         }
     }
 
