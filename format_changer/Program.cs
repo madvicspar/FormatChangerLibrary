@@ -279,7 +279,7 @@ public class Program
     /// </summary>
     /// <param name="doc">The WordprocessingDocument where the table is located</param>
     /// <param name="table">The table to which the signature will be added</param>
-    public static void AddTableSignature(WordprocessingDocument doc, Table table)
+    public static void AddTableSignature(WordprocessingDocument doc, Table table, int tablesIndex)
     {
         TableSignatureSettings tableSignatureSettings = GetTableSignature();
         var tableIndex = doc.MainDocumentPart?.Document?.Body?.Elements().ToList().IndexOf(table);
@@ -288,6 +288,14 @@ public class Program
 
         if (nextParagraph != null)
         {
+            if (!Regex.IsMatch(nextParagraph.InnerText, tableSignatureSettings.SignatureTemplatePattern))
+            {
+                // добавить проверку на то, что подпись есть частично, чтобы не было например "Таблица 1 - Таблица 1: Название таблицы"
+                string signature = $"Таблица {tablesIndex++} – {nextParagraph.InnerText}";
+                nextParagraph.RemoveAllChildren<Run>();
+                nextParagraph.AppendChild<Run>(new Run(new Text(signature)));
+            }
+
             nextParagraph.ParagraphProperties = tableSignatureSettings.GetParagraphProperties();
 
             foreach (Run run in nextParagraph.Elements<Run>())
@@ -360,26 +368,26 @@ public class Program
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
             var tables = doc.MainDocumentPart?.Document?.Body?.Descendants<Table>().ToList();
-            foreach (var table in tables)
+            for (int i = 0; i < tables.Count; i++)
             {
                 TableSettings tableStyle = GetTable();
                 TableCellsSettings tableCellsStyle = GetTableCells();
                 if (tableStyle.BeforeSpacing != 0)
                 {
-                    AddSpacingBeforeTable(doc, table, tableStyle);
+                    AddSpacingBeforeTable(doc, tables[i], tableStyle);
                 }
 
                 if (tableStyle.AfterSpacing != 0)
                 {
-                    AddSpacingAfterTable(doc, table, tableStyle);
+                    AddSpacingAfterTable(doc, tables[i], tableStyle);
                 }
 
                 if (tableStyle.IsTableSignature)
                 {
-                    AddTableSignature(doc, table);
+                    AddTableSignature(doc, tables[i], i + 1);
                 }
 
-                foreach (TableCell cell in table.Elements<TableRow>().SelectMany(row => row.Elements<TableCell>()))
+                foreach (TableCell cell in tables[i].Elements<TableRow>().SelectMany(row => row.Elements<TableCell>()))
                 {
                     cell.Append(new TableCellProperties(
                         new TableCellMargin(
@@ -405,7 +413,7 @@ public class Program
                 if (tableStyle.IsHeading)
                 {
                     TableHeadingSettings tableHeadingStyle = GetTableHeading();
-                    var headingRow = table.Elements<TableRow>().FirstOrDefault();
+                    var headingRow = tables[i].Elements<TableRow>().FirstOrDefault();
 
                     foreach (var cell in headingRow.Elements<TableCell>())
                     {
@@ -543,7 +551,7 @@ public class Program
     public static TableSignatureSettings GetTableSignature()
     {
         return new TableSignatureSettings("Times New Roman", new Color() { Val = "000" },
-        false, false, UnderlineValues.None, "26", "240", "120", "0", JustificationValues.Both, 0, 0, 0, true);
+        false, false, UnderlineValues.None, "26", "240", "120", "0", JustificationValues.Both, 0, 0, 0, true, @"^Таблица \d+ – .*");
     }
 
     private static void Main(string[] args)
@@ -556,9 +564,9 @@ public class Program
         //ChangeHeading5();
         //ChangeNormal();
         //ChangeList();
-        ChangeImage();
+        //ChangeImage();
         //GetProperty();
-        //ChangeTable();
+        ChangeTable();
         //AddPageNumbering();
     }
 }

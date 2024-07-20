@@ -22,10 +22,11 @@ namespace format_changer.Models
         public float Right { get; set; }
         public float FirstLine { get; set; }
         public bool IsKeepWithNext { get; set; }
+        public string SignatureTemplatePattern { get; set; }
 
         public TableSignatureSettings(string font, Color color, bool isBold, bool isItalic, UnderlineValues underline,
             string fontSize, string lineSpacing, string beforeSpacing, string afterSpacing, JustificationValues justification,
-            int left, int right, int firstLine, bool isKeepWithNext)
+            int left, int right, int firstLine, bool isKeepWithNext, string signatureTemplatePattern)
         {
             Font = font;
             Color = color;
@@ -41,6 +42,7 @@ namespace format_changer.Models
             Right = right;
             FirstLine = firstLine;
             IsKeepWithNext = isKeepWithNext;
+            SignatureTemplatePattern = signatureTemplatePattern;
         }
 
         public RunProperties GetRunProperties()
