@@ -32,7 +32,6 @@ public class Program
                         heading1Style.RemoveAllChildren<StyleRunProperties>();
                         heading1Style.AppendChild(h1.GetRunProperties());
                         heading1Style.AppendChild(h1.GetParagraphProperties());
-                        Console.WriteLine("Style 'Heading1' modified successfully.");
                     }
                     else
                     {
@@ -111,7 +110,6 @@ public class Program
                         // изменяем свойства
                         normalStyle.AppendChild(normal.GetRunProperties());
                         normalStyle.AppendChild(normal.GetParagraphProperties());
-                        Console.WriteLine("Style 'Normal' modified successfully.");
                     }
                     else
                     {
@@ -269,7 +267,6 @@ public class Program
                     }
                 }
             }
-            Console.WriteLine("ok");
             doc.Save();
         }
     }
@@ -427,7 +424,6 @@ public class Program
                     }
                 }
             }
-            Console.WriteLine("ok");
             doc.Save();
         }
     }
