@@ -115,11 +115,36 @@ public class Program
 
     public static void ChangeHeading4()
     {
-        string filePath = "../../../data/test.docx";
+        // tab/пробел сохраняются
+        string filePath = "../../../data/temp — копия.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
+            StyleDefinitionsPart stylePart = doc.MainDocumentPart.StyleDefinitionsPart;
 
+            if (stylePart != null)
+            {
+                Styles styles = stylePart.Styles;
+
+                if (styles != null)
+                {
+                    Style heading4Style = styles.Elements<Style>().FirstOrDefault(style => style.StyleId == "4");
+
+                    if (heading4Style != null)
+                    {
+                        HeadingSettings heading4 = GetHeading3();
+                        heading4Style.RemoveAllChildren<StyleParagraphProperties>();
+                        heading4Style.RemoveAllChildren<StyleRunProperties>();
+                        heading4Style.AppendChild(heading4.GetRunProperties());
+                        heading4Style.AppendChild(heading4.GetParagraphProperties());
+                    }
+                    else
+                    {
+                        Console.WriteLine("Style 'Heading4' not found.");
+                    }
+                }
+            }
+            doc.Save();
         }
     }
 
@@ -563,6 +588,12 @@ public class Program
         true, false, UnderlineValues.None, "26", "240", "160", "80", JustificationValues.Both, false, true, 6, 1, 0, 0, 0, true);
     }
 
+    public static HeadingSettings GetHeading4()
+    {
+        return new HeadingSettings("Times New Roman", new Color() { Val = "000" },
+        true, false, UnderlineValues.None, "26", "240", "160", "80", JustificationValues.Both, false, true, 6, 1, 0, 0, 0, true);
+    }
+
     public static NormalSettings GetNormal()
     {
         return new NormalSettings("Times New Roman", new Color() { Val = "000" },
@@ -614,8 +645,8 @@ public class Program
         //GetProperty();
         //ChangeHeading1();
         //ChangeHeading2();
-        ChangeHeading3();
-        //ChangeHeading4();
+        //ChangeHeading3();
+        ChangeHeading4();
         //ChangeHeading5();
         //ChangeNormal();
         //ChangeList();
