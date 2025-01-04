@@ -18,6 +18,7 @@ namespace format_changer.Models
         public float BeforeSpacing { get; set; }
         public float AfterSpacing { get; set; }
         public string Justification { get; set; }
+        // это зачем?
         public bool IsPageBreakBefore { get; set; }
         public bool IsNumbered { get; set; }
         public int NumberingId { get; set; }
@@ -26,6 +27,7 @@ namespace format_changer.Models
         public float Right { get; set; }
         public float FirstLine { get; set; }
         public bool IsKeepWithNext { get; set; }
+        //public bool IsRepeating
 
         public TableHeadingSettings(string font, Color color, bool isBold, bool isItalic, UnderlineValues underline,
             string fontSize, string lineSpacing, string beforeSpacing, string afterSpacing, JustificationValues justification,

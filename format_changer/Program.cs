@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using format_changer.Models;
 using System.Text.RegularExpressions;
@@ -8,10 +9,66 @@ public class Program
     public static bool IsImageSignature = true;
     public const float INCH = 2.5399978f;
     public const int TWIPS = 1440;
+    public static string filePath = "../../../data/мой отчет.docx";
+
+    public static void CleanFormat()
+    {
+        //string filePath = "../../../data/temp.docx";
+
+        using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
+        {
+            var body = doc.MainDocumentPart.Document.Body;
+
+            // Проходим по всем абзацам документа
+            foreach (var paragraph in body.Elements<Paragraph>())
+            {
+                var paragraphProperties = paragraph.Elements<ParagraphProperties>().FirstOrDefault();
+                if (paragraphProperties != null)
+                {
+                    // Оставляем только элемент ParagraphStyleId (связь с применённым стилем)
+                    var styleElement = paragraphProperties.Elements<ParagraphStyleId>().FirstOrDefault();
+                    // Оставляем элемент, связанный с нумерацией, если он есть
+                    var numberingProperties = paragraphProperties.Elements<NumberingProperties>().FirstOrDefault();
+                    paragraphProperties.RemoveAllChildren();  // Удаляем все дочерние элементы
+                    if (styleElement != null)
+                    {
+                        // Восстанавливаем только стиль абзаца
+                        paragraphProperties.Append(styleElement);
+                    }
+                    if (numberingProperties != null)
+                    {
+                        // Восстанавливаем нумерацию, если она была
+                        paragraphProperties.Append(numberingProperties);
+                    }
+                }
+
+                // Проходим по всем "Runs" (текстовые части) в абзаце
+                foreach (var run in paragraph.Elements<Run>())
+                {
+                    var runProperties = run.Elements<RunProperties>().FirstOrDefault();
+                    if (runProperties != null)
+                    {
+                        // Оставляем только элемент RunStyle (связь с применённым стилем)
+                        var styleElement = runProperties.Elements<RunStyle>().FirstOrDefault();
+                        runProperties.RemoveAllChildren();  // Удаляем все локальные свойства
+                        if (styleElement != null)
+                        {
+                            // Восстанавливаем только стиль текста
+                            runProperties.Append(styleElement);
+                        }
+                    }
+                }
+            }
+
+            // Сохраняем изменения
+            doc.Save();
+        }
+    }
+
     public static void ChangeHeading1()
     {
         // tab/пробел сохраняются
-        string filePath = "../../../data/temp.docx";
+        //string filePath = "../../../data/temp.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -46,7 +103,7 @@ public class Program
     public static void ChangeHeading2()
     {
         // tab/пробел сохраняются
-        string filePath = "../../../data/temp — копия.docx";
+        //string filePath = "../../../data/temp — копия.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -81,7 +138,7 @@ public class Program
     public static void ChangeHeading3()
     {
         // tab/пробел сохраняются
-        string filePath = "../../../data/temp — копия.docx";
+        //string filePath = "../../../data/temp — копия.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -116,7 +173,7 @@ public class Program
     public static void ChangeHeading4()
     {
         // tab/пробел сохраняются
-        string filePath = "../../../data/temp — копия.docx";
+        //string filePath = "../../../data/temp — копия.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -151,7 +208,7 @@ public class Program
     public static void ChangeHeading5()
     {
         // tab/пробел сохраняются
-        string filePath = "../../../data/temp — копия.docx";
+        //string filePath = "../../../data/temp — копия.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -185,7 +242,7 @@ public class Program
 
     public static void ChangeNormal()
     {
-        string filePath = "../../../data/temp.docx";
+        //string filePath = "../../../data/temp.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -230,7 +287,7 @@ public class Program
         // сейчас номер стиля выбран из того, какой стоит в документе, но в кадлом документе могут быть свои настройки,
         // так что нужно искать номер стиля
         // маркированные списки пока делаются просто текстом
-        string filePath = "../../../data/temp.docx";
+        //string filePath = "../../../data/temp.docx";
         int targetListStyleId = 35;
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
@@ -292,7 +349,7 @@ public class Program
 
     public static void GetListStyles()
     {
-        string filePath = "../../../data/temp.docx";
+        //string filePath = "../../../data/temp.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -332,7 +389,7 @@ public class Program
 
     public static void ChangeImage()
     {
-        string filePath = "../../../data/temp — копия.docx";
+        //string filePath = "../../../data/temp — копия.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -457,7 +514,7 @@ public class Program
 
     public static void ChangeTable()
     {
-        string filePath = "../../../data/temp — копия.docx";
+        //string filePath = "../../../data/temp — копия.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -466,6 +523,9 @@ public class Program
             {
                 TableSettings tableStyle = GetTable();
                 TableCellsSettings tableCellsStyle = GetTableCells();
+
+                // автоподбор например по ширине окна
+
                 if (tableStyle.BeforeSpacing != 0)
                 {
                     AddSpacingBeforeTable(doc, tables[i], tableStyle);
@@ -529,7 +589,7 @@ public class Program
 
     public static void AddPageNumbering()
     {
-        string filePath = "../../../data/temp — копия.docx";
+        //string filePath = "../../../data/temp — копия.docx";
 
         using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
         {
@@ -565,7 +625,7 @@ public class Program
 
     public static void GetProperty()
     {
-        string filePath = "../../../data/temp.docx";
+        //string filePath = "../../../data/temp.docx";
 
         using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(filePath, false))
         {
@@ -610,19 +670,19 @@ public class Program
     public static HeadingSettings GetHeading3()
     {
         return new HeadingSettings("Times New Roman", new Color() { Val = "000" },
-        true, false, UnderlineValues.None, "26", "240", "160", "80", JustificationValues.Both, false, true, 6, 1, 0, 0, 0, true);
+        true, false, UnderlineValues.None, "26", "240", "160", "80", JustificationValues.Both, false, true, 6, 2, 0, 0, 0, true);
     }
 
     public static HeadingSettings GetHeading4()
     {
         return new HeadingSettings("Times New Roman", new Color() { Val = "000" },
-        true, false, UnderlineValues.None, "26", "240", "160", "80", JustificationValues.Both, false, true, 6, 1, 0, 0, 0, true);
+        true, false, UnderlineValues.None, "26", "240", "160", "80", JustificationValues.Both, false, true, 6, 3, 0, 0, 0, true);
     }
 
     public static HeadingSettings GetHeading5()
     {
         return new HeadingSettings("Times New Roman", new Color() { Val = "000" },
-        true, false, UnderlineValues.None, "26", "240", "160", "80", JustificationValues.Both, false, true, 6, 1, 0, 0, 0, true);
+        true, false, UnderlineValues.None, "26", "240", "160", "80", JustificationValues.Both, false, true, 6, 4, 0, 0, 0, true);
     }
 
     public static NormalSettings GetNormal()
@@ -669,6 +729,140 @@ public class Program
     {
         return new TableSignatureSettings("Times New Roman", new Color() { Val = "000" },
         false, false, UnderlineValues.None, "26", "240", "120", "0", JustificationValues.Both, 0, 0, 0, true, @"^Таблица \d+ – .*");
+    }
+
+    public static void Пытка()
+    {
+        using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
+        {
+            // Получаем или создаем коллекцию стилей
+            StyleDefinitionsPart stylePart = doc.MainDocumentPart.StyleDefinitionsPart;
+            if (stylePart == null)
+            {
+                stylePart = doc.MainDocumentPart.AddNewPart<StyleDefinitionsPart>();
+                stylePart.Styles = new Styles();
+            }
+
+            Styles styles = stylePart.Styles;
+
+            // Проверяем, существует ли стиль с именем "пытка"
+            if (styles.Elements<Style>().Any(s => s.StyleId == "torture"))
+                return;
+
+            // Создаем стиль "пытка"
+            Style style = new Style
+            {
+                Type = StyleValues.Paragraph,
+                StyleId = "torture",
+                CustomStyle = true
+            };
+
+            // Название стиля, отображаемое в интерфейсе Word
+            style.Append(new StyleName { Val = "пытка" });
+
+            // Указываем, что это стиль заголовка
+            style.Append(new BasedOn { Val = "Normal" });
+            style.Append(new PrimaryStyle());
+
+            // Свойства абзаца
+            style.Append(new StyleParagraphProperties
+            {
+                KeepNext = new KeepNext { Val = OnOffValue.FromBoolean(true) },
+                SpacingBetweenLines = new SpacingBetweenLines
+                {
+                    Line = "240",
+                    LineRule = LineSpacingRuleValues.Auto,
+                    Before = "0",
+                    After = "240"
+                },
+                Indentation = new Indentation
+                {
+                    Left = "0",
+                    Right = "0",
+                    FirstLine = "0"
+                },
+                Justification = new Justification { Val = JustificationValues.Both },
+                PageBreakBefore = new PageBreakBefore(),
+                NumberingProperties = new NumberingProperties
+                {
+                    NumberingId = new NumberingId { Val = 6 },
+                    NumberingLevelReference = new NumberingLevelReference { Val = 0 }
+                }
+            });
+
+            // Свойства текста
+            style.Append(new StyleRunProperties
+            {
+                RunFonts = new RunFonts { Ascii = "Times New Roman", HighAnsi = "Times New Roman" },
+                Color = new Color { Val = "000" },
+                Bold = new Bold { Val = OnOffValue.FromBoolean(true) },
+                Italic = new Italic { Val = OnOffValue.FromBoolean(false) },
+                Underline = new Underline { Val = UnderlineValues.None },
+                FontSize = new FontSize { Val = "32" }
+            });
+
+            // Добавляем стиль в коллекцию
+            styles.Append(style);
+
+            // Сохраняем изменения
+            stylePart.Styles.Save();
+        }
+    }
+
+    static void AddComment(string commentText)
+    {
+        using (WordprocessingDocument wordDocument = WordprocessingDocument.Open(filePath, true))
+        {
+            // Получаем часть документа
+            var mainPart = wordDocument.MainDocumentPart;
+
+            // Создаем секцию для комментариев, если ее еще нет
+            if (mainPart.WordprocessingCommentsPart == null)
+            {
+                mainPart.AddNewPart<WordprocessingCommentsPart>();
+                mainPart.WordprocessingCommentsPart.Comments = new Comments();
+            }
+
+            // Получаем доступ к комментариям
+            var commentsPart = mainPart.WordprocessingCommentsPart;
+            var comments = commentsPart.Comments;
+
+            // Создаем новый комментарий
+            var commentId = (uint)(comments.Count() + 1);
+            var comment = new Comment()
+            {
+                Id = commentId.ToString(),
+                Author = "киктория",
+                Date = DateTime.Now
+            };
+            comment.Append(new Paragraph(new Run(new Text(commentText))));
+
+            // Добавляем комментарий в коллекцию комментариев
+            comments.Append(comment);
+            commentsPart.Comments.Save();
+
+            // Получаем первый абзац документа
+            var firstParagraph = mainPart.Document.Body.Elements<Paragraph>().FirstOrDefault();
+            if (firstParagraph == null)
+            {
+                throw new InvalidOperationException("Документ не содержит абзацев.");
+            }
+
+            // Создаем элементы для связи комментария с текстом
+            var commentRangeStart = new CommentRangeStart() { Id = commentId.ToString() };
+            var commentRangeEnd = new CommentRangeEnd() { Id = commentId.ToString() };
+
+            // Вставляем метки начала и конца комментария в первый абзац
+            firstParagraph.InsertBefore(commentRangeStart, firstParagraph.GetFirstChild<Run>());
+            firstParagraph.InsertAfter(commentRangeEnd, firstParagraph.Elements<Run>().Last());
+
+            // Добавляем ссылку на комментарий
+            var commentRun = new Run(new CommentReference() { Id = commentId.ToString() });
+            firstParagraph.InsertAfter(commentRun, commentRangeEnd);
+
+            // Обновляем документ
+            mainPart.Document.Save();
+        }
     }
 
     private static void Main(string[] args)
