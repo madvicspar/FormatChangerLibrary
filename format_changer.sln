@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "format_changer", "format_changer\format_changer.csproj", "{544AE60B-1B01-4BA4-A21C-63DDFD598B83}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatChanger", "FormatChanger\FormatChanger.csproj", "{9B84DF57-9DD2-4629-936A-54C214175877}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{544AE60B-1B01-4BA4-A21C-63DDFD598B83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{544AE60B-1B01-4BA4-A21C-63DDFD598B83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{544AE60B-1B01-4BA4-A21C-63DDFD598B83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B84DF57-9DD2-4629-936A-54C214175877}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B84DF57-9DD2-4629-936A-54C214175877}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B84DF57-9DD2-4629-936A-54C214175877}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B84DF57-9DD2-4629-936A-54C214175877}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
