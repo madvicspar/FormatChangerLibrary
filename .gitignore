@@ -4,3 +4,5 @@ format_changer/bin/
 format_changer/obj/
 FormatChanger/bin/
 FormatChanger/obj/
+FormatChanger/obj
+/FormatChanger/appsettings.json

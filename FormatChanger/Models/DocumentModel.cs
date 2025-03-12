@@ -6,7 +6,7 @@ namespace FormatChanger.Models
     {
         public long Id { get; set; }
         [ForeignKey("User")]
-        public long UserId { get; set; }
+        public string UserId { get; set; }
         public string FilePath { get; set; }
         /// <summary>
         /// Оригинальная версия документа или исправленная/проверенная/список недочетов
