@@ -12,6 +12,7 @@ namespace FormatChanger.Services
         public DocumentService(ApplicationDbContext context)
         {
             _context = context;
+            //_context.SeedData(_context);
         }
 
         // Загрузка документа и сохранение в БД

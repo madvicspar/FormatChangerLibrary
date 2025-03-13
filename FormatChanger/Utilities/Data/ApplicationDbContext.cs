@@ -27,7 +27,7 @@ namespace FormatChanger.Utilities.Data
         public DbSet<CellSettingsModel> CellSettings { get; set; } = null!;
         public DbSet<HeaderSettingsModel> HeaderSettings { get; set; } = null!;
         public DbSet<DocumentSettingsModel> DocumentSettings { get; set; } = null!;
-        protected void SeedData(ApplicationDbContext context)
+        public void SeedData(ApplicationDbContext context)
         {
             // Шаблон форматирования для РИС-22
             // **1. Данные для настроек обычного текста**
@@ -52,8 +52,6 @@ namespace FormatChanger.Utilities.Data
             context.TextSettings.Add(textSettings);
             context.SaveChanges();
 
-            var textSettingsId = context.TextSettings.Last().Id;
-
             // **2. Данные для настроек текста - основы заголовка первого уровня**
             var textSettings_h1 = new TextSettingsModel
             {
@@ -75,8 +73,6 @@ namespace FormatChanger.Utilities.Data
 
             context.TextSettings.Add(textSettings_h1);
             context.SaveChanges();
-
-            var textSettings_h1Id = context.TextSettings.Last().Id;
 
             // **3. Данные для настроек текста - основы заголовка второго уровня**
             var textSettings_h2 = new TextSettingsModel
@@ -100,8 +96,6 @@ namespace FormatChanger.Utilities.Data
             context.TextSettings.Add(textSettings_h2);
             context.SaveChanges();
 
-            var textSettings_h2Id = context.TextSettings.Last().Id;
-
             // **4. Данные для настроек текста - основы заголовка третьего уровня**
             var textSettings_h3 = new TextSettingsModel
             {
@@ -123,8 +117,6 @@ namespace FormatChanger.Utilities.Data
 
             context.TextSettings.Add(textSettings_h3);
             context.SaveChanges();
-
-            var textSettings_h3Id = context.TextSettings.Last().Id;
 
             // **5. Данные для настроек текста - основы подписи к таблице**
             var textSettings_tableCaption = new TextSettingsModel
@@ -148,8 +140,6 @@ namespace FormatChanger.Utilities.Data
             context.TextSettings.Add(textSettings_tableCaption);
             context.SaveChanges();
 
-            var textSettings_tableCaptionId = context.TextSettings.Last().Id;
-
             // **6. Данные для настроек текста - основы подписи к изображению**
             var textSettings_imageCaption = new TextSettingsModel
             {
@@ -171,8 +161,6 @@ namespace FormatChanger.Utilities.Data
 
             context.TextSettings.Add(textSettings_imageCaption);
             context.SaveChanges();
-
-            var textSettings_imageCaptionId = context.TextSettings.Last().Id;
 
             // **7. Данные для настроек текста - основы ячеек таблицы**
             var textSettings_cells = new TextSettingsModel
@@ -196,8 +184,6 @@ namespace FormatChanger.Utilities.Data
             context.TextSettings.Add(textSettings_cells);
             context.SaveChanges();
 
-            var textSettings_cellsId = context.TextSettings.Last().Id;
-
             // **7. Данные для настроек текста - основы ячеек таблицы для заголовков**
             var textSettings_cells_header = new TextSettingsModel
             {
@@ -219,8 +205,6 @@ namespace FormatChanger.Utilities.Data
 
             context.TextSettings.Add(textSettings_cells_header);
             context.SaveChanges();
-
-            var textSettings_cells_headerId = context.TextSettings.Last().Id;
 
             // **1. Данные для настроек текста - основы списков**
             var textSettings_list = new TextSettingsModel
@@ -244,12 +228,10 @@ namespace FormatChanger.Utilities.Data
             context.TextSettings.Add(textSettings_list);
             context.SaveChanges();
 
-            var textSettings_listId = context.TextSettings.Last().Id;
-
             // **. Данные для настроек заголовка первого уровня**
             var headingSettings1 = new HeadingSettingsModel
             {
-                TextSettingsId = textSettings_h1Id,
+                TextSettings = textSettings_h1,
                 HeadingLevel = 1,
                 StartOnNewPage = true
             };
@@ -257,12 +239,10 @@ namespace FormatChanger.Utilities.Data
             context.HeadingSettings.Add(headingSettings1);
             context.SaveChanges();
 
-            var headingSettings1Id = context.HeadingSettings.Last().Id;
-
             // **. Данные для настроек заголовка второго уровня**
             var headingSettings2 = new HeadingSettingsModel
             {
-                TextSettingsId = textSettings_h2Id,
+                TextSettings = textSettings_h2,
                 HeadingLevel = 2,
                 StartOnNewPage = true
             };
@@ -270,12 +250,10 @@ namespace FormatChanger.Utilities.Data
             context.HeadingSettings.Add(headingSettings2);
             context.SaveChanges();
 
-            var headingSettings2Id = context.HeadingSettings.Last().Id;
-
             // **. Данные для настроек заголовка третьего уровня**
             var headingSettings3 = new HeadingSettingsModel
             {
-                TextSettingsId = textSettings_h3Id,
+                TextSettings = textSettings_h3,
                 HeadingLevel = 3,
                 StartOnNewPage = true
             };
@@ -283,36 +261,30 @@ namespace FormatChanger.Utilities.Data
             context.HeadingSettings.Add(headingSettings3);
             context.SaveChanges();
 
-            var headingSettings3Id = context.HeadingSettings.Last().Id;
-
             // **. Данные для настроек подписи к рисунку**
             var tableCaptionSettings = new CaptionSettingsModel
             {
-                TextSettingsId = textSettings_tableCaptionId,
+                TextSettings = textSettings_tableCaption,
                 TextTemplate = "Таблица\\s+\\d+\\s+-\\s+(.+)"
             };
 
             context.CaptionSettings.Add(tableCaptionSettings);
             context.SaveChanges();
 
-            var tableCaptionSettingsId = context.CaptionSettings.Last().Id;
-
             // **. Данные для настроек подписи к рисунку**
             var imageCaptionSettings = new CaptionSettingsModel
             {
-                TextSettingsId = textSettings_imageCaptionId,
+                TextSettings = textSettings_imageCaption,
                 TextTemplate = "Рисунок\\s+\\d+\\s+-\\s+(.+)"
             };
 
             context.CaptionSettings.Add(imageCaptionSettings);
             context.SaveChanges();
 
-            var imageCaptionSettingsId = context.CaptionSettings.Last().Id;
-
             // **. Данные для настроек рисунка**
             var imageSettings = new ImageSettingsModel
             {
-                CaptionSettingsId = imageCaptionSettingsId,
+                CaptionSettings = imageCaptionSettings,
                 LineSpacing = 240,
                 BeforeSpacing = 120,
                 AfterSpacing = 0,
@@ -326,13 +298,11 @@ namespace FormatChanger.Utilities.Data
             context.ImageSettings.Add(imageSettings);
             context.SaveChanges();
 
-            var imageSettingsId = context.ImageSettings.Last().Id;
-
             // **. Данные для настроек ячеек таблицы**
             // значения полей неверные
             var cellSettings = new CellSettingsModel
             {
-                TextSettingsId = textSettings_cellsId,
+                TextSettings = textSettings_cells,
                 VerticalAlignment = "Top",
                 TopPadding = 0,
                 LeftPadding = 0,
@@ -343,13 +313,11 @@ namespace FormatChanger.Utilities.Data
             context.CellSettings.Add(cellSettings);
             context.SaveChanges();
 
-            var cellSettingsId = context.CellSettings.Last().Id;
-
             // **. Данные для настроек ячеек таблицы для заголовка**
             // значения полей неверные
             var cellSettings_header = new CellSettingsModel
             {
-                TextSettingsId = textSettings_cells_headerId,
+                TextSettings = textSettings_cells_header,
                 VerticalAlignment = "Top",
                 TopPadding = 0,
                 LeftPadding = 0,
@@ -360,32 +328,26 @@ namespace FormatChanger.Utilities.Data
             context.CellSettings.Add(cellSettings_header);
             context.SaveChanges();
 
-            var cellSettings_headerId = context.CellSettings.Last().Id;
-
             var headerSettings = new HeaderSettingsModel
             {
-                CellSettingsId = cellSettings_headerId,
+                CellSettings = cellSettings_header,
                 HasRepetitions = true
             };
 
             context.HeaderSettings.Add(headerSettings);
             context.SaveChanges();
 
-            var headerSettingsId = context.HeaderSettings.Last().Id;
-
             var tableSettings = new TableSettingsModel
             {
                 BeforeSpacing = 0,
                 AfterSpacing = 120,
-                CaptionSettingsId = tableCaptionSettingsId,
-                CellSettingsId = cellSettingsId,
-                HeaderSettingsModelId = headerSettingsId,
+                CaptionSettings = tableCaptionSettings,
+                CellSettings = cellSettings,
+                HeaderSettings = headerSettings
             };
 
             context.TableSettings.Add(tableSettings);
             context.SaveChanges();
-
-            var tableSettingsId = context.TableSettings.Last().Id;
 
             var documentSettings = new DocumentSettingsModel
             {
@@ -397,8 +359,6 @@ namespace FormatChanger.Utilities.Data
             context.DocumentSettings.Add(documentSettings);
             context.SaveChanges();
 
-            var documentSettingsId = context.DocumentSettings.Last().Id;
-
             // маркированный список просто
             var listSettings = new ListSettingsModel
             {
@@ -406,13 +366,11 @@ namespace FormatChanger.Utilities.Data
                 IsNumeric = false,
                 MarkerType = "-",
                 ListLevel = 0,
-                TextSettingsId = textSettings_listId
+                TextSettings = textSettings_list
             };
 
             context.ListSettings.Add(listSettings);
             context.SaveChanges();
-
-            var listSettingsId = context.ListSettings.Last().Id;
 
             // TODO: пофиксить логику шаблона - заголовки например вплоть до 8 уровня, списки - хотя бы три варианта
             // **3. Данные для шаблона форматирования**
