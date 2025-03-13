@@ -18,5 +18,125 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-color: #ffffff;
+    font-family: "Work Sans", -apple-system, Roboto, Helvetica, sans-serif;
+    padding: 0;
+}
+
+/* ÿ‡ÔÍ‡ */
+.header {
+    width: 100%;
+    padding: 12px 40px 13px;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.logo-image {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+.logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111418;
+    letter-spacing: -0.27px;
+    margin: 0;
+}
+
+.navigation {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.nav-links {
+    display: flex;
+    padding: 10px;
+    gap: 36px;
+}
+
+.nav-link {
+    color: #111418;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+/*  ÌÓÔÍË */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    display: inline-block;
+    border-radius: 12px;
+    padding: 10px 17px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.21px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+}
+
+.upload-btn {
+    background-color: #1980e6;
+    color: #ffffff;
+    transition: all 0.2s ease-in-out;
+}
+
+.upload-btn:hover {
+    background-color: #1666b8;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(25, 128, 230, 0.2);
+}
+
+.upload-btn:active {
+    background-color: #145ca6;
+    color: #ffffff;
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+.export-btn {
+    background-color: #f0f2f4;
+    color: #111418;
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    padding: 10px;
+    background-color: #f0f2f4;
+}
+
+.icon-image {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: contain;
 }

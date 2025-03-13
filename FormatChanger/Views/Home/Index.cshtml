@@ -1,8 +1,231 @@
-﻿@{
+﻿@using DocumentFormat.OpenXml.Wordprocessing;
+@model IEnumerable<Paragraph>
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<head>
+    <link rel="stylesheet" href="~/css/styles.css" />
+    <script>
+        // Функция для отображения формы загрузки
+        function showUploadForm() {
+            var form = document.getElementById('uploadForm');
+            form.style.display = 'block';
+        }
+    </script>
+</head>
+
+<form method="post" enctype="multipart/form-data" id="uploadForm" asp-action="Upload" class="shadow p-4 mb-4 bg-light rounded" style="display:none;">
+    <div class="form-group">
+        <label for="file" class="h5 text-dark">Выберите файл</label>
+        <input type="file" name="file" class="form-control-file border-0 p-2" id="file" />
+    </div>
+    <button type="submit" class="action-btn upload-btn">Подтвердить</button>
+</form>
+
+<main class="main-content">
+    <article class="document-preview">
+        <h2 class="editor-title">Document Editor</h2>
+        <p class="editor-subtitle">
+            Убедитесь, что все абзацы соответствуют нужному типу
+        </p>
+
+        <div class="document-content">
+            <p class="text-block highlighted">
+                Много обычного текста. Много обычного текста. Много обычного текста.
+                Много обычного текста. Много обычного текста. Много обычного текста.
+                Много обычного текста. Много обычного текста. Много обычного текста.
+                Много обычного текста. Много обычного текста. Много обычного текста.
+                Много обычного текста. Много обычного текста. Много обычного текста.
+                Много обычного текста. Много обычного текста. Много обычного текста.
+            </p>
+            <div id="paragraphsContainer">
+                @if (Model != null)
+                {
+                    foreach (var paragraph in Model)
+                    {
+                        <p class="text-block">@paragraph.InnerText</p>
+                    }
+                }
+            </div>
+        </div>
+    </article>
+
+    <div class="scroll-bar"></div>
+
+    <aside class="formatting-panel">
+        <section class="panel-section">
+            <h3 class="panel-title">Тип действия</h3>
+            <div class="action-selector">
+                <label class="selector-label">
+                    <div class="selector-option">
+                        <div class="option-icon">
+                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/70edb4692955b816d2425d9a2451595f1d40491621a4d01d8e63ed2b40d12d30?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
+                                 alt="Action type"
+                                 class="icon" />
+                        </div>
+                        <span class="option-text">Исправление</span>
+                    </div>
+                </label>
+            </div>
+
+            <h3 class="panel-title">Типы абзацев</h3>
+            <div class="paragraph-types">
+                <label class="type-option">
+                    <div class="radio-input">
+                        <div class="radio-icon">
+                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/b0ac7924d909f285695cd32a5f4d504b9a0fcdb5486405929f1a3ed932140f5a?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
+                                 alt="Selected"
+                                 class="icon" />
+                        </div>
+                    </div>
+                    <span class="option-text">Обычный текст</span>
+                </label>
+
+                <label class="type-option">
+                    <div class="radio-input"></div>
+                    <span class="option-text">Заголовок</span>
+                </label>
+
+                <label class="type-option">
+                    <div class="radio-input"></div>
+                    <span class="option-text">Список</span>
+                </label>
+
+                <label class="type-option">
+                    <div class="radio-input"></div>
+                    <span class="option-text">Подпись к рисунку</span>
+                </label>
+
+                <label class="type-option">
+                    <div class="radio-input"></div>
+                    <span class="option-text">Подпись к таблице</span>
+                </label>
+
+                <label class="type-option">
+                    <div class="radio-input"></div>
+                    <span class="option-text">Не трогать!</span>
+                </label>
+            </div>
+
+            <div class="navigation-buttons">
+                <button class="nav-btn prev-btn">
+                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/7ce5602468264e26d735ed48d78dcb781607c2e1c0cb26f9abf04a9081b0213d?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
+                         alt="Previous"
+                         class="btn-icon" />
+                    <span>Предыдущий абзац</span>
+                </button>
+
+                <button class="nav-btn next-btn">
+                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/b353f06303c317a9aa4bbfbf127b4a5e9e0845ed9ae101a86a8ec2f05cc86ba3?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
+                         alt="Next"
+                         class="btn-icon" />
+                    <span>Следующий абзац</span>
+                </button>
+
+                <button class="action-btn get-btn">Получить</button>
+            </div>
+        </section>
+
+        <section class="panel-section">
+            <h3 class="panel-title">Шаблон форматирования</h3>
+            <div class="template-selector">
+                <label class="selector-label">
+                    <div class="selector-option">
+                        <div class="option-icon">
+                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/70edb4692955b816d2425d9a2451595f1d40491621a4d01d8e63ed2b40d12d30?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
+                                 alt="Template"
+                                 class="icon" />
+                        </div>
+                        <span class="option-text">HSE RIS-22</span>
+                    </div>
+                </label>
+            </div>
+
+            <h3 class="panel-title">Настройки документа</h3>
+            <div class="document-settings">
+                <label class="setting-option">
+                    <div class="checkbox-input">
+                        <div class="checkbox-icon">
+                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ac6b0b16e69b6b4a9ff530df653f72abf551a54c7f75c0ea495cb7d5e66864fe?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
+                                 alt="Checked"
+                                 class="icon" />
+                        </div>
+                    </div>
+                    <span class="option-text">Настройка 1</span>
+                </label>
+
+                <label class="setting-option">
+                    <div class="checkbox-input">
+                        <div class="checkbox-icon">
+                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ac6b0b16e69b6b4a9ff530df653f72abf551a54c7f75c0ea495cb7d5e66864fe?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
+                                 alt="Checked"
+                                 class="icon" />
+                        </div>
+                    </div>
+                    <span class="option-text">Настройка 2</span>
+                </label>
+
+                <label class="setting-option">
+                    <div class="checkbox-input">
+                        <div class="checkbox-icon">
+                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ac6b0b16e69b6b4a9ff530df653f72abf551a54c7f75c0ea495cb7d5e66864fe?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
+                                 alt="Checked"
+                                 class="icon" />
+                        </div>
+                    </div>
+                    <span class="option-text">Настройка 3</span>
+                </label>
+            </div>
+
+            <div class="additional-settings">
+                <label class="selector-label">
+                    <span class="setting-label">Настройка 4</span>
+                    <div class="selector-option">
+                        <div class="option-icon">
+                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/048a33bcb6395d8ae12a6b189734fa892d754141eddab3b606d12c58b2298f85?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
+                                 alt="Setting"
+                                 class="icon" />
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <h3 class="panel-title">Еще настройки</h3>
+            <div class="more-settings">
+                <label class="setting-option">
+                    <div class="checkbox-input">
+                        <div class="checkbox-icon">
+                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ac6b0b16e69b6b4a9ff530df653f72abf551a54c7f75c0ea495cb7d5e66864fe?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
+                                 alt="Checked"
+                                 class="icon" />
+                        </div>
+                    </div>
+                    <span class="option-text">Настройка 1</span>
+                </label>
+
+                <label class="setting-option">
+                    <div class="checkbox-input">
+                        <div class="checkbox-icon">
+                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ac6b0b16e69b6b4a9ff530df653f72abf551a54c7f75c0ea495cb7d5e66864fe?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
+                                 alt="Checked"
+                                 class="icon" />
+                        </div>
+                    </div>
+                    <span class="option-text">Настройка 2</span>
+                </label>
+
+                <label class="setting-option">
+                    <div class="checkbox-input">
+                        <div class="checkbox-icon">
+                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ac6b0b16e69b6b4a9ff530df653f72abf551a54c7f75c0ea495cb7d5e66864fe?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
+                                 alt="Checked"
+                                 class="icon" />
+                        </div>
+                    </div>
+                    <span class="option-text">Настройка 3</span>
+                </label>
+            </div>
+        </section>
+    </aside>
+</main>

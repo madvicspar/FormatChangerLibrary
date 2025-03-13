@@ -1,0 +1,247 @@
+﻿/* Main content styles */
+.main-content {
+    display: flex;
+    height: calc(100vh - 60px); /* Учитывает высоту шапки */
+    padding: 20px 50px;
+    gap: 4px;
+    overflow: hidden;
+}
+
+.document-preview {
+    flex: 1;
+    padding: 10px 25px;
+    border-right: 1px solid #f0f2f4;
+    max-width: 60%;
+    font-size: 16px;
+    color: #111418;
+    overflow-y: auto;
+}
+
+.editor-title {
+    font-size: 24px;
+    font-weight: 700;
+    padding: 20px 16px 8px;
+    margin: 0;
+}
+
+.editor-subtitle {
+    font-size: 14px;
+    padding: 0 16px 12px;
+    margin: 0;
+    color: #111418;
+    line-height: 24px;
+}
+
+.text-block {
+    padding: 4px 16px 12px;
+    margin: 0;
+    line-height: 24px;
+}
+
+.highlighted {
+    background-color: rgba(59, 130, 246, 0.102);
+    border-left: 3px solid #1980e6;
+    font-size: 24px;
+}
+
+.figure-caption {
+    padding: 4px 16px 12px;
+    margin: 0;
+}
+
+.document-list {
+    padding: 4px 16px 12px;
+    margin: 0;
+    list-style-position: inside;
+}
+
+.section-heading {
+    padding: 4px 16px 12px;
+    margin: 0;
+    font-weight: normal;
+}
+
+/* Scroll bar */
+.scroll-bar {
+    width: 10px;
+    height: 436px;
+    background-color: #d9d9d9;
+    border-radius: 50px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* Formatting panel styles */
+.formatting-panel {
+    display: flex;
+    flex-direction: row; /* Делаем панели в строку */
+    height: 100%; /* Занимаем всю высоту */
+    gap: 10px; /* Расстояние между панелями */
+    overflow-y: auto;
+}
+
+.panel-section {
+    flex: 1; /* Чтобы панели равномерно распределялись */
+    overflow-y: auto; /* Добавляем прокрутку, если контента много */
+}
+
+.panel-title {
+    font-size: 18px;
+    font-weight: 700;
+    padding: 16px;
+    margin: 0;
+    letter-spacing: -0.27px;
+    color: #111418;
+}
+
+.action-selector,
+.template-selector {
+    padding: 12px 16px;
+}
+
+.selector-label {
+    width: 100%;
+}
+
+.selector-option {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border: 1px solid #dce0e5;
+    border-radius: 12px;
+    background-color: #ffffff;
+}
+
+.option-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.option-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111418;
+    margin-left: 8px;
+}
+
+.paragraph-types {
+    padding: 16px;
+}
+
+.type-option {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid #dce0e5;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.radio-input {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #111418;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.radio-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.navigation-buttons {
+    padding: 12px 16px;
+}
+
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    background-color: #f0f2f4;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #111418;
+    cursor: pointer;
+}
+
+.btn-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.get-btn {
+    width: 100%;
+    background-color: #1980e6;
+    color: #ffffff;
+    min-height: 40px;
+}
+
+.document-settings,
+.more-settings {
+    padding: 0 16px;
+}
+
+.setting-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+}
+
+.checkbox-input {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #1980e6;
+    border-radius: 4px;
+    background-color: #1980e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkbox-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.additional-settings {
+    padding: 12px 16px;
+}
+
+.setting-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    color: #111418;
+    padding-bottom: 8px;
+}
+
+/* Responsive styles */
+@media (max-width: 991px) {
+    .header {
+        padding: 12px 20px 13px;
+    }
+
+    .main-content {
+        display: flex;
+        height: 100vh;
+        padding: 20px;
+    }
+
+    .document-preview {
+        padding-right: 20px;
+    }
+
+    .logo-text,
+    .nav-link {
+        white-space: normal;
+    }
+}
