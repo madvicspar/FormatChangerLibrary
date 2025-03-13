@@ -2,6 +2,7 @@
 @model IEnumerable<Paragraph>
 @{
     ViewData["Title"] = "Home Page";
+    var templates = ViewBag.Templates as List<FormattingTemplateModel>;
 }
 
 <head>
@@ -16,13 +17,12 @@
         function startFormattingProcess() {
             var selectedTemplateId = document.getElementById('templateSelect').value;
             var selectedActionId = document.getElementById('actionSelect').value;
-            
-            fetch('/Home/Export', {
+
+            fetch(`/Home/Export?templateId=${selectedTemplateId}&actionId=${selectedActionId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ actionId: selectedActionId, templateId: selectedTemplateId })
+                }
             })
             .then(response => {
                 if (response.ok) {
@@ -165,10 +165,13 @@
                                  class="icon" />
                         </div>
                         <select name="templateId" id="templateSelect" class="form-control">
-                            
-                            <option class="option-text" value="1">HSE RIS-22</option>
-                            <option class="option-text" value="2">HSE RIS-23</option>
-                            <option class="option-text" value="3">HSE MB-22</option>
+                            @if (templates != null)
+                            {
+                                foreach (var template in templates)
+                                {
+                                    <option value="@template.Id">@template.Title</option>
+                                }
+                            }
                         </select>
                     </div>
                 </label>

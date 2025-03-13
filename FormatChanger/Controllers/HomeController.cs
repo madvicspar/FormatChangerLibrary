@@ -11,15 +11,21 @@ namespace FormatChanger.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IDocumentService _documentService;
+        private readonly ITemplateService _templateService;
 
-        public HomeController(ILogger<HomeController> logger, IDocumentService documentService)
+        public HomeController(ILogger<HomeController> logger, IDocumentService documentService, ITemplateService templateService)
         {
             _logger = logger;
             _documentService = documentService;
+            _templateService = templateService;
         }
 
         public IActionResult Index(IEnumerable<Paragraph> paragraphs = null)
         {
+            var templates = _templateService.GetTemplatesAsync();
+
+            ViewBag.Templates = templates.Result;
+
             return View(paragraphs);
         }
 
