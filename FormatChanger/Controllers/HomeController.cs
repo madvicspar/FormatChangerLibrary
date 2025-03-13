@@ -44,9 +44,8 @@ namespace FormatChanger.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Export(int templateId, int actionId)
+        public async Task<IActionResult> Export(long templateId, int actionId)
         {
-            // получить тип действия (исправление, проверка, оценивание)
             // получить шаблон
             // если оценивание, то получить систему оценивания
             // если проверка, то тип исправлений
@@ -55,20 +54,34 @@ namespace FormatChanger.Controllers
 
 
             // Извлекаем документ и шаблон из TempData
-            //var documentId = TempData["DocumentId"] as int?;
-            //if (!documentId.HasValue)
-            //{
-            //    return BadRequest("Документ не найден.");
-            //}
+            var documentId = TempData["DocumentId"] as int?;
+            if (!documentId.HasValue)
+            {
+                return BadRequest("Документ не найден.");
+            }
 
-            //var document = await _documentService.GetDocumentByIdAsync(documentId.Value);
-            //if (document == null)
-            //{
-            //    return NotFound();
-            //}
+            var document = await _documentService.GetDocumentByIdAsync(documentId.Value);
+            if (document == null)
+            {
+                return NotFound();
+            }
 
-            // Применяем исправление форматирования
-            //await _documentService.FixDocumentFormattingAsync(document, templateId);
+            DocumentModel resultDocumentId;
+
+            switch (actionId)
+            {
+                case 1: // Исправление
+                    resultDocumentId = await _documentService.CorrectDocumentAsync(document, templateId);
+                    break;
+                case 2: // Проверка
+                    resultDocumentId = await _documentService.CheckDocumentAsync(document, templateId);
+                    break;
+                case 3: // Оценивание
+                    resultDocumentId = await _documentService.EvaluateDocumentAsync(document, templateId);
+                    break;
+                default:
+                    return BadRequest("Неизвестное действие");
+            }
 
             // Экспортируем документ
             return View();

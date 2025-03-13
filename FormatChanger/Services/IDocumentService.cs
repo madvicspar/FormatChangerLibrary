@@ -1,9 +1,5 @@
-﻿using FormatChanger.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Text;
-using static System.Net.Mime.MediaTypeNames;
-using System.Text.RegularExpressions;
-using DocumentFormat.OpenXml.Wordprocessing;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using FormatChanger.Models;
 
 namespace FormatChanger.Services
 {
@@ -17,6 +13,11 @@ namespace FormatChanger.Services
 
         // Метод для извлечения абзацев из документа
         List<Paragraph> GetDocumentParagraphs(DocumentModel document);
-        Task FixDocumentFormattingAsync(DocumentModel document, int templateId);
+        // Метод для исправления форматирования документа
+        Task<DocumentModel> CorrectDocumentAsync(DocumentModel document, long templateId);
+        // Метод для проверки форматирования документа
+        Task<DocumentModel> CheckDocumentAsync(DocumentModel document, long templateId);
+        // Метод для оценивания форматирования документа
+        Task<DocumentModel> EvaluateDocumentAsync(DocumentModel document, long templateId);
     }
 }

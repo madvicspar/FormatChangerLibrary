@@ -2,12 +2,15 @@
 using FormatChanger.Utilities.Data;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml;
+using System.Xml.Linq;
 
 namespace FormatChanger.Services
 {
     public class DocumentService : IDocumentService
     {
         private readonly ApplicationDbContext _context;
+        //private readonly IEnumerable<IElementCorrectionStrategy<T>> _correctionStrategies;
 
         public DocumentService(ApplicationDbContext context)
         {
@@ -54,9 +57,27 @@ namespace FormatChanger.Services
             }
         }
 
-        public async Task FixDocumentFormattingAsync(DocumentModel document, int templateId)
+        public async Task<DocumentModel> CorrectDocumentAsync(DocumentModel document, long templateId)
         {
-            
+            using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
+            {
+                //foreach (var strategy in _correctionStrategies)
+                //{
+                //    strategy.ApplyCorrection(doc, templateId);
+                //}
+            }
+            // TODO: достать исправленный документ
+            return document;
+        }
+
+        public async Task<DocumentModel> CheckDocumentAsync(DocumentModel document, long templateId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<DocumentModel> EvaluateDocumentAsync(DocumentModel document, long templateId)
+        {
+            throw new NotImplementedException();
         }
     }
 }
