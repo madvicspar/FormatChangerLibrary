@@ -43,6 +43,37 @@ namespace FormatChanger.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Export(int templateId, int actionId)
+        {
+            // получить тип действия (исправление, проверка, оценивание)
+            // получить шаблон
+            // если оценивание, то получить систему оценивания
+            // если проверка, то тип исправлений
+            // что-то делаем в зависимости от типа
+
+
+
+            // Извлекаем документ и шаблон из TempData
+            //var documentId = TempData["DocumentId"] as int?;
+            //if (!documentId.HasValue)
+            //{
+            //    return BadRequest("Документ не найден.");
+            //}
+
+            //var document = await _documentService.GetDocumentByIdAsync(documentId.Value);
+            //if (document == null)
+            //{
+            //    return NotFound();
+            //}
+
+            // Применяем исправление форматирования
+            //await _documentService.FixDocumentFormattingAsync(document, templateId);
+
+            // Экспортируем документ
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

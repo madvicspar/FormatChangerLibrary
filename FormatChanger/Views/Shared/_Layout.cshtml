@@ -23,7 +23,7 @@
                 </div>
                 <div class="action-buttons">
                     <button @* asp-controller="Documents" asp-action="Index" *@ id="showUploadButton" class="action-btn upload-btn" onclick="showUploadForm()">Загрузить</button>
-                    <button class="action-btn export-btn">Экспорт</button>
+                    <button class="action-btn export-btn" id="exportButton" onclick="startFormattingProcess()">Экспорт</button>
                     <button class="action-btn icon-btn">
                         <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/551b08bab8c5619ab69f69323afcd4b3d5b9be5dd7ec43d65ffca3e852bad776?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
                              alt="Settings"

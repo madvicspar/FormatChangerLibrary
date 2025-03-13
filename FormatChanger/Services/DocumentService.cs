@@ -52,5 +52,10 @@ namespace FormatChanger.Services
                 return paragraphs;
             }
         }
+
+        public async Task FixDocumentFormattingAsync(DocumentModel document, int templateId)
+        {
+            
+        }
     }
 }

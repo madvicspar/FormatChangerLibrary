@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<ITemplateService, TemplateService>();
 
 
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

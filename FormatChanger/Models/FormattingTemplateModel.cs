@@ -5,6 +5,7 @@ namespace FormatChanger.Models
     public class FormattingTemplateModel
     {
         public long Id { get; set; }
+        public string Title { get; set; }
         [ForeignKey("TextSettings")]
         public long TextSettingsId { get; set; }
         [ForeignKey("HeadingSettings")]

@@ -12,6 +12,28 @@
             var form = document.getElementById('uploadForm');
             form.style.display = 'block';
         }
+
+        function startFormattingProcess() {
+            var selectedTemplateId = document.getElementById('templateSelect').value;
+            var selectedActionId = document.getElementById('actionSelect').value;
+            
+            fetch('/Home/Export', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ actionId: selectedActionId, templateId: selectedTemplateId })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Если запрос успешен, можем выполнить дополнительные действия
+                    alert('Процесс исправления начался');
+                } else {
+                    alert('Ошибка при отправке запроса');
+                }
+            })
+            .catch(error => alert('Ошибка сети:', error));
+        }
     </script>
 </head>
 
@@ -61,10 +83,15 @@
                     <div class="selector-option">
                         <div class="option-icon">
                             <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/70edb4692955b816d2425d9a2451595f1d40491621a4d01d8e63ed2b40d12d30?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
-                                 alt="Action type"
+                                 alt="Action"
                                  class="icon" />
                         </div>
-                        <span class="option-text">Исправление</span>
+                        <select name="actionId" id="actionSelect" class="form-control">
+
+                            <option class="option-text" value="1">Исправление</option>
+                            <option class="option-text" value="2">Проверка</option>
+                            <option class="option-text" value="3">Оценивание</option>
+                        </select>
                     </div>
                 </label>
             </div>
@@ -137,11 +164,15 @@
                                  alt="Template"
                                  class="icon" />
                         </div>
-                        <span class="option-text">HSE RIS-22</span>
+                        <select name="templateId" id="templateSelect" class="form-control">
+                            
+                            <option class="option-text" value="1">HSE RIS-22</option>
+                            <option class="option-text" value="2">HSE RIS-23</option>
+                            <option class="option-text" value="3">HSE MB-22</option>
+                        </select>
                     </div>
                 </label>
             </div>
-
             <h3 class="panel-title">Настройки документа</h3>
             <div class="document-settings">
                 <label class="setting-option">

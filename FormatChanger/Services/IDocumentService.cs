@@ -17,5 +17,6 @@ namespace FormatChanger.Services
 
         // Метод для извлечения абзацев из документа
         List<Paragraph> GetDocumentParagraphs(DocumentModel document);
+        Task FixDocumentFormattingAsync(DocumentModel document, int templateId);
     }
 }
