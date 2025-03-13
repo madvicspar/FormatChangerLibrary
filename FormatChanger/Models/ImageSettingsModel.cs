@@ -1,4 +1,6 @@
-﻿namespace FormatChanger.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace FormatChanger.Models
 {
     public class ImageSettingsModel
     {
@@ -35,5 +37,8 @@
         /// Атрибут "Не отрывать от следующего"
         /// </summary>
         public bool KeepWithNext { get; set; }
+        [ForeignKey("CaptionSettings")]
+        public long CaptionSettingsId { get; set; }
+        public virtual CaptionSettingsModel CaptionSettings { get; set; }
     }
 }
