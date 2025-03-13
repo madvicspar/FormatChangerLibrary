@@ -20,7 +20,7 @@ namespace FormatChanger.Controllers
             _templateService = templateService;
         }
 
-        public IActionResult Index(IEnumerable<Paragraph> paragraphs = null)
+        public IActionResult Index(List<ParagraphModel> paragraphs = null)
         {
             var templates = _templateService.GetTemplatesAsync();
 
@@ -44,7 +44,22 @@ namespace FormatChanger.Controllers
 
                 var paragraphs = _documentService.GetDocumentParagraphs(document);
 
-                return View("Index", paragraphs);
+                var paragraphList = new List<ParagraphModel>();
+
+                foreach (var paragraph in paragraphs)
+                {
+                    //string userDefinedType = DetermineParagraphType(paragraph);
+                    string type = "Обычный текст";
+
+                    paragraphList.Add(new ParagraphModel
+                    {
+                        Paragraph = paragraph,
+                        Type = type
+                    });
+                }
+
+
+                return View("Index", paragraphList);
             }
             return RedirectToAction("Index");
         }

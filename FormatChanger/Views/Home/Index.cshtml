@@ -1,5 +1,5 @@
 ﻿@using DocumentFormat.OpenXml.Wordprocessing;
-@model IEnumerable<Paragraph>
+@model List<ParagraphModel>
 @{
     ViewData["Title"] = "Home Page";
     var templates = ViewBag.Templates as List<FormattingTemplateModel>;
@@ -34,6 +34,66 @@
             })
             .catch(error => alert('Ошибка сети:', error));
         }
+        document.addEventListener('DOMContentLoaded', function () {
+            let currentIndex = 0; // Индекс активного параграфа
+            const paragraphs = document.querySelectorAll('#paragraphsContainer .text-block');
+
+            // Отображаем первый параграф как активный
+            if (paragraphs.length > 0) {
+                paragraphs[currentIndex].classList.add('highlighted');
+            }
+
+            // Функция для обновления активного параграфа
+            function updateActiveParagraph() {
+                paragraphs.forEach((p, index) => {
+                    p.classList.remove('highlighted'); // Убираем активный класс у всех
+                    if (index === currentIndex) {
+                        p.classList.add('highlighted'); // Добавляем активный класс к текущему параграфу
+                    }
+                });
+            }
+
+            // Обработчик нажатия на кнопку "Предыдущий абзац"
+            document.querySelector('.prev-btn').addEventListener('click', function () {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateActiveParagraph();
+                }
+            });
+
+            // Обработчик нажатия на кнопку "Следующий абзац"
+            document.querySelector('.next-btn').addEventListener('click', function () {
+                if (currentIndex < paragraphs.length - 1) {
+                    currentIndex++;
+                    updateActiveParagraph();
+                }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const typeOptions = document.querySelectorAll('.type-option');
+
+            typeOptions.forEach(option => {
+                option.addEventListener('click', function () {
+                    // Убираем класс "active" у всех кнопок
+                    typeOptions.forEach(o => o.classList.remove('active'));
+
+                    // Добавляем "active" к текущему выбранному элементу
+                    option.classList.add('active');
+
+                    // // Сохраняем выбранный тип для текущего абзаца
+                    // const highlightedParagraph = document.querySelector('.highlighted');
+                    // if (highlightedParagraph) {
+                    //     const paragraphIndex = highlightedParagraph.dataset.index;
+                    //     saveParagraphType(paragraphIndex, option.getAttribute('data-type'));
+                    // }
+                });
+            });
+
+            // Функция для сохранения типа абзаца
+            function saveParagraphType(paragraphIndex, type) {
+                // TODO: сохранить принадлежность абзаца к типу (хотя мб лучше все сразу выгрузить, хз пока)
+            }
+        });
     </script>
 </head>
 
@@ -53,20 +113,14 @@
         </p>
 
         <div class="document-content">
-            <p class="text-block highlighted">
-                Много обычного текста. Много обычного текста. Много обычного текста.
-                Много обычного текста. Много обычного текста. Много обычного текста.
-                Много обычного текста. Много обычного текста. Много обычного текста.
-                Много обычного текста. Много обычного текста. Много обычного текста.
-                Много обычного текста. Много обычного текста. Много обычного текста.
-                Много обычного текста. Много обычного текста. Много обычного текста.
-            </p>
             <div id="paragraphsContainer">
                 @if (Model != null)
                 {
+                    int index = 0;
                     foreach (var paragraph in Model)
                     {
-                        <p class="text-block">@paragraph.InnerText</p>
+                        <p class="text-block" data-index="@index">@paragraph.InnerText</p>
+                        index++;
                     }
                 }
             </div>
@@ -98,38 +152,32 @@
 
             <h3 class="panel-title">Типы абзацев</h3>
             <div class="paragraph-types">
-                <label class="type-option">
-                    <div class="radio-input">
-                        <div class="radio-icon">
-                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/b0ac7924d909f285695cd32a5f4d504b9a0fcdb5486405929f1a3ed932140f5a?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
-                                 alt="Selected"
-                                 class="icon" />
-                        </div>
-                    </div>
+                <label class="type-option active" data-type="normal">
+                    <div class="radio-input"></div>
                     <span class="option-text">Обычный текст</span>
                 </label>
 
-                <label class="type-option">
+                <label class="type-option" data-type="heading">
                     <div class="radio-input"></div>
                     <span class="option-text">Заголовок</span>
                 </label>
 
-                <label class="type-option">
+                <label class="type-option" data-type="list">
                     <div class="radio-input"></div>
                     <span class="option-text">Список</span>
                 </label>
 
-                <label class="type-option">
+                <label class="type-option" data-type="caption-image">
                     <div class="radio-input"></div>
                     <span class="option-text">Подпись к рисунку</span>
                 </label>
 
-                <label class="type-option">
+                <label class="type-option" data-type="caption-table">
                     <div class="radio-input"></div>
                     <span class="option-text">Подпись к таблице</span>
                 </label>
 
-                <label class="type-option">
+                <label class="type-option" data-type="no-edit">
                     <div class="radio-input"></div>
                     <span class="option-text">Не трогать!</span>
                 </label>

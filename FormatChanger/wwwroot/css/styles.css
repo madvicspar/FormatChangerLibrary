@@ -135,7 +135,12 @@
     border: 1px solid #dce0e5;
     border-radius: 12px;
     margin-bottom: 12px;
+    transition: background-color 0.3s ease;
 }
+
+    .type-option:hover {
+        border: 1px solid #000;
+    }
 
 .radio-input {
     width: 20px;
@@ -147,9 +152,18 @@
     justify-content: center;
 }
 
-.radio-icon {
-    width: 20px;
-    height: 20px;
+.type-option.active .radio-input {
+    background-color: #fff; /* Оставляем фон белым */
+    position: relative;
+}
+
+.type-option.active .radio-input::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background-color: #000; /* Черный кружок внутри активной кнопки */
+    border-radius: 50%;
+    position: absolute;
 }
 
 .navigation-buttons {
