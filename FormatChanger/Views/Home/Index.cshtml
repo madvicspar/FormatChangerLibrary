@@ -37,10 +37,12 @@
         document.addEventListener('DOMContentLoaded', function () {
             let currentIndex = 0; // Индекс активного параграфа
             const paragraphs = document.querySelectorAll('#paragraphsContainer .text-block');
+            const typeOptions = document.querySelectorAll('.type-option');
 
             // Отображаем первый параграф как активный
             if (paragraphs.length > 0) {
                 paragraphs[currentIndex].classList.add('highlighted');
+                updateActiveTypeButton(paragraphs[currentIndex]);
             }
 
             // Функция для обновления активного параграфа
@@ -49,6 +51,7 @@
                     p.classList.remove('highlighted'); // Убираем активный класс у всех
                     if (index === currentIndex) {
                         p.classList.add('highlighted'); // Добавляем активный класс к текущему параграфу
+                        updateActiveTypeButton(p); // Синхронизируем тип с кнопкой
                     }
                 });
             }
@@ -68,30 +71,28 @@
                     updateActiveParagraph();
                 }
             });
-        });
-        document.addEventListener('DOMContentLoaded', function () {
-            const typeOptions = document.querySelectorAll('.type-option');
+
 
             typeOptions.forEach(option => {
                 option.addEventListener('click', function () {
-                    // Убираем класс "active" у всех кнопок
-                    typeOptions.forEach(o => o.classList.remove('active'));
-
-                    // Добавляем "active" к текущему выбранному элементу
-                    option.classList.add('active');
-
-                    // // Сохраняем выбранный тип для текущего абзаца
-                    // const highlightedParagraph = document.querySelector('.highlighted');
-                    // if (highlightedParagraph) {
-                    //     const paragraphIndex = highlightedParagraph.dataset.index;
-                    //     saveParagraphType(paragraphIndex, option.getAttribute('data-type'));
-                    // }
+                    const highlightedParagraph = document.querySelector('.text-block.highlighted');
+                    if (highlightedParagraph) {
+                        const newType = option.getAttribute('data-type');
+                        highlightedParagraph.dataset.type = newType; // Обновляем тип абзаца
+                        updateActiveTypeButton(highlightedParagraph); // Синхронизируем кнопку
+                    }
                 });
             });
 
-            // Функция для сохранения типа абзаца
-            function saveParagraphType(paragraphIndex, type) {
-                // TODO: сохранить принадлежность абзаца к типу (хотя мб лучше все сразу выгрузить, хз пока)
+            function updateActiveTypeButton(paragraph) {
+                const type = paragraph.dataset.type;
+
+                typeOptions.forEach(option => {
+                    option.classList.remove('active');
+                    if (option.getAttribute('data-type') === type) {
+                        option.classList.add('active');
+                    }
+                });
             }
         });
     </script>
@@ -119,7 +120,7 @@
                     int index = 0;
                     foreach (var paragraph in Model)
                     {
-                        <p class="text-block" data-index="@index">@paragraph.InnerText</p>
+                        <p class="text-block" data-index="@index" data-type="@paragraph.Type">@paragraph.InnerText</p>
                         index++;
                     }
                 }

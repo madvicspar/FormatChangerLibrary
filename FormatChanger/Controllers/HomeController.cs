@@ -54,7 +54,7 @@ namespace FormatChanger.Controllers
                     paragraphList.Add(new ParagraphModel
                     {
                         Paragraph = paragraph,
-                        Type = type
+                        Type = ParagraphTypes.Heading.ToEnumString()
                     });
                 }
 
