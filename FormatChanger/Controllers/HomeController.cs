@@ -22,11 +22,14 @@ namespace FormatChanger.Controllers
 
         public IActionResult Index(List<ParagraphModel> paragraphs = null)
         {
-            var templates = _templateService.GetTemplatesAsync();
-
-            ViewBag.Templates = templates.Result;
-
+            SetTemplates();
             return View(paragraphs);
+        }
+
+        public void SetTemplates()
+        {
+            var templates = _templateService.GetTemplatesAsync();
+            ViewBag.Templates = templates.Result;
         }
 
         [HttpPost]
@@ -58,6 +61,7 @@ namespace FormatChanger.Controllers
                     });
                 }
 
+                SetTemplates();
 
                 return View("Index", paragraphList);
             }
@@ -65,7 +69,7 @@ namespace FormatChanger.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Export(long templateId, int actionId)
+        public async Task<IActionResult> Export(long templateId, int actionId, [FromBody] string[] types)
         {
             // получить шаблон
             // если оценивание, то получить систему оценивания
