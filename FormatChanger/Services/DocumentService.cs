@@ -12,14 +12,17 @@ namespace FormatChanger.Services
         private readonly ApplicationDbContext _context;
         private readonly IElementCorrectionStrategy<TextSettingsModel> _textCorrectionStrategy;
         private readonly IElementCorrectionStrategy<HeadingSettingsModel> _headingFirstCorrectionStrategies;
+        private readonly IElementCorrectionStrategy<ImageSettingsModel> _imageCorrectionStrategy;
 
         public DocumentService(ApplicationDbContext context, 
             IElementCorrectionStrategy<TextSettingsModel> textStrategy,
             IElementCorrectionStrategy<HeadingSettingsModel> h1Strategy,
+            IElementCorrectionStrategy<ImageSettingsModel> imageStrategy,
         {
             _context = context;
             _textCorrectionStrategy = textStrategy;
             _headingFirstCorrectionStrategies = h1Strategy;
+            _imageCorrectionStrategy = imageStrategy;
             //_context.SeedData(_context);
         }
 

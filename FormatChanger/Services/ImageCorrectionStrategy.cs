@@ -1,11 +1,16 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FormatChanger.Models;
+using System.Text.RegularExpressions;
 
 namespace FormatChanger.Services
 {
-    public class ImageCorrectionStrategy /*: IElementCorrectionStrategy<ImageSettingsModel>*/
+    public class ImageCorrectionStrategy : IElementCorrectionStrategy<ImageSettingsModel>
     {
+        public ImageSettingsModel GetSettings(FormattingTemplateModel template)
+        {
+            return template.ImageSettings;
+        }
         public RunProperties GetRunProperties(ImageSettingsModel settings)
         {
             return new RunProperties();
@@ -31,8 +36,9 @@ namespace FormatChanger.Services
             new KeepNext { Val = settings.KeepWithNext });
         }
 
-        public void ApplyCorrection(WordprocessingDocument doc, ImageSettingsModel settings)
+        public void ApplyCorrection(WordprocessingDocument doc, FormattingTemplateModel template)
         {
+            var settings = GetSettings(template);
             var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().ToList();
             if (paragraphs == null) return;
 
