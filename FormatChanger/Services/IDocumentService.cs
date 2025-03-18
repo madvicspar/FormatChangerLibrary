@@ -14,10 +14,10 @@ namespace FormatChanger.Services
         // Метод для извлечения абзацев из документа
         List<Paragraph> GetDocumentParagraphs(DocumentModel document);
         // Метод для исправления форматирования документа
-        Task<DocumentModel> CorrectDocumentAsync(DocumentModel document, long templateId);
+        Task<DocumentModel> CorrectDocumentAsync(DocumentModel document, FormattingTemplateModel template);
         // Метод для проверки форматирования документа
-        Task<DocumentModel> CheckDocumentAsync(DocumentModel document, long templateId);
+        Task<DocumentModel> CheckDocumentAsync(DocumentModel document, FormattingTemplateModel template);
         // Метод для оценивания форматирования документа
-        Task<DocumentModel> EvaluateDocumentAsync(DocumentModel document, long templateId);
+        Task<DocumentModel> EvaluateDocumentAsync(DocumentModel document, FormattingTemplateModel template);
     }
 }

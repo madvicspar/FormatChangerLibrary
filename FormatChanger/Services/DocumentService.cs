@@ -57,7 +57,7 @@ namespace FormatChanger.Services
             }
         }
 
-        public async Task<DocumentModel> CorrectDocumentAsync(DocumentModel document, long templateId)
+        public async Task<DocumentModel> CorrectDocumentAsync(DocumentModel document, FormattingTemplateModel template)
         {
             using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
             {
@@ -65,17 +65,18 @@ namespace FormatChanger.Services
                 //{
                 //    strategy.ApplyCorrection(doc, templateId);
                 //}
+                doc.Save();
             }
             // TODO: достать исправленный документ
             return document;
         }
 
-        public async Task<DocumentModel> CheckDocumentAsync(DocumentModel document, long templateId)
+        public async Task<DocumentModel> CheckDocumentAsync(DocumentModel document, FormattingTemplateModel template)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<DocumentModel> EvaluateDocumentAsync(DocumentModel document, long templateId)
+        public async Task<DocumentModel> EvaluateDocumentAsync(DocumentModel document, FormattingTemplateModel template)
         {
             throw new NotImplementedException();
         }

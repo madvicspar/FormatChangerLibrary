@@ -28,6 +28,7 @@ namespace FormatChanger.Controllers
 
         public void SetTemplates()
         {
+            // TODO: убрать из типов подпись, если ее не должно быть, после чего поменять логику классификации
             var templates = _templateService.GetTemplatesAsync();
             ViewBag.Templates = templates.Result;
         }
@@ -63,6 +64,8 @@ namespace FormatChanger.Controllers
 
                 SetTemplates();
 
+                TempData["DocumentId"] = JsonConvert.SerializeObject(document.Id);
+
                 return View("Index", paragraphList);
             }
             return RedirectToAction("Index");
@@ -71,45 +74,34 @@ namespace FormatChanger.Controllers
         [HttpPost]
         public async Task<IActionResult> Export(long templateId, int actionId, [FromBody] string[] types)
         {
-            // получить шаблон
-            // если оценивание, то получить систему оценивания
-            // если проверка, то тип исправлений
-            // что-то делаем в зависимости от типа
+            var documentId = (long)JsonConvert.DeserializeObject<long>(TempData["DocumentId"].ToString());
 
-
-
-            // Извлекаем документ и шаблон из TempData
-            var documentId = TempData["DocumentId"] as int?;
-            if (!documentId.HasValue)
-            {
-                return BadRequest("Документ не найден.");
-            }
-
-            var document = await _documentService.GetDocumentByIdAsync(documentId.Value);
+            var document = await _documentService.GetDocumentByIdAsync(documentId);
             if (document == null)
             {
                 return NotFound();
             }
 
             DocumentModel resultDocumentId;
+            var template = _templateService.GetTemplateByIdAsync(templateId).Result;
 
             switch (actionId)
             {
                 case 1: // Исправление
-                    resultDocumentId = await _documentService.CorrectDocumentAsync(document, templateId);
+                    resultDocumentId = await _documentService.CorrectDocumentAsync(document, template);
                     break;
                 case 2: // Проверка
-                    resultDocumentId = await _documentService.CheckDocumentAsync(document, templateId);
+                    resultDocumentId = await _documentService.CheckDocumentAsync(document, template);
                     break;
                 case 3: // Оценивание
-                    resultDocumentId = await _documentService.EvaluateDocumentAsync(document, templateId);
+                    resultDocumentId = await _documentService.EvaluateDocumentAsync(document, template);
                     break;
                 default:
                     return BadRequest("Неизвестное действие");
             }
 
             // Экспортируем документ
-            return View();
+            return RedirectToAction("Index");
         }
 
         public IActionResult Privacy()
