@@ -13,16 +13,22 @@ namespace FormatChanger.Services
         private readonly IElementCorrectionStrategy<TextSettingsModel> _textCorrectionStrategy;
         private readonly IElementCorrectionStrategy<HeadingSettingsModel> _headingFirstCorrectionStrategies;
         private readonly IElementCorrectionStrategy<ImageSettingsModel> _imageCorrectionStrategy;
+        private readonly IElementCorrectionStrategy<TableSettingsModel> _tableCorrectionStrategy;
+        private readonly IElementCorrectionStrategy<CellSettingsModel> _cellCorrectionStrategy;
 
         public DocumentService(ApplicationDbContext context, 
             IElementCorrectionStrategy<TextSettingsModel> textStrategy,
             IElementCorrectionStrategy<HeadingSettingsModel> h1Strategy,
             IElementCorrectionStrategy<ImageSettingsModel> imageStrategy,
+            IElementCorrectionStrategy<TableSettingsModel> tableCorrectionStrategy,
+            IElementCorrectionStrategy<CellSettingsModel> cellCorrectionStrategy)
         {
             _context = context;
             _textCorrectionStrategy = textStrategy;
             _headingFirstCorrectionStrategies = h1Strategy;
             _imageCorrectionStrategy = imageStrategy;
+            _tableCorrectionStrategy = tableCorrectionStrategy;
+            _cellCorrectionStrategy = cellCorrectionStrategy;
             //_context.SeedData(_context);
         }
 
@@ -69,10 +75,13 @@ namespace FormatChanger.Services
         {
             using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
             {
-                //foreach (var strategy in _correctionStrategies)
-                //{
+
+                _textCorrectionStrategy.ApplyCorrection(doc, template);
                 _headingFirstCorrectionStrategies.ApplyCorrection(doc, template);
-                //}
+                _imageCorrectionStrategy.ApplyCorrection(doc, template);
+                _tableCorrectionStrategy.ApplyCorrection(doc, template);
+                _cellCorrectionStrategy.ApplyCorrection(doc, template);
+                
                 doc.Save();
             }
             // TODO: достать исправленный документ
