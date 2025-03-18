@@ -11,10 +11,13 @@ namespace FormatChanger.Services
     {
         private readonly ApplicationDbContext _context;
         //private readonly IEnumerable<IElementCorrectionStrategy<T>> _correctionStrategies;
+        private readonly IElementCorrectionStrategy<HeadingSettingsModel> _headingFirstCorrectionStrategies;
 
         public DocumentService(ApplicationDbContext context)
+            IElementCorrectionStrategy<HeadingSettingsModel> h1Strategy,
         {
             _context = context;
+            _headingFirstCorrectionStrategies = h1Strategy;
             //_context.SeedData(_context);
         }
 
@@ -63,7 +66,7 @@ namespace FormatChanger.Services
             {
                 //foreach (var strategy in _correctionStrategies)
                 //{
-                //    strategy.ApplyCorrection(doc, templateId);
+                _headingFirstCorrectionStrategies.ApplyCorrection(doc, template);
                 //}
                 doc.Save();
             }

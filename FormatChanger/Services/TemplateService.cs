@@ -15,7 +15,7 @@ public class TemplateService : ITemplateService
     // Получить шаблон по ID
     public async Task<FormattingTemplateModel> GetTemplateByIdAsync(long templateId)
     {
-        return await _context.FormattingTemplates.FindAsync(templateId);
+        return await _context.FormattingTemplates
     }
     // Получить список шаблонов
     // TODO: после реализации добавления шаблона поменять структуру бд и выводить только шаблоны, доступные текущему пользователю

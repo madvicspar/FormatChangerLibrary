@@ -4,8 +4,12 @@ using FormatChanger.Models;
 
 namespace FormatChanger.Services
 {
-    public class HeadingFirstCorrectionStrategy /*: IElementCorrectionStrategy<HeadingSettingsModel>*/
+    public class HeadingFirstCorrectionStrategy : IElementCorrectionStrategy<HeadingSettingsModel>
     {
+        public HeadingSettingsModel GetSettings(FormattingTemplateModel template)
+        {
+            return template.HeadingSettings;
+        }
         public RunProperties GetRunProperties(HeadingSettingsModel settings)
         {
             return new RunProperties(
@@ -44,12 +48,13 @@ namespace FormatChanger.Services
             return paragraphProperties;
         }
 
-        public void ApplyCorrection(WordprocessingDocument doc, HeadingSettingsModel settings)
+        public void ApplyCorrection(WordprocessingDocument doc, FormattingTemplateModel template)
         {
+            var settings = GetSettings(template);
             var stylePart = doc.MainDocumentPart?.StyleDefinitionsPart;
             if (stylePart?.Styles == null) return;
 
-            var style = stylePart.Styles.Elements<Style>().FirstOrDefault(style => style.StyleId == "Heading");
+            var style = stylePart.Styles.Elements<Style>().FirstOrDefault(style => style.StyleId == "1");
             if (style == null)
             {
                 Console.WriteLine("Style 'Heading' not found.");
