@@ -18,8 +18,7 @@ function startFormattingProcess() {
     })
         .then(response => {
             if (response.ok) {
-                // Если запрос успешен, можем выполнить дополнительные действия
-                alert('Процесс исправления начался');
+                
             } else {
                 alert('Ошибка при отправке запроса');
             }
