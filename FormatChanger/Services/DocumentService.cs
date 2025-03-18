@@ -10,13 +10,15 @@ namespace FormatChanger.Services
     public class DocumentService : IDocumentService
     {
         private readonly ApplicationDbContext _context;
-        //private readonly IEnumerable<IElementCorrectionStrategy<T>> _correctionStrategies;
+        private readonly IElementCorrectionStrategy<TextSettingsModel> _textCorrectionStrategy;
         private readonly IElementCorrectionStrategy<HeadingSettingsModel> _headingFirstCorrectionStrategies;
 
-        public DocumentService(ApplicationDbContext context)
+        public DocumentService(ApplicationDbContext context, 
+            IElementCorrectionStrategy<TextSettingsModel> textStrategy,
             IElementCorrectionStrategy<HeadingSettingsModel> h1Strategy,
         {
             _context = context;
+            _textCorrectionStrategy = textStrategy;
             _headingFirstCorrectionStrategies = h1Strategy;
             //_context.SeedData(_context);
         }

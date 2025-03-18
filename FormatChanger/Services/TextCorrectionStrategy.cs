@@ -4,8 +4,12 @@ using FormatChanger.Models;
 
 namespace FormatChanger.Services
 {
-    public class TextCorrectionStrategy /*: IElementCorrectionStrategy<TextSettingsModel>*/
+    public class TextCorrectionStrategy : IElementCorrectionStrategy<TextSettingsModel>
     {
+        public TextSettingsModel GetSettings(FormattingTemplateModel template)
+        {
+            return template.TextSettings;
+        }
         public RunProperties GetRunProperties(TextSettingsModel settings)
         {
             return new RunProperties(
@@ -32,19 +36,21 @@ namespace FormatChanger.Services
                 {
                     Left = settings.Left.ToString(),
                     Right = settings.Right.ToString(),
-                    FirstLine = settings.FirstLine.ToString()
+                    FirstLine = ((int)(settings.FirstLine * 567)).ToString()
                 },
                 new Justification { Val = JustificationConverter.Parse(settings.Justification) },
                 new KeepNext { Val = settings.KeepWithNext }
             );
         }
 
-        public void ApplyCorrection(WordprocessingDocument doc, TextSettingsModel settings)
+        public void ApplyCorrection(WordprocessingDocument doc, FormattingTemplateModel template)
         {
+            // TODO: сделать очистку формата (например, шрифты идут выше стилей)
+            var settings = GetSettings(template);
             var stylePart = doc.MainDocumentPart?.StyleDefinitionsPart;
             if (stylePart?.Styles == null) return;
 
-            var normalStyle = stylePart.Styles.Elements<Style>().FirstOrDefault(style => style.StyleId == "Normal");
+            var normalStyle = stylePart.Styles.Elements<Style>().FirstOrDefault(style => style.StyleName.Val == "Normal");
             if (normalStyle == null)
             {
                 Console.WriteLine("Style 'Normal' not found.");
