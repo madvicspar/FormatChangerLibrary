@@ -39,6 +39,6 @@ namespace FormatChanger.Models
         public bool KeepWithNext { get; set; }
         [ForeignKey("CaptionSettings")]
         public long CaptionSettingsId { get; set; }
-        public virtual CaptionSettingsModel CaptionSettings { get; set; }
+        public virtual ICaptionSettingsModel CaptionSettings { get; set; }
     }
 }

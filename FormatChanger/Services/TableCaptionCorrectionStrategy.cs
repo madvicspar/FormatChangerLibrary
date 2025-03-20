@@ -4,9 +4,13 @@ using FormatChanger.Models;
 
 namespace FormatChanger.Services
 {
-    public class TableCaptionCorrectionStrategy /*: IElementCorrectionStrategy<CaptionSettingsModel>*/
+    public class TableCaptionCorrectionStrategy : IElementCorrectionStrategy<TableCaptionSettingsModel>
     {
-        public RunProperties GetRunProperties(CaptionSettingsModel settings)
+        public TableCaptionSettingsModel GetSettings(FormattingTemplateModel template)
+        {
+            return template.TableSettings.CaptionSettings as TableCaptionSettingsModel;
+        }
+        public RunProperties GetRunProperties(TableCaptionSettingsModel settings)
         {
             return new RunProperties(
                 new RunFonts { Ascii = settings.TextSettings.Font, HighAnsi = settings.TextSettings.Font },
@@ -18,7 +22,7 @@ namespace FormatChanger.Services
             );
         }
 
-        public ParagraphProperties GetParagraphProperties(CaptionSettingsModel settings)
+        public ParagraphProperties GetParagraphProperties(TableCaptionSettingsModel settings)
         {
             var paragraphProperties = new ParagraphProperties(
             new SpacingBetweenLines
@@ -40,18 +44,19 @@ namespace FormatChanger.Services
             return paragraphProperties;
         }
 
-        public void ApplyCorrection(WordprocessingDocument doc, CaptionSettingsModel settings)
+        public void ApplyCorrection(WordprocessingDocument doc, FormattingTemplateModel template)
         {
-            // TODO: Add string pattern
+            // TODO: Add string pattern and maybe numbering
             // TODO: think about: need caption, but in classification there is no caption - what should we do?
-            // TODO: Change logic of getting table signature paragraphs
+            // TODO: Change logic of getting image signature paragraphs
+            var settings = GetSettings(template);
             var stylePart = doc.MainDocumentPart?.StyleDefinitionsPart;
             if (stylePart?.Styles == null) return;
 
-            var style = stylePart.Styles.Elements<Style>().FirstOrDefault(style => style.StyleId == "TableCaption");
+            var style = stylePart.Styles.Elements<Style>().FirstOrDefault(style => style.StyleId == ParagraphTypes.TableCaption.ToString());
             if (style == null)
             {
-                Console.WriteLine("Style 'TableCaption' not found.");
+                Console.WriteLine($"Style {ParagraphTypes.TableCaption} not found.");
                 return;
             }
 

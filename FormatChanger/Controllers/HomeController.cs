@@ -48,25 +48,11 @@ namespace FormatChanger.Controllers
 
                 var paragraphs = _documentService.GetDocumentParagraphs(document);
 
-                var paragraphList = new List<ParagraphModel>();
-
-                foreach (var paragraph in paragraphs)
-                {
-                    //string userDefinedType = DetermineParagraphType(paragraph);
-                    string type = "Обычный текст";
-
-                    paragraphList.Add(new ParagraphModel
-                    {
-                        Paragraph = paragraph,
-                        Type = ParagraphTypes.Heading.ToEnumString()
-                    });
-                }
-
                 SetTemplates();
 
                 TempData["DocumentId"] = JsonConvert.SerializeObject(document.Id);
 
-                return View("Index", paragraphList);
+                return View("Index", paragraphs);
             }
             return RedirectToAction("Index");
         }
@@ -88,13 +74,13 @@ namespace FormatChanger.Controllers
             switch (actionId)
             {
                 case 1: // Исправление
-                    resultDocumentId = await _documentService.CorrectDocumentAsync(document, template);
+                    resultDocumentId = await _documentService.CorrectDocumentAsync(document, template, types);
                     break;
                 case 2: // Проверка
-                    resultDocumentId = await _documentService.CheckDocumentAsync(document, template);
+                    resultDocumentId = await _documentService.CheckDocumentAsync(document, template, types);
                     break;
                 case 3: // Оценивание
-                    resultDocumentId = await _documentService.EvaluateDocumentAsync(document, template);
+                    resultDocumentId = await _documentService.EvaluateDocumentAsync(document, template, types);
                     break;
                 default:
                     return BadRequest("Неизвестное действие");

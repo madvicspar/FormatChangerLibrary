@@ -6,20 +6,20 @@ namespace FormatChanger.Models
     public static class ParagraphTypesEnumExtensions
     {
         // Преобразование enum в строку
-        public static string ToEnumString(this ParagraphTypes type)
+        public static string ToString(this ParagraphTypes type)
         {
             switch (type)
             {
                 case ParagraphTypes.Normal:
-                    return "normal";
+                    return "Normal";
                 case ParagraphTypes.Heading:
-                    return "heading";
+                    return "Heading";
                 case ParagraphTypes.List:
-                    return "list";
+                    return "List";
                 case ParagraphTypes.ImageCaption:
-                    return "caption-image";
+                    return "ImageCaption";
                 case ParagraphTypes.TableCaption:
-                    return "caption-table";
+                    return "TableCaption";
                 case ParagraphTypes.NoEdit:
                     return "no-edit";
                 default:
@@ -30,20 +30,17 @@ namespace FormatChanger.Models
         // Преобразование строки в enum
         public static ParagraphTypes ToEnum(this string typeString)
         {
-            // Приводим строку к нижнему регистру и пробуем разобрать
-            typeString = typeString.ToLower();
-
             switch (typeString)
             {
-                case "normal":
+                case "Normal":
                     return ParagraphTypes.Normal;
-                case "heading":
+                case "Heading":
                     return ParagraphTypes.Heading;
-                case "list":
+                case "List":
                     return ParagraphTypes.List;
-                case "caption-image":
+                case "ImageCaption":
                     return ParagraphTypes.ImageCaption;
-                case "caption-table":
+                case "TableCaption":
                     return ParagraphTypes.TableCaption;
                 case "no-edit":
                     return ParagraphTypes.NoEdit;

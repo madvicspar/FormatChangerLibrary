@@ -1,4 +1,3 @@
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using FormatChanger.Models;
 using FormatChanger.Services;
 using FormatChanger.Utilities.Data;
@@ -14,6 +13,8 @@ builder.Services.AddScoped<ITemplateService, TemplateService>();
 builder.Services.AddScoped<IElementCorrectionStrategy<TextSettingsModel>, TextCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<HeadingSettingsModel>, HeadingFirstCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<ImageSettingsModel>, ImageCorrectionStrategy>();
+builder.Services.AddScoped<IElementCorrectionStrategy<ImageCaptionSettingsModel>, ImageCaptionCorrectionStrategy>();
+builder.Services.AddScoped<IElementCorrectionStrategy<TableCaptionSettingsModel>, TableCaptionCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<TableSettingsModel>, TableCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<CellSettingsModel>, TableCellCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<HeaderSettingsModel>, TableHeaderCorrectionStrategy>();
@@ -22,33 +23,20 @@ builder.Services.AddScoped<IElementCorrectionStrategy<HeaderSettingsModel>, Tabl
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options
                     => options.UseNpgsql(connectionString));
-//builder.Services.AddIdentity<UserModel, IdentityRole>()
-//    .AddEntityFrameworkStores<ApplicationDbContext>()
-//    .AddDefaultTokenProviders();
+builder.Services.AddIdentity<UserModel, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
-
-//// Используем инициализацию данных после запуска приложения
-//using (var scope = app.Services.CreateScope())
-//{
-//    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
-//    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-//    var testUser = new UserModel
-//    {
-//        UserName = "me_test",
-//        TelegramUserName = "madvicspar"
-//    };
-
-//    // Проверяем, существует ли уже пользователь, и если нет - создаем его
-//    var user = await userManager.FindByNameAsync(testUser.UserName);
-//    if (user == null)
-//    {
-//        var createUserResult = await userManager.CreateAsync(testUser, "Test!123");
-//    }
-//}
-
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    dbContext.ClearAndSeed(dbContext);
+    await ApplicationDbContext.Initialize(scope.ServiceProvider, userManager, roleManager);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

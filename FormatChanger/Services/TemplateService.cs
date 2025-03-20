@@ -20,7 +20,7 @@ public class TemplateService : ITemplateService
             .Include(s => s.TextSettings)
             .Include(s => s.HeadingSettings).ThenInclude(t => t.TextSettings)
             .Include(s => s.ListSettings)
-            .Include(s => s.ImageSettings)
+            .Include(s => s.ImageSettings).ThenInclude(c => c.CaptionSettings).ThenInclude(t => t.TextSettings)
             .Include(s => s.TableSettings).ThenInclude(c => c.CellSettings).ThenInclude(t => t.TextSettings)
             .Include(s => s.TableSettings).ThenInclude(h => h.HeaderSettings).ThenInclude(c => c.CellSettings).ThenInclude(t => t.TextSettings)
             .Include(s => s.TableSettings).ThenInclude(c => c.CaptionSettings).ThenInclude(t => t.TextSettings)

@@ -4,9 +4,13 @@ using FormatChanger.Models;
 
 namespace FormatChanger.Services
 {
-    public class ImageCaptionCorrectionStrategy /*: IElementCorrectionStrategy<CaptionSettingsModel>*/
+    public class ImageCaptionCorrectionStrategy : IElementCorrectionStrategy<ImageCaptionSettingsModel>
     {
-        public RunProperties GetRunProperties(CaptionSettingsModel settings)
+        public ImageCaptionSettingsModel GetSettings(FormattingTemplateModel template)
+        {
+            return template.ImageSettings.CaptionSettings as ImageCaptionSettingsModel;
+        }
+        public RunProperties GetRunProperties(ImageCaptionSettingsModel settings)
         {
             return new RunProperties(
                 new RunFonts { Ascii = settings.TextSettings.Font, HighAnsi = settings.TextSettings.Font },
@@ -18,7 +22,7 @@ namespace FormatChanger.Services
             );
         }
 
-        public ParagraphProperties GetParagraphProperties(CaptionSettingsModel settings)
+        public ParagraphProperties GetParagraphProperties(ImageCaptionSettingsModel settings)
         {
             var paragraphProperties = new ParagraphProperties(
             new SpacingBetweenLines
@@ -40,18 +44,19 @@ namespace FormatChanger.Services
             return paragraphProperties;
         }
 
-        public void ApplyCorrection(WordprocessingDocument doc, CaptionSettingsModel settings)
+        public void ApplyCorrection(WordprocessingDocument doc, FormattingTemplateModel template)
         {
-            // TODO: Add string pattern
+            // TODO: Add string pattern and maybe numbering
             // TODO: think about: need caption, but in classification there is no caption - what should we do?
             // TODO: Change logic of getting image signature paragraphs
+            var settings = GetSettings(template);
             var stylePart = doc.MainDocumentPart?.StyleDefinitionsPart;
             if (stylePart?.Styles == null) return;
 
-            var style = stylePart.Styles.Elements<Style>().FirstOrDefault(style => style.StyleId == "ImageCaption");
+            var style = stylePart.Styles.Elements<Style>().FirstOrDefault(style => style.StyleId == ParagraphTypes.ImageCaption.ToString());
             if (style == null)
             {
-                Console.WriteLine("Style 'ImageCaption' not found.");
+                Console.WriteLine($"Style {ParagraphTypes.ImageCaption} not found.");
                 return;
             }
 

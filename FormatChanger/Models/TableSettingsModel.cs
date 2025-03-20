@@ -19,7 +19,7 @@ namespace FormatChanger.Models
         public long CellSettingsId { get; set; }
         [ForeignKey("HeaderSettings")]
         public long HeaderSettingsModelId { get; set; }
-        public virtual CaptionSettingsModel CaptionSettings { get; set; }
+        public virtual ICaptionSettingsModel CaptionSettings { get; set; }
         public virtual CellSettingsModel CellSettings { get; set; }
         public virtual HeaderSettingsModel HeaderSettings { get; set; }
     }

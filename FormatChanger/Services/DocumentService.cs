@@ -13,9 +13,11 @@ namespace FormatChanger.Services
         private readonly IElementCorrectionStrategy<TextSettingsModel> _textCorrectionStrategy;
         private readonly IElementCorrectionStrategy<HeadingSettingsModel> _headingFirstCorrectionStrategies;
         private readonly IElementCorrectionStrategy<ImageSettingsModel> _imageCorrectionStrategy;
+        private readonly IElementCorrectionStrategy<ImageCaptionSettingsModel> _imageCaptionCorrectionStrategy;
         private readonly IElementCorrectionStrategy<TableSettingsModel> _tableCorrectionStrategy;
         private readonly IElementCorrectionStrategy<CellSettingsModel> _cellCorrectionStrategy;
         private readonly IElementCorrectionStrategy<HeaderSettingsModel> _headerTableCorrectionStrategies;
+        private readonly IElementCorrectionStrategy<TableCaptionSettingsModel> _tableCaptionCorrectionStrategy;
 
         public DocumentService(ApplicationDbContext context, 
             IElementCorrectionStrategy<TextSettingsModel> textStrategy,
@@ -23,15 +25,21 @@ namespace FormatChanger.Services
             IElementCorrectionStrategy<ImageSettingsModel> imageStrategy,
             IElementCorrectionStrategy<TableSettingsModel> tableCorrectionStrategy,
             IElementCorrectionStrategy<CellSettingsModel> cellCorrectionStrategy,
-            IElementCorrectionStrategy<HeaderSettingsModel> headerTableCorrectionStrategies)
+            IElementCorrectionStrategy<HeaderSettingsModel> headerTableCorrectionStrategies,
+            IElementCorrectionStrategy<ImageCaptionSettingsModel> imageCaptionCorrectionStrategy,
+            IElementCorrectionStrategy<TableCaptionSettingsModel> tableCaptionCorrectionStrategy)
         {
             _context = context;
+            //_context.ClearAndSeed(_context);
             _textCorrectionStrategy = textStrategy;
             _headingFirstCorrectionStrategies = h1Strategy;
             _imageCorrectionStrategy = imageStrategy;
             _tableCorrectionStrategy = tableCorrectionStrategy;
             _cellCorrectionStrategy = cellCorrectionStrategy;
             _headerTableCorrectionStrategies = headerTableCorrectionStrategies;
+            _imageCaptionCorrectionStrategy = imageCaptionCorrectionStrategy;
+            _tableCaptionCorrectionStrategy = tableCaptionCorrectionStrategy;
+
             //_context.SeedData(_context);
         }
 
@@ -65,26 +73,108 @@ namespace FormatChanger.Services
         }
 
         // Извлечение абзацев из документа
-        public List<Paragraph> GetDocumentParagraphs(DocumentModel document)
+        public List<ParagraphModel>? GetDocumentParagraphs(DocumentModel document)
         {
+            // TODO: убрать рисунки и таблицы (хотя мб не убирать, а писать что вот тут фотка или изображение
             using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
             {
-                var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().ToList();
-                return paragraphs;
+                return doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().Where(p => !string.IsNullOrWhiteSpace(p.InnerText))
+                    .Select(p => new ParagraphModel
+                    {
+                        Paragraph = p,
+                        Type = ParagraphTypes.Heading.ToString()
+                    })
+                    .ToList();
             }
         }
 
-        public async Task<DocumentModel> CorrectDocumentAsync(DocumentModel document, FormattingTemplateModel template)
+        public async Task<DocumentModel> CorrectDocumentAsync(DocumentModel document, FormattingTemplateModel template, string[] types)
         {
+            var paragraphList = GetDocumentParagraphs(document);
+            for (int i = 0; i < types.Length; i++)
+            {
+                paragraphList[i].Type = ParagraphTypesEnumExtensions.ToEnum(types[i]).ToString();
+            }
+
+            using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
+            {
+                MainDocumentPart mainPart = doc.MainDocumentPart;
+                StyleDefinitionsPart stylePart = mainPart.StyleDefinitionsPart;
+
+                Styles styles = stylePart.Styles;
+
+                var styleType = ParagraphTypes.ImageCaption.ToString();
+                // Проверяем, существует ли стиль
+                if (styles.Elements<Style>().All(s => s.StyleName.Val != styleType))
+                {
+                    Style style = new Style()
+                    {
+                        Type = StyleValues.Paragraph,
+                        StyleId = styleType,
+                        CustomStyle = true,
+                        StyleName = new StyleName() { Val = styleType }
+                    };
+
+                    style.Append(new BasedOn() { Val = "Normal" });
+                    style.Append(new NextParagraphStyle() { Val = "Normal" });
+
+                    styles.Append(style);
+                }
+
+                styleType = ParagraphTypes.TableCaption.ToString();
+                // Проверяем, существует ли стиль
+                if (styles.Elements<Style>().All(s => s.StyleName.Val != styleType))
+                {
+                    Style style = new Style()
+                    {
+                        Type = StyleValues.Paragraph,
+                        StyleId = styleType,
+                        CustomStyle = true,
+                        StyleName = new StyleName() { Val = styleType }
+                    };
+
+                    style.Append(new BasedOn() { Val = "Normal" });
+                    style.Append(new NextParagraphStyle() { Val = "Normal" });
+
+                    styles.Append(style);
+                }
+
+                styles.Save();
+
+                var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().Where(p => !string.IsNullOrWhiteSpace(p.InnerText)).ToList();
+                foreach (var paragraph in paragraphs)
+                {
+                    var type = paragraphList.Where(x => x.Paragraph.ParagraphId == paragraph.ParagraphId).First().Type;
+
+                    ParagraphProperties paraProps = paragraph.Elements<ParagraphProperties>().FirstOrDefault();
+
+                    if (paraProps == null)
+                    {
+                        paraProps = new ParagraphProperties();
+                        paragraph.PrependChild(paraProps);
+                    }
+
+                    if (type == "Heading")
+                        type = "heading 1";
+
+                    var styleId = doc.MainDocumentPart.StyleDefinitionsPart.Styles.Elements<Style>().Where(x => x.StyleName.Val == type).First().StyleId;
+
+                    paraProps.ParagraphStyleId = new ParagraphStyleId() { Val = styleId };
+                }
+                doc.Save();
+            }
+
             CleanFormat(document.FilePath);
             using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
             {
                 _textCorrectionStrategy.ApplyCorrection(doc, template);
                 _headingFirstCorrectionStrategies.ApplyCorrection(doc, template);
                 _imageCorrectionStrategy.ApplyCorrection(doc, template);
+                _imageCaptionCorrectionStrategy.ApplyCorrection(doc, template);
                 _tableCorrectionStrategy.ApplyCorrection(doc, template);
                 _cellCorrectionStrategy.ApplyCorrection(doc, template);
                 _headerTableCorrectionStrategies.ApplyCorrection(doc, template);
+                _tableCaptionCorrectionStrategy.ApplyCorrection(doc, template);
                 
                 doc.Save();
             }
@@ -92,12 +182,12 @@ namespace FormatChanger.Services
             return document;
         }
 
-        public async Task<DocumentModel> CheckDocumentAsync(DocumentModel document, FormattingTemplateModel template)
+        public async Task<DocumentModel> CheckDocumentAsync(DocumentModel document, FormattingTemplateModel template, string[] types)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<DocumentModel> EvaluateDocumentAsync(DocumentModel document, FormattingTemplateModel template)
+        public async Task<DocumentModel> EvaluateDocumentAsync(DocumentModel document, FormattingTemplateModel template, string[] types)
         {
             throw new NotImplementedException();
         }

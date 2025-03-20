@@ -36,6 +36,38 @@ namespace FormatChanger.Utilities.Data
         public DbSet<CellSettingsModel> CellSettings { get; set; } = null!;
         public DbSet<HeaderSettingsModel> HeaderSettings { get; set; } = null!;
         public DbSet<DocumentSettingsModel> DocumentSettings { get; set; } = null!;
+        public void ClearAndSeed(ApplicationDbContext _context)
+        {
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
+
+            SeedData(_context);
+        }
+        public static async Task Initialize(IServiceProvider serviceProvider, UserManager<UserModel> userManager, RoleManager<IdentityRole> roleManager)
+        {
+            var testUser = new UserModel
+            {
+                UserName = "me_test",
+                TelegramUserName = "madvicspar"
+            };
+
+            var user = await userManager.FindByNameAsync(testUser.UserName);
+            if (user == null)
+            {
+                var createUserResult = await userManager.CreateAsync(testUser, "Test!123");
+
+                if (createUserResult.Succeeded)
+                {
+                    var roleExist = await roleManager.RoleExistsAsync("UserRole");
+                    if (!roleExist)
+                    {
+                        await roleManager.CreateAsync(new IdentityRole("UserRole"));
+                    }
+
+                    await userManager.AddToRoleAsync(testUser, "UserRole");
+                }
+            }
+        }
         public void SeedData(ApplicationDbContext context)
         {
             // Шаблон форматирования для РИС-22
@@ -43,11 +75,11 @@ namespace FormatChanger.Utilities.Data
             var textSettings = new TextSettingsModel
             {
                 Font = "Times New Roman",
-                Color = "000",
+                Color = "000000",
                 IsBold = false,
                 IsItalic = false,
                 IsUnderscore = false,
-                FontSize = 26,
+                FontSize = 13,
                 LineSpacing = 360,
                 BeforeSpacing = 0,
                 AfterSpacing = 0,
@@ -65,11 +97,11 @@ namespace FormatChanger.Utilities.Data
             var textSettings_h1 = new TextSettingsModel
             {
                 Font = "Times New Roman",
-                Color = "000",
+                Color = "000000",
                 IsBold = true,
                 IsItalic = false,
                 IsUnderscore = false,
-                FontSize = 32,
+                FontSize = 16,
                 LineSpacing = 240,
                 BeforeSpacing = 0,
                 AfterSpacing = 240,
@@ -87,11 +119,11 @@ namespace FormatChanger.Utilities.Data
             var textSettings_h2 = new TextSettingsModel
             {
                 Font = "Times New Roman",
-                Color = "000",
+                Color = "000000",
                 IsBold = true,
                 IsItalic = false,
                 IsUnderscore = false,
-                FontSize = 28,
+                FontSize = 14,
                 LineSpacing = 240,
                 BeforeSpacing = 240,
                 AfterSpacing = 120,
@@ -109,11 +141,11 @@ namespace FormatChanger.Utilities.Data
             var textSettings_h3 = new TextSettingsModel
             {
                 Font = "Times New Roman",
-                Color = "000",
+                Color = "000000",
                 IsBold = true,
                 IsItalic = false,
                 IsUnderscore = false,
-                FontSize = 26,
+                FontSize = 13,
                 LineSpacing = 240,
                 BeforeSpacing = 160,
                 AfterSpacing = 80,
@@ -131,11 +163,11 @@ namespace FormatChanger.Utilities.Data
             var textSettings_tableCaption = new TextSettingsModel
             {
                 Font = "Times New Roman",
-                Color = "000",
+                Color = "000000",
                 IsBold = false,
                 IsItalic = false,
                 IsUnderscore = false,
-                FontSize = 26,
+                FontSize = 13,
                 LineSpacing = 240,
                 BeforeSpacing = 120,
                 AfterSpacing = 0,
@@ -153,19 +185,19 @@ namespace FormatChanger.Utilities.Data
             var textSettings_imageCaption = new TextSettingsModel
             {
                 Font = "Times New Roman",
-                Color = "000",
+                Color = "000000",
                 IsBold = true,
                 IsItalic = true,
                 IsUnderscore = false,
-                FontSize = 22,
+                FontSize = 11,
                 LineSpacing = 240,
                 BeforeSpacing = 0,
                 AfterSpacing = 120,
-                Justification = "Both",
+                Justification = "Center",
                 Left = 0,
                 Right = 0,
                 FirstLine = 0,
-                KeepWithNext = true
+                KeepWithNext = false
             };
 
             context.TextSettings.Add(textSettings_imageCaption);
@@ -175,15 +207,15 @@ namespace FormatChanger.Utilities.Data
             var textSettings_cells = new TextSettingsModel
             {
                 Font = "Times New Roman",
-                Color = "000",
+                Color = "000000",
                 IsBold = false,
                 IsItalic = false,
                 IsUnderscore = false,
-                FontSize = 22,
+                FontSize = 11,
                 LineSpacing = 240,
                 BeforeSpacing = 0,
                 AfterSpacing = 0,
-                Justification = "Both",
+                Justification = "Left",
                 Left = 0,
                 Right = 0,
                 FirstLine = 0,
@@ -197,19 +229,19 @@ namespace FormatChanger.Utilities.Data
             var textSettings_cells_header = new TextSettingsModel
             {
                 Font = "Times New Roman",
-                Color = "000",
-                IsBold = true,
+                Color = "000000",
+                IsBold = false,
                 IsItalic = false,
                 IsUnderscore = false,
-                FontSize = 22,
+                FontSize = 11,
                 LineSpacing = 240,
                 BeforeSpacing = 0,
                 AfterSpacing = 0,
-                Justification = "Both",
+                Justification = "Center",
                 Left = 0,
                 Right = 0,
                 FirstLine = 0,
-                KeepWithNext = false
+                KeepWithNext = true
             };
 
             context.TextSettings.Add(textSettings_cells_header);
@@ -219,11 +251,11 @@ namespace FormatChanger.Utilities.Data
             var textSettings_list = new TextSettingsModel
             {
                 Font = "Times New Roman",
-                Color = "000",
+                Color = "000000",
                 IsBold = false,
                 IsItalic = false,
                 IsUnderscore = false,
-                FontSize = 26,
+                FontSize = 13,
                 LineSpacing = 360,
                 BeforeSpacing = 0,
                 AfterSpacing = 0,
@@ -231,7 +263,7 @@ namespace FormatChanger.Utilities.Data
                 Left = 1.5f,
                 Right = 0.5f,
                 FirstLine = 1.25f,
-                KeepWithNext = true
+                KeepWithNext = false
             };
 
             context.TextSettings.Add(textSettings_list);
@@ -313,10 +345,10 @@ namespace FormatChanger.Utilities.Data
             {
                 TextSettings = textSettings_cells,
                 VerticalAlignment = "Top",
-                TopPadding = 0,
-                LeftPadding = 0,
-                BottomPadding = 0,
-                RightPadding = 0
+                TopPadding = 2,
+                LeftPadding = 2,
+                BottomPadding = 2,
+                RightPadding = 2
             };
 
             context.CellSettings.Add(cellSettings);
@@ -328,10 +360,10 @@ namespace FormatChanger.Utilities.Data
             {
                 TextSettings = textSettings_cells_header,
                 VerticalAlignment = "Top",
-                TopPadding = 0,
-                LeftPadding = 0,
-                BottomPadding = 0,
-                RightPadding = 0
+                TopPadding = 2,
+                LeftPadding = 2,
+                BottomPadding = 2,
+                RightPadding = 2
             };
 
             context.CellSettings.Add(cellSettings_header);
