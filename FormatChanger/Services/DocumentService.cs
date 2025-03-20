@@ -73,6 +73,7 @@ namespace FormatChanger.Services
 
         public async Task<DocumentModel> CorrectDocumentAsync(DocumentModel document, FormattingTemplateModel template)
         {
+            CleanFormat(document.FilePath);
             using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
             {
 
@@ -96,6 +97,50 @@ namespace FormatChanger.Services
         public async Task<DocumentModel> EvaluateDocumentAsync(DocumentModel document, FormattingTemplateModel template)
         {
             throw new NotImplementedException();
+        }
+
+        public void CleanFormat(string filePath)
+        {
+            using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
+            {
+                var body = doc.MainDocumentPart.Document.Body;
+
+                foreach (var paragraph in body.Elements<Paragraph>())
+                {
+                    var paragraphProperties = paragraph.Elements<ParagraphProperties>().FirstOrDefault();
+                    if (paragraphProperties != null)
+                    {
+                        var styleElement = paragraphProperties.Elements<ParagraphStyleId>().FirstOrDefault();
+                        var numberingProperties = paragraphProperties.Elements<NumberingProperties>().FirstOrDefault();
+                        paragraphProperties.RemoveAllChildren();
+
+                        if (styleElement != null)
+                        {
+                            paragraphProperties.Append(styleElement);
+                        }
+                        if (numberingProperties != null)
+                        {
+                            paragraphProperties.Append(numberingProperties);
+                        }
+                    }
+
+                    foreach (var run in paragraph.Elements<Run>())
+                    {
+                        var runProperties = run.Elements<RunProperties>().FirstOrDefault();
+                        if (runProperties != null)
+                        {
+                            var styleElement = runProperties.Elements<RunStyle>().FirstOrDefault();
+                            runProperties.RemoveAllChildren();
+                            if (styleElement != null)
+                            {
+                                runProperties.Append(styleElement);
+                            }
+                        }
+                    }
+                }
+
+                doc.Save();
+            }
         }
     }
 }
