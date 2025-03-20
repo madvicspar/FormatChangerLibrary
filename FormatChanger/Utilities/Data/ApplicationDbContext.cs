@@ -12,6 +12,15 @@ namespace FormatChanger.Utilities.Data
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<ICaptionSettingsModel>()
+                .HasDiscriminator<string>("Discriminator")
+                .HasValue<ImageCaptionSettingsModel>("Image")
+                .HasValue<TableCaptionSettingsModel>("Table");
+        }
+
         public DbSet<UserModel> Users { get; set; } = null!;
         public DbSet<DocumentModel> Documents { get; set; } = null!;
         public DbSet<FormattingTemplateModel> FormattingTemplates { get; set; } = null!;
@@ -21,7 +30,7 @@ namespace FormatChanger.Utilities.Data
         public DbSet<TextSettingsModel> TextSettings { get; set; } = null!;
         public DbSet<HeadingSettingsModel> HeadingSettings { get; set; } = null!;
         public DbSet<ListSettingsModel> ListSettings { get; set; } = null!;
-        public DbSet<CaptionSettingsModel> CaptionSettings { get; set; } = null!;
+        public DbSet<ICaptionSettingsModel> CaptionSettings { get; set; } = null!;
         public DbSet<ImageSettingsModel> ImageSettings { get; set; } = null!;
         public DbSet<TableSettingsModel> TableSettings { get; set; } = null!;
         public DbSet<CellSettingsModel> CellSettings { get; set; } = null!;
@@ -261,8 +270,8 @@ namespace FormatChanger.Utilities.Data
             context.HeadingSettings.Add(headingSettings3);
             context.SaveChanges();
 
-            // **. Данные для настроек подписи к рисунку**
-            var tableCaptionSettings = new CaptionSettingsModel
+            // **. Данные для настроек подписи к таблице**
+            var tableCaptionSettings = new TableCaptionSettingsModel
             {
                 TextSettings = textSettings_tableCaption,
                 TextTemplate = "Таблица\\s+\\d+\\s+-\\s+(.+)"
@@ -272,7 +281,7 @@ namespace FormatChanger.Utilities.Data
             context.SaveChanges();
 
             // **. Данные для настроек подписи к рисунку**
-            var imageCaptionSettings = new CaptionSettingsModel
+            var imageCaptionSettings = new ImageCaptionSettingsModel
             {
                 TextSettings = textSettings_imageCaption,
                 TextTemplate = "Рисунок\\s+\\d+\\s+-\\s+(.+)"

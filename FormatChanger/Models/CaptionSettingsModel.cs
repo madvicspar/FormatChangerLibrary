@@ -2,7 +2,7 @@
 
 namespace FormatChanger.Models
 {
-    public class CaptionSettingsModel
+    public class ICaptionSettingsModel
     {
         public long Id { get; set; }
         [ForeignKey("TextSettings")]
@@ -11,6 +11,9 @@ namespace FormatChanger.Models
         /// Шаблон текста для подписей, например "Рисунок 1 - "
         /// </summary>
         public string TextTemplate { get; set; }
+        public string Discriminator { get; set; }
         public virtual TextSettingsModel TextSettings { get; set; }
     }
+    public class ImageCaptionSettingsModel : ICaptionSettingsModel { }
+    public class TableCaptionSettingsModel : ICaptionSettingsModel { }
 }
