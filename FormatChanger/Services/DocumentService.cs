@@ -15,13 +15,15 @@ namespace FormatChanger.Services
         private readonly IElementCorrectionStrategy<ImageSettingsModel> _imageCorrectionStrategy;
         private readonly IElementCorrectionStrategy<TableSettingsModel> _tableCorrectionStrategy;
         private readonly IElementCorrectionStrategy<CellSettingsModel> _cellCorrectionStrategy;
+        private readonly IElementCorrectionStrategy<HeaderSettingsModel> _headerTableCorrectionStrategies;
 
         public DocumentService(ApplicationDbContext context, 
             IElementCorrectionStrategy<TextSettingsModel> textStrategy,
             IElementCorrectionStrategy<HeadingSettingsModel> h1Strategy,
             IElementCorrectionStrategy<ImageSettingsModel> imageStrategy,
             IElementCorrectionStrategy<TableSettingsModel> tableCorrectionStrategy,
-            IElementCorrectionStrategy<CellSettingsModel> cellCorrectionStrategy)
+            IElementCorrectionStrategy<CellSettingsModel> cellCorrectionStrategy,
+            IElementCorrectionStrategy<HeaderSettingsModel> headerTableCorrectionStrategies)
         {
             _context = context;
             _textCorrectionStrategy = textStrategy;
@@ -29,6 +31,7 @@ namespace FormatChanger.Services
             _imageCorrectionStrategy = imageStrategy;
             _tableCorrectionStrategy = tableCorrectionStrategy;
             _cellCorrectionStrategy = cellCorrectionStrategy;
+            _headerTableCorrectionStrategies = headerTableCorrectionStrategies;
             //_context.SeedData(_context);
         }
 
@@ -76,12 +79,12 @@ namespace FormatChanger.Services
             CleanFormat(document.FilePath);
             using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
             {
-
                 _textCorrectionStrategy.ApplyCorrection(doc, template);
                 _headingFirstCorrectionStrategies.ApplyCorrection(doc, template);
                 _imageCorrectionStrategy.ApplyCorrection(doc, template);
                 _tableCorrectionStrategy.ApplyCorrection(doc, template);
                 _cellCorrectionStrategy.ApplyCorrection(doc, template);
+                _headerTableCorrectionStrategies.ApplyCorrection(doc, template);
                 
                 doc.Save();
             }

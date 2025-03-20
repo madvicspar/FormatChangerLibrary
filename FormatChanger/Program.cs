@@ -16,6 +16,7 @@ builder.Services.AddScoped<IElementCorrectionStrategy<HeadingSettingsModel>, Hea
 builder.Services.AddScoped<IElementCorrectionStrategy<ImageSettingsModel>, ImageCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<TableSettingsModel>, TableCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<CellSettingsModel>, TableCellCorrectionStrategy>();
+builder.Services.AddScoped<IElementCorrectionStrategy<HeaderSettingsModel>, TableHeaderCorrectionStrategy>();
 
 
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
