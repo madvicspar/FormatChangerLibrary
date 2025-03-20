@@ -88,6 +88,36 @@ namespace FormatChanger.Services
             }
         }
 
+        public void AddPageNumbers(WordprocessingDocument doc)
+        {
+            // TODO: привязать к обычному тексту?
+            FooterPart footerPart = doc.MainDocumentPart.AddNewPart<FooterPart>();
+            string footerPartId = doc.MainDocumentPart.GetIdOfPart(footerPart);
+
+            Footer footer = new Footer(new Paragraph(
+                new ParagraphProperties(
+                    new ParagraphStyleId() { Val = "Normal" },
+                    new Justification() { Val = JustificationValues.Center },
+                    new SpacingBetweenLines() { After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto },
+                    new Indentation { Left = "0", Right = "0", FirstLine = "0" }
+                ),
+                new Run(
+                    new SimpleField() { Instruction = "PAGE" })));
+
+            footerPart.Footer = footer;
+
+            IEnumerable<SectionProperties> sectionProperties = doc.MainDocumentPart.Document.Body.Elements<SectionProperties>();
+
+            foreach (var sectionProperty in sectionProperties)
+            {
+                sectionProperty.RemoveAllChildren<FooterReference>();
+                sectionProperty.PrependChild(new FooterReference()
+                {
+                    Id = footerPartId
+                });
+            }
+        }
+
         public async Task<DocumentModel> CorrectDocumentAsync(DocumentModel document, FormattingTemplateModel template, string[] types)
         {
             var paragraphList = GetDocumentParagraphs(document);
@@ -98,6 +128,7 @@ namespace FormatChanger.Services
 
             using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
             {
+                AddPageNumbers(doc);
                 MainDocumentPart mainPart = doc.MainDocumentPart;
                 StyleDefinitionsPart stylePart = mainPart.StyleDefinitionsPart;
 
