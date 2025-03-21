@@ -1,9 +1,8 @@
-﻿using FormatChanger.Models;
-using FormatChanger.Utilities.Data;
+﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using DocumentFormat.OpenXml;
-using System.Xml.Linq;
+using FormatChanger.Models;
+using FormatChanger.Utilities.Data;
 
 namespace FormatChanger.Services
 {
@@ -19,7 +18,7 @@ namespace FormatChanger.Services
         private readonly IElementCorrectionStrategy<HeaderSettingsModel> _headerTableCorrectionStrategies;
         private readonly IElementCorrectionStrategy<TableCaptionSettingsModel> _tableCaptionCorrectionStrategy;
 
-        public DocumentService(ApplicationDbContext context, 
+        public DocumentService(ApplicationDbContext context,
             IElementCorrectionStrategy<TextSettingsModel> textStrategy,
             IElementCorrectionStrategy<HeadingSettingsModel> h1Strategy,
             IElementCorrectionStrategy<ImageSettingsModel> imageStrategy,
@@ -118,6 +117,26 @@ namespace FormatChanger.Services
             }
         }
 
+        public void EnsureStylesExists(Styles styles, ParagraphTypes type)
+        {
+            // Проверяем, существует ли стиль
+            if (styles.Elements<Style>().All(s => s.StyleName.Val != type.ToString()))
+            {
+                Style style = new Style()
+                {
+                    Type = StyleValues.Paragraph,
+                    StyleId = type.ToString(),
+                    CustomStyle = true,
+                    StyleName = new StyleName() { Val = type.ToString() }
+                };
+
+                style.Append(new BasedOn() { Val = "Normal" });
+                style.Append(new NextParagraphStyle() { Val = "Normal" });
+
+                styles.Append(style);
+            }
+        }
+
         public async Task<DocumentModel> CorrectDocumentAsync(DocumentModel document, FormattingTemplateModel template, string[] types)
         {
             var paragraphList = GetDocumentParagraphs(document);
@@ -129,69 +148,17 @@ namespace FormatChanger.Services
             using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
             {
                 AddPageNumbers(doc);
-                MainDocumentPart mainPart = doc.MainDocumentPart;
-                StyleDefinitionsPart stylePart = mainPart.StyleDefinitionsPart;
 
-                Styles styles = stylePart.Styles;
+                var styles = doc.MainDocumentPart.StyleDefinitionsPart.Styles;
 
-                var styleType = ParagraphTypes.ImageCaption.ToString();
-                // Проверяем, существует ли стиль
-                if (styles.Elements<Style>().All(s => s.StyleName.Val != styleType))
-                {
-                    Style style = new Style()
-                    {
-                        Type = StyleValues.Paragraph,
-                        StyleId = styleType,
-                        CustomStyle = true,
-                        StyleName = new StyleName() { Val = styleType }
-                    };
-
-                    style.Append(new BasedOn() { Val = "Normal" });
-                    style.Append(new NextParagraphStyle() { Val = "Normal" });
-
-                    styles.Append(style);
-                }
-
-                styleType = ParagraphTypes.TableCaption.ToString();
-                // Проверяем, существует ли стиль
-                if (styles.Elements<Style>().All(s => s.StyleName.Val != styleType))
-                {
-                    Style style = new Style()
-                    {
-                        Type = StyleValues.Paragraph,
-                        StyleId = styleType,
-                        CustomStyle = true,
-                        StyleName = new StyleName() { Val = styleType }
-                    };
-
-                    style.Append(new BasedOn() { Val = "Normal" });
-                    style.Append(new NextParagraphStyle() { Val = "Normal" });
-
-                    styles.Append(style);
-                }
+                EnsureStylesExists(styles, ParagraphTypes.ImageCaption);
+                EnsureStylesExists(styles, ParagraphTypes.TableCaption);
 
                 styles.Save();
 
                 var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().Where(p => !string.IsNullOrWhiteSpace(p.InnerText)).ToList();
-                foreach (var paragraph in paragraphs)
-                {
-                    var type = paragraphList.Where(x => x.Paragraph.ParagraphId == paragraph.ParagraphId).First().Type;
-
-                    ParagraphProperties paraProps = paragraph.Elements<ParagraphProperties>().FirstOrDefault();
-
-                    if (paraProps == null)
-                    {
-                        paraProps = new ParagraphProperties();
-                        paragraph.PrependChild(paraProps);
-                    }
-
-                    if (type == "Heading")
-                        type = "heading 1";
-
-                    var styleId = doc.MainDocumentPart.StyleDefinitionsPart.Styles.Elements<Style>().Where(x => x.StyleName.Val == type).First().StyleId;
-
-                    paraProps.ParagraphStyleId = new ParagraphStyleId() { Val = styleId };
-                }
+                ApplyStyle(styles, paragraphs, paragraphList);
+                
                 doc.Save();
             }
 
@@ -206,11 +173,94 @@ namespace FormatChanger.Services
                 _cellCorrectionStrategy.ApplyCorrection(doc, template);
                 _headerTableCorrectionStrategies.ApplyCorrection(doc, template);
                 _tableCaptionCorrectionStrategy.ApplyCorrection(doc, template);
-                
+
                 doc.Save();
             }
             // TODO: достать исправленный документ
             return document;
+        }
+
+        public void ApplyStyle(Styles styles, List<Paragraph> paragraphs, List<ParagraphModel> paragraphList)
+        {
+            var stack = new Stack<int>();
+            for (int i = 0; i < paragraphs.Count; i++)
+            {
+                var paragraph = paragraphs[i];
+                var type = paragraphList.Where(x => x.Paragraph.ParagraphId == paragraph.ParagraphId).First().Type;
+
+                ParagraphProperties paraProps = paragraph.Elements<ParagraphProperties>().FirstOrDefault();
+
+                if (paraProps == null)
+                {
+                    paraProps = new ParagraphProperties();
+                    paragraph.PrependChild(paraProps);
+                }
+
+                if (type == "Heading")
+                    type = "heading 1";
+
+                if (IsList(type))
+                {
+                    int level = DetermineListLevel(paragraphList, stack, type, paragraph);
+                    ApplyNumbering(paraProps, level, type);
+                }
+                else
+                {
+                    var styleId = styles.Elements<Style>().Where(x => x.StyleName.Val == type).First().StyleId;
+
+                    paraProps.ParagraphStyleId = new ParagraphStyleId() { Val = styleId };
+                }
+            }
+        }
+
+        private int DetermineListLevel(List<ParagraphModel> paragraphList, Stack<int> stack, string type, Paragraph paragraph)
+        {
+            int level = 0;
+
+            if (stack.Count > 0)
+            {
+                var index = paragraphList.FindIndex(p => p.Paragraph.ParagraphId == paragraph.ParagraphId);
+
+                var previousParagraph = index > 0 ? paragraphList[index - 1] : null; ;
+                if (previousParagraph != null && IsList(previousParagraph.Type))
+                {
+                    if (previousParagraph.Type != type)
+                    {
+                        level = stack.Count > 0 ? stack.Pop() + 1 : 0;
+                    }
+                    else
+                    {
+                        level = stack.Count > 0 ? stack.Peek() : 0;
+                    }
+                }
+                else
+                {
+                    level = 0;
+                }
+            }
+            else
+            {
+                level = 0;
+            }
+
+            stack.Push(level);
+            return level;
+        }
+
+        private void ApplyNumbering(ParagraphProperties paraProps, int level, string type)
+        {
+            NumberingId numberingId = new NumberingId() { Val = level == 0 ? 1 : 2 };
+            NumberingProperties numberingProperties = new NumberingProperties(
+                new NumberingLevelReference() { Val = level },
+                numberingId
+            );
+
+            paraProps.Append(numberingProperties);
+        }
+
+        public bool IsList(string type)
+        {
+            return type == ParagraphTypes.Period.ToString() || type == ParagraphTypes.Bracket.ToString() || type == ParagraphTypes.Dash.ToString();
         }
 
         public async Task<DocumentModel> CheckDocumentAsync(DocumentModel document, FormattingTemplateModel template, string[] types)
