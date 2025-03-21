@@ -138,9 +138,9 @@
     transition: background-color 0.3s ease;
 }
 
-    .type-option:hover {
-        border: 1px solid #000;
-    }
+.type-option:hover {
+    border: 1px solid #000;
+}
 
 .radio-input {
     width: 20px;
@@ -155,6 +155,7 @@
 .type-option.active .radio-input {
     background-color: #fff; /* Оставляем фон белым */
     position: relative;
+    border: 1px solid #000;
 }
 
 .type-option.active .radio-input::after {
@@ -271,16 +272,41 @@
     gap: 12px; /* Расстояние между иконкой и текстом */
 }
 
+.list-markers {
+    display: flex; /* Aligns items in a row */
+    gap: 10px; /* Adds space between the buttons */
+}
+
+.marker-btn {
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.list-markers .type-option {
+    padding: 10px;
+    width: 30%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+}
+
+.list-markers .type-option.active {
+    border: 1px solid #000;
+}
+
 .option-icon {
     width: 24px;
     height: 24px;
 }
 
-    .option-icon img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain; /* Убедитесь, что изображение не искажается */
-    }
+.option-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Убедитесь, что изображение не искажается */
+}
 
 /* Текст опции */
 .option-text {

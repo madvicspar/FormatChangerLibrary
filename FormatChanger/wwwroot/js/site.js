@@ -87,6 +87,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+
+
     function updateActiveTypeButton(paragraph) {
         const type = paragraph.dataset.type;
 

@@ -14,8 +14,12 @@ namespace FormatChanger.Models
                     return "Normal";
                 case ParagraphTypes.Heading:
                     return "Heading";
-                case ParagraphTypes.List:
-                    return "List";
+                case ParagraphTypes.Period:
+                    return "Period";
+                case ParagraphTypes.Bracket:
+                    return "Bracket";
+                case ParagraphTypes.Dash:
+                    return "Dash";
                 case ParagraphTypes.ImageCaption:
                     return "ImageCaption";
                 case ParagraphTypes.TableCaption:
@@ -36,8 +40,12 @@ namespace FormatChanger.Models
                     return ParagraphTypes.Normal;
                 case "Heading":
                     return ParagraphTypes.Heading;
-                case "List":
-                    return ParagraphTypes.List;
+                case "Period":
+                    return ParagraphTypes.Period;
+                case "Bracket":
+                    return ParagraphTypes.Bracket;
+                case "Dash":
+                    return ParagraphTypes.Dash;
                 case "ImageCaption":
                     return ParagraphTypes.ImageCaption;
                 case "TableCaption":
@@ -53,10 +61,12 @@ namespace FormatChanger.Models
     {
         Normal = 0,
         Heading = 1,
-        List = 2,
-        ImageCaption = 3,
-        TableCaption = 4,
-        NoEdit = 5
+        ImageCaption = 2,
+        TableCaption = 3,
+        Period = 4,
+        Bracket = 5,
+        Dash = 6,
+        NoEdit = 7
     }
     public class ParagraphModel
     {
