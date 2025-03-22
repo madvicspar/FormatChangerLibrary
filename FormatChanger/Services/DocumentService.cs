@@ -265,12 +265,81 @@ namespace FormatChanger.Services
 
         public async Task<DocumentModel> CheckDocumentAsync(DocumentModel document, FormattingTemplateModel template, string[] types)
         {
-            throw new NotImplementedException();
+            var paragraphList = GetDocumentParagraphs(document);
+            for (int i = 0; i < types.Length; i++)
+            {
+                paragraphList[i].Type = ParagraphTypesEnumExtensions.ToEnum(types[i]).ToString();
+        }
+
+            using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
+            {
+
+                var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().Where(p => !string.IsNullOrWhiteSpace(p.InnerText)).ToList();
+                for (int i = 0; i < 1; i++)
+                {
+                    var paragraph = paragraphs[i];
+                    if (paragraphList[i].Type == ParagraphTypes.Heading.ToString())
+                    {
+                        var issues = _headingFirstCorrectionStrategies.CheckFormatting(paragraph, template);
+
+                        if (issues.Any())
+                        {
+                            AddCommentToParagraph(paragraph, issues);
+                        }
+                    }
+                }
+                doc.Save();
+            }
+            return document;
         }
 
         public async Task<DocumentModel> EvaluateDocumentAsync(DocumentModel document, FormattingTemplateModel template, string[] types)
         {
             throw new NotImplementedException();
+        }
+
+        private void AddCommentToParagraph(Paragraph paragraph, List<string> commentText)
+        {
+            var mainPart = paragraph.Ancestors<Document>().First().MainDocumentPart;
+            var commentsPart = mainPart.GetPartsOfType<WordprocessingCommentsPart>().FirstOrDefault();
+
+            if (commentsPart == null)
+            {
+                commentsPart = mainPart.AddNewPart<WordprocessingCommentsPart>();
+                commentsPart.Comments = new Comments();
+            }
+
+            var comments = commentsPart.Comments;
+
+            int id = comments.Elements<Comment>().Count() + 1;
+            string commentId = id.ToString();
+
+            var comment = new Comment()
+            {
+                Id = commentId,
+                Author = "Автоматическая проверка",
+                Date = DateTime.Now
+            };
+
+            foreach (var line in commentText)
+            {
+                comment.Append(new Paragraph(new Run(new Text(line))));
+            }
+
+            comments.Append(comment);
+            comments.Save();
+
+            var commentRangeStart = new CommentRangeStart() { Id = commentId };
+            var commentRangeEnd = new CommentRangeEnd() { Id = commentId };
+            var commentReference = new CommentReference() { Id = commentId };
+
+            var firstRun = paragraph.GetFirstChild<Run>();
+            if (firstRun != null)
+            {
+                paragraph.InsertBefore(commentRangeStart, firstRun);
+            }
+            paragraph.Append(commentRangeEnd);
+            paragraph.Append(new Run(commentReference));
         }
 
         public void CleanFormat(string filePath)
