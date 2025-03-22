@@ -79,40 +79,85 @@ namespace FormatChanger.Services
             var actualRunProps = paragraph.Descendants<RunProperties>().FirstOrDefault();
             var actualParaProps = paragraph.ParagraphProperties;
 
-            CompareRunProperties(actualRunProps, expectedRunProps, issues);
-            CompareParagraphProperties(actualParaProps, expectedParaProps, issues);
+            string styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val;
+            Style style = null;
+            StyleRunProperties styleRunProps = null;
+
+            var document = paragraph.Ancestors<Document>().FirstOrDefault();
+            if (document != null)
+            {
+                var stylePart = document.MainDocumentPart?.StyleDefinitionsPart;
+                if (stylePart != null)
+                {
+                    style = stylePart.Styles.Elements<Style>().FirstOrDefault(s => s.StyleId == styleId);
+                    styleRunProps = style?.StyleRunProperties;
+                }
+            }
+
+            CompareRunProperties(actualRunProps, expectedRunProps, styleRunProps, issues);
+            //CompareParagraphProperties(actualParaProps, expectedParaProps, issues);
 
             return issues;
         }
 
-        private void CompareRunProperties(RunProperties actual, RunProperties expected, List<string> issues)
+        private void CompareRunProperties(RunProperties actual, RunProperties expected, StyleRunProperties style, List<string> issues)
         {
-            if (actual == null)
-            {
-                issues.Add("Не получилось получить настройки");
-                return;
-            }
+            //if (actual == null)
+            //{
+            //    issues.Add("Не получилось получить настройки");
+            //    return;
+            //}
 
-            if (actual.RunFonts?.Ascii?.Value != expected.RunFonts?.Ascii?.Value)
-                issues.Add($"Неверный шрифт: {actual.RunFonts?.Ascii?.Value}, должен быть {expected.RunFonts?.Ascii?.Value}");
+            //if (actual.RunFonts?.Ascii?.Value != expected.RunFonts?.Ascii?.Value)
+            //    issues.Add($"Неверный шрифт: {actual.RunFonts?.Ascii?.Value}, должен быть {expected.RunFonts?.Ascii?.Value}");
 
-            if (actual.Color?.Val != expected.Color?.Val)
-                issues.Add($"Неверный цвет: {actual.Color?.Val}, должен быть {expected.Color?.Val}");
+            //if (actual.Color?.Val != expected.Color?.Val)
+            //    issues.Add($"Неверный цвет: {actual.Color?.Val}, должен быть {expected.Color?.Val}");
 
-            if (actual.FontSize?.Val != expected.FontSize?.Val)
-                issues.Add($"Неверный размер шрифта: {actual.FontSize?.Val}, должен быть {expected.FontSize?.Val}");
+            //if (actual.FontSize?.Val != expected.FontSize?.Val)
+            //    issues.Add($"Неверный размер шрифта: {actual.FontSize?.Val}, должен быть {expected.FontSize?.Val}");
 
-            bool isBold = actual.Bold != null;
+            //bool isBold = actual.Bold != null;
+            //bool shouldBeBold = expected.Bold?.Val == true;
+            //if (isBold != shouldBeBold)
+            //    issues.Add(shouldBeBold ? "Должен быть полужирным" : "Не должен быть полужирным");
+
+            //bool isItalic = actual.Italic != null;
+            //bool shouldBeItalic = expected.Italic?.Val == true;
+            //if (isItalic != shouldBeItalic)
+            //    issues.Add(shouldBeItalic ? "Должен быть курсивным" : "Не должен быть курсивным");
+
+            //bool isUnderlined = actual.Underline != null && actual.Underline?.Val != UnderlineValues.None;
+            //bool shouldBeUnderlined = expected.Underline?.Val == UnderlineValues.Single;
+            //if (isUnderlined != shouldBeUnderlined)
+            //    issues.Add(shouldBeUnderlined ? "Должен быть подчеркнут" : "Не должен быть подчеркнут");
+
+
+
+            string actualFont = actual?.RunFonts?.Ascii?.Value ?? style?.RunFonts?.Ascii?.Value;
+            if (actualFont != expected.RunFonts?.Ascii?.Value)
+                issues.Add($"Шрифт: {actualFont ?? "не задан"}, должен быть {expected.RunFonts?.Ascii?.Value}");
+
+            string actualColor = actual?.Color?.Val ?? style?.Color?.Val;
+            if (actualColor != expected.Color?.Val)
+                issues.Add($"Цвет текста: {actualColor ?? "не задан"}, должен быть {expected.Color?.Val}");
+
+            string actualFontSize = actual?.FontSize?.Val ?? style?.FontSize?.Val;
+            if (actualFontSize != expected.FontSize?.Val)
+                issues.Add($"Размер шрифта: {actualFontSize ?? "не задан"}, должен быть {expected.FontSize?.Val}");
+
+            bool isBold = actual?.Bold != null || (actual?.Bold == null && style?.Bold != null);
             bool shouldBeBold = expected.Bold?.Val == true;
             if (isBold != shouldBeBold)
                 issues.Add(shouldBeBold ? "Должен быть полужирным" : "Не должен быть полужирным");
 
-            bool isItalic = actual.Italic != null;
+            bool isItalic = actual?.Italic != null || (actual?.Italic == null && style?.Italic != null);
             bool shouldBeItalic = expected.Italic?.Val == true;
             if (isItalic != shouldBeItalic)
                 issues.Add(shouldBeItalic ? "Должен быть курсивным" : "Не должен быть курсивным");
 
-            bool isUnderlined = actual.Underline != null && actual.Underline?.Val != UnderlineValues.None;
+            bool isUnderlined = (actual?.Underline != null && actual?.Underline.Val != UnderlineValues.None) ||
+                                (actual?.Underline == null && style?.Underline != null && style.Underline.Val != UnderlineValues.None);
             bool shouldBeUnderlined = expected.Underline?.Val == UnderlineValues.Single;
             if (isUnderlined != shouldBeUnderlined)
                 issues.Add(shouldBeUnderlined ? "Должен быть подчеркнут" : "Не должен быть подчеркнут");
