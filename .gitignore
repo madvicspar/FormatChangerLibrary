@@ -1,10 +1,7 @@
 .vs/
-format_changer/data/
-format_changer/bin/
-format_changer/obj/
+/format_changer/
 FormatChanger/bin/
 FormatChanger/obj/
 FormatChanger/obj
 /FormatChanger/appsettings.json
 /FormatChanger/uploads
-/format_changer/Program.cs
