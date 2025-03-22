@@ -272,19 +272,19 @@
     gap: 12px; /* Расстояние между иконкой и текстом */
 }
 
-.list-markers {
+.list-markers, .heading-markers {
     display: flex; /* Aligns items in a row */
     gap: 10px; /* Adds space between the buttons */
 }
 
-.marker-btn {
+.marker-btn, .heading-btn {
     border: none;
     font-size: 16px;
     cursor: pointer;
     background-color: transparent;
 }
 
-.list-markers .type-option {
+.list-markers .type-option, .heading-markers .type-option {
     padding: 10px;
     width: 30%;
     justify-content: center;
@@ -293,7 +293,7 @@
     cursor: pointer;
 }
 
-.list-markers .type-option.active {
+.list-markers .type-option.active, .list-markers .type-option.active {
     border: 1px solid #000;
 }
 

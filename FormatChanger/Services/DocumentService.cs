@@ -81,7 +81,7 @@ namespace FormatChanger.Services
                     .Select(p => new ParagraphModel
                     {
                         Paragraph = p,
-                        Type = ParagraphTypes.Heading.ToString()
+                        Type = ParagraphTypes.Normal.ToString()
                     })
                     .ToList();
             }
@@ -196,8 +196,18 @@ namespace FormatChanger.Services
                     paragraph.PrependChild(paraProps);
                 }
 
-                if (type == "Heading")
+                if (type == ParagraphTypes.FirstH.ToString())
+                {
                     type = "heading 1";
+                }
+                else if (type == ParagraphTypes.SecondH.ToString())
+                {
+                    type = "heading 2";
+                }
+                else if (type == ParagraphTypes.ThirdH.ToString())
+                {
+                    type = "heading 3";
+                }
 
                 if (IsList(type))
                 {
@@ -278,15 +288,15 @@ namespace FormatChanger.Services
                 for (int i = 0; i < 1; i++)
                 {
                     var paragraph = paragraphs[i];
-                    if (paragraphList[i].Type == ParagraphTypes.Heading.ToString())
-                    {
-                        var issues = _headingFirstCorrectionStrategies.CheckFormatting(paragraph, template);
+                    //if (paragraphList[i].Type == ParagraphTypes.Heading.ToString())
+                    //{
+                    //    var issues = _headingFirstCorrectionStrategies.CheckFormatting(paragraph, template);
 
-                        if (issues.Any())
-                        {
-                            AddCommentToParagraph(paragraph, issues);
-                        }
-                    }
+                    //    if (issues.Any())
+                    //    {
+                    //        AddCommentToParagraph(paragraph, issues);
+                    //    }
+                    //}
                 }
                 doc.Save();
             }

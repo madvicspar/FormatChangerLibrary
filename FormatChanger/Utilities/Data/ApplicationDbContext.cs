@@ -269,28 +269,6 @@ namespace FormatChanger.Utilities.Data
             context.TextSettings.Add(textSettings_list);
             context.SaveChanges();
 
-            // **. Данные для настроек заголовка первого уровня**
-            var headingSettings1 = new HeadingSettingsModel
-            {
-                TextSettings = textSettings_h1,
-                HeadingLevel = 1,
-                StartOnNewPage = true
-            };
-
-            context.HeadingSettings.Add(headingSettings1);
-            context.SaveChanges();
-
-            // **. Данные для настроек заголовка второго уровня**
-            var headingSettings2 = new HeadingSettingsModel
-            {
-                TextSettings = textSettings_h2,
-                HeadingLevel = 2,
-                StartOnNewPage = true
-            };
-
-            context.HeadingSettings.Add(headingSettings2);
-            context.SaveChanges();
-
             // **. Данные для настроек заголовка третьего уровня**
             var headingSettings3 = new HeadingSettingsModel
             {
@@ -300,6 +278,30 @@ namespace FormatChanger.Utilities.Data
             };
 
             context.HeadingSettings.Add(headingSettings3);
+            context.SaveChanges();
+
+            // **. Данные для настроек заголовка второго уровня**
+            var headingSettings2 = new HeadingSettingsModel
+            {
+                TextSettings = textSettings_h2,
+                HeadingLevel = 2,
+                StartOnNewPage = true,
+                NextHeadingLevel = headingSettings3
+            };
+
+            context.HeadingSettings.Add(headingSettings2);
+            context.SaveChanges();
+
+            // **. Данные для настроек заголовка первого уровня**
+            var headingSettings1 = new HeadingSettingsModel
+            {
+                TextSettings = textSettings_h1,
+                HeadingLevel = 1,
+                StartOnNewPage = true,
+                NextHeadingLevel = headingSettings2
+            };
+
+            context.HeadingSettings.Add(headingSettings1);
             context.SaveChanges();
 
             // **. Данные для настроек подписи к таблице**
