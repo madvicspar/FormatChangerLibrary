@@ -68,5 +68,10 @@ namespace FormatChanger.Services
             tableProperties.AppendChild(new Justification { Val=JustificationValues.Center });
             tableProperties.AppendChild(tableCellMargins);
         }
+
+        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -113,5 +113,10 @@ namespace FormatChanger.Services
                 }
             }
         }
+
+        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

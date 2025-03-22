@@ -63,5 +63,10 @@ namespace FormatChanger.Services
             normalStyle.AppendChild(new StyleRunProperties(GetRunProperties(settings)));
             normalStyle.AppendChild(new StyleParagraphProperties(GetParagraphProperties(settings)));
         }
+
+        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
