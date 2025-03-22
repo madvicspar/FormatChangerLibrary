@@ -17,7 +17,6 @@ namespace FormatChanger.Services
         private readonly IElementCorrectionStrategy<CellSettingsModel> _cellCorrectionStrategy;
         private readonly IElementCorrectionStrategy<HeaderSettingsModel> _headerTableCorrectionStrategies;
         private readonly IElementCorrectionStrategy<TableCaptionSettingsModel> _tableCaptionCorrectionStrategy;
-        private readonly IElementCorrectionStrategy<CommentSettingsModel> _commentCorrectionStrategy;
 
         public DocumentService(ApplicationDbContext context,
             IElementCorrectionStrategy<TextSettingsModel> textStrategy,
@@ -27,8 +26,7 @@ namespace FormatChanger.Services
             IElementCorrectionStrategy<CellSettingsModel> cellCorrectionStrategy,
             IElementCorrectionStrategy<HeaderSettingsModel> headerTableCorrectionStrategies,
             IElementCorrectionStrategy<ImageCaptionSettingsModel> imageCaptionCorrectionStrategy,
-            IElementCorrectionStrategy<TableCaptionSettingsModel> tableCaptionCorrectionStrategy,
-            IElementCorrectionStrategy<CommentSettingsModel> commentCorrectionStrategy)
+            IElementCorrectionStrategy<TableCaptionSettingsModel> tableCaptionCorrectionStrategy)
         {
             _context = context;
             //_context.ClearAndSeed(_context);
@@ -40,7 +38,6 @@ namespace FormatChanger.Services
             _headerTableCorrectionStrategies = headerTableCorrectionStrategies;
             _imageCaptionCorrectionStrategy = imageCaptionCorrectionStrategy;
             _tableCaptionCorrectionStrategy = tableCaptionCorrectionStrategy;
-            _commentCorrectionStrategy = commentCorrectionStrategy;
 
             //_context.SeedData(_context);
         }
@@ -272,7 +269,7 @@ namespace FormatChanger.Services
             for (int i = 0; i < types.Length; i++)
             {
                 paragraphList[i].Type = ParagraphTypesEnumExtensions.ToEnum(types[i]).ToString();
-            }
+        }
 
             using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
             {

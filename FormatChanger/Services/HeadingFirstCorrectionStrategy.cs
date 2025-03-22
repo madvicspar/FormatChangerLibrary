@@ -82,136 +82,171 @@ namespace FormatChanger.Services
             string styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val;
             Style style = null;
             StyleRunProperties styleRunProps = null;
-            StyleParagraphProperties styleParagraphProps = null;
 
-            IEnumerable<Style> styles = new List<Style>();
             var document = paragraph.Ancestors<Document>().FirstOrDefault();
             if (document != null)
             {
                 var stylePart = document.MainDocumentPart?.StyleDefinitionsPart;
                 if (stylePart != null)
                 {
-                    styles = stylePart.Styles.Elements<Style>();
                     style = stylePart.Styles.Elements<Style>().FirstOrDefault(s => s.StyleId == styleId);
                     styleRunProps = style?.StyleRunProperties;
-                    styleParagraphProps = style?.StyleParagraphProperties;
                 }
             }
 
-            
-
-            CompareRunProperties(paragraph, actualRunProps, expectedRunProps, styles, issues);
-            CompareParagraphProperties(actualParaProps, expectedParaProps, styleParagraphProps, issues);
+            CompareRunProperties(actualRunProps, expectedRunProps, styleRunProps, issues);
+            //CompareParagraphProperties(actualParaProps, expectedParaProps, issues);
 
             return issues;
         }
 
-        RunFonts GetFont(Paragraph p, IEnumerable<Style> styles)
+        private void CompareRunProperties(RunProperties actual, RunProperties expected, StyleRunProperties style, List<string> issues)
         {
-            // если styleId = null, то проверяем стиль обычный
-            Style style;
-            var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val;
+            //if (actual == null)
+            //{
+            //    issues.Add("Не получилось получить настройки");
+            //    return;
+            //}
 
-            do
-            {
-                style = styles.First(s => s.StyleId == styleId);
-                styleId = style?.BasedOn?.Val;
-            } while (style.StyleRunProperties?.RunFonts?.Ascii == null);
+            //if (actual.RunFonts?.Ascii?.Value != expected.RunFonts?.Ascii?.Value)
+            //    issues.Add($"Неверный шрифт: {actual.RunFonts?.Ascii?.Value}, должен быть {expected.RunFonts?.Ascii?.Value}");
 
-            return style?.StyleRunProperties?.RunFonts;
-        }
+            //if (actual.Color?.Val != expected.Color?.Val)
+            //    issues.Add($"Неверный цвет: {actual.Color?.Val}, должен быть {expected.Color?.Val}");
 
+            //if (actual.FontSize?.Val != expected.FontSize?.Val)
+            //    issues.Add($"Неверный размер шрифта: {actual.FontSize?.Val}, должен быть {expected.FontSize?.Val}");
 
-        private void CompareRunProperties(Paragraph p, RunProperties actual, RunProperties expected, IEnumerable<Style> styles, List<string> issues)
-        {
-            var actualFont = actual?.RunFonts?.Ascii?.Value ?? GetFont(p, styles)?.Ascii?.Value;
-            var expectedFont = expected.RunFonts?.Ascii?.Value;
-
-            if (actualFont != expectedFont)
-            {
-                issues.Add($"Шрифт: {actualFont ?? "не задан"}, должен быть {expectedFont}");
-            }
-
-            //string actualColor = actual?.Color?.Val ?? style?.Color?.Val;
-            //if (actualColor != expected.Color?.Val)
-            //    issues.Add($"Цвет текста: {actualColor ?? "не задан"}, должен быть {expected.Color?.Val}");
-
-            //string actualFontSize = actual?.FontSize?.Val ?? style?.FontSize?.Val;
-            //if (actualFontSize != expected.FontSize?.Val)
-            //    issues.Add($"Размер шрифта: {actualFontSize ?? "не задан"}, должен быть {expected.FontSize?.Val}");
-
-            //bool isBold = actual?.Bold != null || (actual?.Bold == null && style?.Bold != null);
+            //bool isBold = actual.Bold != null;
             //bool shouldBeBold = expected.Bold?.Val == true;
             //if (isBold != shouldBeBold)
             //    issues.Add(shouldBeBold ? "Должен быть полужирным" : "Не должен быть полужирным");
 
-            //bool isItalic = actual?.Italic != null || (actual?.Italic == null && style?.Italic != null);
+            //bool isItalic = actual.Italic != null;
             //bool shouldBeItalic = expected.Italic?.Val == true;
             //if (isItalic != shouldBeItalic)
             //    issues.Add(shouldBeItalic ? "Должен быть курсивным" : "Не должен быть курсивным");
 
-            //bool isUnderlined = (actual?.Underline != null && actual?.Underline.Val != UnderlineValues.None) ||
-            //                    (actual?.Underline == null && style?.Underline != null && style.Underline.Val != UnderlineValues.None);
+            //bool isUnderlined = actual.Underline != null && actual.Underline?.Val != UnderlineValues.None;
             //bool shouldBeUnderlined = expected.Underline?.Val == UnderlineValues.Single;
             //if (isUnderlined != shouldBeUnderlined)
             //    issues.Add(shouldBeUnderlined ? "Должен быть подчеркнут" : "Не должен быть подчеркнут");
+
+
+
+            string actualFont = actual?.RunFonts?.Ascii?.Value ?? style?.RunFonts?.Ascii?.Value;
+            if (actualFont != expected.RunFonts?.Ascii?.Value)
+                issues.Add($"Шрифт: {actualFont ?? "не задан"}, должен быть {expected.RunFonts?.Ascii?.Value}");
+
+            string actualColor = actual?.Color?.Val ?? style?.Color?.Val;
+            if (actualColor != expected.Color?.Val)
+                issues.Add($"Цвет текста: {actualColor ?? "не задан"}, должен быть {expected.Color?.Val}");
+
+            string actualFontSize = actual?.FontSize?.Val ?? style?.FontSize?.Val;
+            if (actualFontSize != expected.FontSize?.Val)
+                issues.Add($"Размер шрифта: {actualFontSize ?? "не задан"}, должен быть {expected.FontSize?.Val}");
+
+            bool isBold = actual?.Bold != null || (actual?.Bold == null && style?.Bold != null);
+            bool shouldBeBold = expected.Bold?.Val == true;
+            if (isBold != shouldBeBold)
+                issues.Add(shouldBeBold ? "Должен быть полужирным" : "Не должен быть полужирным");
+
+            bool isItalic = actual?.Italic != null || (actual?.Italic == null && style?.Italic != null);
+            bool shouldBeItalic = expected.Italic?.Val == true;
+            if (isItalic != shouldBeItalic)
+                issues.Add(shouldBeItalic ? "Должен быть курсивным" : "Не должен быть курсивным");
+
+            bool isUnderlined = (actual?.Underline != null && actual?.Underline.Val != UnderlineValues.None) ||
+                                (actual?.Underline == null && style?.Underline != null && style.Underline.Val != UnderlineValues.None);
+            bool shouldBeUnderlined = expected.Underline?.Val == UnderlineValues.Single;
+            if (isUnderlined != shouldBeUnderlined)
+                issues.Add(shouldBeUnderlined ? "Должен быть подчеркнут" : "Не должен быть подчеркнут");
         }
 
-        private void CompareParagraphProperties(ParagraphProperties actual, ParagraphProperties expected, StyleParagraphProperties style, List<string> issues)
+        private void CompareParagraphProperties(ParagraphProperties actual, ParagraphProperties expected, List<string> issues)
         {
-            //var actualSpacing = actual?.SpacingBetweenLines ?? style?.SpacingBetweenLines;
-            //var expectedSpacing = expected.SpacingBetweenLines;
-
-            //if (actualSpacing?.Line != expectedSpacing?.Line)
-            //    issues.Add($"Неверный межстрочный интервал: {actualSpacing?.Line ?? "не задан"}, должен быть {expectedSpacing?.Line}");
-
-            //if (actualSpacing?.Before != expectedSpacing?.Before)
-            //    issues.Add($"Неверный отступ перед: {actualSpacing?.Before ?? "не задан"}, должен быть {expectedSpacing?.Before}");
-
-            //if (actualSpacing?.After != expectedSpacing?.After)
-            //    issues.Add($"Неверный отступ после: {actualSpacing?.After ?? "не задан"}, должен быть {expectedSpacing?.After}");
-
-            //var actualIndentation = actual?.Indentation ?? style?.Indentation;
-            //var expectedIndentation = expected.Indentation;
-
-            //if (actualIndentation?.Left != expectedIndentation?.Left)
-            //    issues.Add($"Неверный отступ слева: {actualIndentation?.Left ?? "не задан"}, должен быть {expectedIndentation?.Left}");
-
-            //if (actualIndentation?.Right != expectedIndentation?.Right)
-            //    issues.Add($"Неверный отступ справа: {actualIndentation?.Right ?? "не задан"}, должен быть {expectedIndentation?.Right}");
-
-            //if (actualIndentation?.FirstLine != expectedIndentation?.FirstLine)
-            //    issues.Add($"Неверный отступ первой строки: {actualIndentation?.FirstLine ?? "не задан"}, должен быть {expectedIndentation?.FirstLine}");
-
-            var actualSpacing = actual?.SpacingBetweenLines ?? style?.SpacingBetweenLines;
+            //var styleParaProps = actual.Elements<Style>().FirstOrDefault().Elements<StyleParagraphProperties>().FirstOrDefault();
             var expectedSpacing = expected.SpacingBetweenLines;
+            if (actual == null)
+            {
+                //if (styleParaProps.Justification?.Val != expected.Justification?.Val)
+                //    issues.Add($"Неверное выравнивание: {styleParaProps.Justification?.Val}, должно быть {expected.Justification?.Val}");
 
+                //var actualSpacingStyle = styleParaProps.SpacingBetweenLines;
+                //if (actualSpacingStyle?.Line != expectedSpacing?.Line)
+                //    issues.Add($"Неверный межстрочный интервал: {actualSpacingStyle?.Line}, должен быть {expectedSpacing?.Line}");
+
+                //if (actualSpacingStyle?.Before != expectedSpacing?.Before)
+                //    issues.Add($"Неверный отступ перед: {actualSpacingStyle?.Before}, должен быть {expectedSpacing?.Before}");
+
+                //if (actualSpacingStyle?.After != expectedSpacing?.After)
+                //    issues.Add($"Неверный отступ после: {actualSpacingStyle?.After}, должен быть {expectedSpacing?.After}");
+
+                //if (styleParaProps?.Indentation?.Left != expected?.Indentation?.Left)
+                //    issues.Add($"Неверный отступ слева: {styleParaProps?.Indentation?.Left}, должен быть {expected?.Indentation?.Left}");
+
+                //if (styleParaProps?.Indentation?.Right != expected?.Indentation?.Right)
+                //    issues.Add($"Неверный отступ справа: {styleParaProps?.Indentation?.Right}, должен быть {expected?.Indentation?.Right}");
+
+                //if (styleParaProps?.Indentation?.FirstLine != expected?.Indentation?.FirstLine)
+                //    issues.Add($"Неверный отступ первой строки: {styleParaProps?.Indentation?.FirstLine}, должен быть {expected?.Indentation?.FirstLine}");
+
+                //return;
+            }
+
+            //if (actual.Indentation != null)
+            //{
+            //    if (actual.Justification.Val != expected.Justification?.Val)
+            //        issues.Add($"Неверное выравнивание: {actual.Justification.Val}, должно быть {expected.Justification?.Val}");
+            //}
+            //else
+            //{
+            //    if (styleParaProps?.Justification?.Val != expected.Justification?.Val)
+            //        issues.Add($"Неверное выравнивание: {styleParaProps?.Justification?.Val}, должно быть {expected.Justification?.Val}");
+            //}
+
+            //if (actual.SpacingBetweenLines != null)
+            //{
+            //    var actualSpacing = actual.SpacingBetweenLines;
+            //    if (actualSpacing.Line != null)
+            //    {
+            //        if (actualSpacing?.Line != expectedSpacing?.Line)
+            //            issues.Add($"Неверный межстрочный интервал: {actualSpacing?.Line}, должен быть {expectedSpacing?.Line}");
+            //    }
+            //    else
+            //    {
+            //        if (styleParaProps.SpacingBetweenLines?.Line != expectedSpacing?.Line)
+            //            issues.Add($"Неверный межстрочный интервал: {styleParaProps.SpacingBetweenLines?.Line}, должен быть {expectedSpacing?.Line}");
+            //    }
+            //}
+            //else
+            //{
+            //    var actualSpacingStyle = styleParaProps.SpacingBetweenLines;
+            //    if (actualSpacingStyle.Line != null)
+            //    {
+            //        if (actualSpacingStyle?.Line != expectedSpacing?.Line)
+            //            issues.Add($"Неверный межстрочный интервал: {actualSpacingStyle?.Line}, должен быть {expectedSpacing?.Line}");
+            //    }
+            //}
+
+            var actualSpacing = actual.SpacingBetweenLines;
             if (actualSpacing?.Line != expectedSpacing?.Line)
-                issues.Add($"Неверный межстрочный интервал: {actualSpacing?.Line ?? "не задан"}, должен быть {expectedSpacing?.Line}");
+                issues.Add($"Неверный межстрочный интервал: {actualSpacing?.Line}, должен быть {expectedSpacing?.Line}");
 
             if (actualSpacing?.Before != expectedSpacing?.Before)
-                issues.Add($"Неверный отступ перед: {actualSpacing?.Before ?? "не задан"}, должен быть {expectedSpacing?.Before}");
+                issues.Add($"Неверный отступ перед: {actualSpacing?.Before}, должен быть {expectedSpacing?.Before}");
 
             if (actualSpacing?.After != expectedSpacing?.After)
-                issues.Add($"Неверный отступ после: {actualSpacing?.After ?? "не задан"}, должен быть {expectedSpacing?.After}");
+                issues.Add($"Неверный отступ после: {actualSpacing?.After}, должен быть {expectedSpacing?.After}");
 
-            var actualIndentation = actual?.Indentation ?? style?.Indentation;
-            var expectedIndentation = expected.Indentation;
+            if (actual?.Indentation?.Left != expected?.Indentation?.Left)
+                issues.Add($"Неверный отступ слева: {actual?.Indentation?.Left}, должен быть {expected?.Indentation?.Left}");
 
-            if (actualIndentation?.Left != expectedIndentation?.Left)
-                issues.Add($"Неверный отступ слева: {actualIndentation?.Left ?? "не задан"}, должен быть {expectedIndentation?.Left}");
+            if (actual?.Indentation?.Right != expected?.Indentation?.Right)
+                issues.Add($"Неверный отступ справа: {actual?.Indentation?.Right}, должен быть {expected?.Indentation?.Right}");
 
-            if (actualIndentation?.Right != expectedIndentation?.Right)
-                issues.Add($"Неверный отступ справа: {actualIndentation?.Right ?? "не задан"}, должен быть {expectedIndentation?.Right}");
-
-            if (actualIndentation?.FirstLine != expectedIndentation?.FirstLine)
-                issues.Add($"Неверный отступ первой строки: {actualIndentation?.FirstLine ?? "не задан"}, должен быть {expectedIndentation?.FirstLine}");
-
-            if (actual?.KeepNext?.Val != expected.KeepNext?.Val)
-                issues.Add("Некорректный параметр KeepWithNext");
-
-            if (actual?.PageBreakBefore != null != (expected.PageBreakBefore != null))
-                issues.Add("Неверный разрыв страницы перед параграфом");
+            if (actual?.Indentation?.FirstLine != expected?.Indentation?.FirstLine)
+                issues.Add($"Неверный отступ первой строки: {actual?.Indentation?.FirstLine}, должен быть {expected?.Indentation?.FirstLine}");
         }
     }
 }

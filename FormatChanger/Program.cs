@@ -18,7 +18,6 @@ builder.Services.AddScoped<IElementCorrectionStrategy<TableCaptionSettingsModel>
 builder.Services.AddScoped<IElementCorrectionStrategy<TableSettingsModel>, TableCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<CellSettingsModel>, TableCellCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<HeaderSettingsModel>, TableHeaderCorrectionStrategy>();
-builder.Services.AddScoped<IElementCorrectionStrategy<CommentSettingsModel>, CommentCorrectionStrategy>();
 
 
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
