@@ -147,7 +147,7 @@ namespace FormatChanger.Services
         private bool IsTable(Paragraph paragraph)
         {
             // Проверка, является ли абзац частью таблицы (например, на основе наличия элемента Table)
-            return paragraph.Ancestors<TableCell>().Any(); ;
+            return paragraph.Ancestors<TableCell>().Any();
         }
 
         public void AddPageNumbers(WordprocessingDocument doc)
@@ -219,7 +219,7 @@ namespace FormatChanger.Services
 
                 styles.Save();
 
-                var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().Where(p => !string.IsNullOrWhiteSpace(p.InnerText)).ToList();
+                var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().Where(p => !string.IsNullOrEmpty(p.InnerText) && !p.Ancestors<TableCell>().Any()).ToList();
                 ApplyStyle(styles, paragraphs, paragraphList);
                 
                 doc.Save();

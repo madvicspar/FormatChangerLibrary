@@ -24,7 +24,6 @@ namespace FormatChanger.Services
 
         public ParagraphProperties GetParagraphProperties(HeadingSettingsModel settings)
         {
-            // TODO: Add numbering
             var paragraphProperties = new ParagraphProperties(
             new SpacingBetweenLines
             {
@@ -46,10 +45,12 @@ namespace FormatChanger.Services
             if (settings.StartOnNewPage)
                 paragraphProperties.AddChild(new PageBreakBefore());
 
-            paragraphProperties.AppendChild(new NumberingProperties(
+            var numberingProperties = new NumberingProperties(
                 new NumberingLevelReference { Val = settings.HeadingLevel - 1 },
-                new NumberingId { Val = 4 }
-            ));
+                new NumberingId { Val = 1007 }
+            );
+
+            paragraphProperties.Append(numberingProperties);
 
             return paragraphProperties;
         }
@@ -62,61 +63,56 @@ namespace FormatChanger.Services
 
             var numberingPart = doc.MainDocumentPart.NumberingDefinitionsPart ?? doc.MainDocumentPart.AddNewPart<NumberingDefinitionsPart>();
             EnsureNumbering(numberingPart);
-
             ApplyCorrectionToStyle(stylePart, settings, "heading 1");
         }
 
         private void EnsureNumbering(NumberingDefinitionsPart numberingPart)
         {
-            if (numberingPart.Numbering == null)
+            var numbering = numberingPart.Numbering;
+
+            var abstractNum = new AbstractNum()
             {
-                numberingPart.Numbering = new Numbering();
-            }
+                AbstractNumberId = 1007
+            };
 
-            var abstractNumId = 1;
-            var numId = "1";
-
-            // Проверяем, есть ли уже такая нумерация
-            if (numberingPart.Numbering.Elements<AbstractNum>().Any(an => an.AbstractNumberId.Value == abstractNumId))
-            {
-                return;
-            }
-
-            var abstractNum = new AbstractNum(
-                new Level(
-                    new StartNumberingValue { Val = 1 },
-                    new NumberingFormat { Val = NumberFormatValues.Decimal },
-                    new LevelText { Val = "%1" },
-                    new LevelJustification { Val = LevelJustificationValues.Left }
-                )
-                { LevelIndex = 0 },
-
-                new Level(
-                    new StartNumberingValue { Val = 1 },
-                    new NumberingFormat { Val = NumberFormatValues.Decimal },
-                    new LevelText { Val = "%1.%2" },
-                    new LevelJustification { Val = LevelJustificationValues.Left }
-                )
-                { LevelIndex = 1 },
-
-                new Level(
-                    new StartNumberingValue { Val = 1 },
-                    new NumberingFormat { Val = NumberFormatValues.Decimal },
-                    new LevelText { Val = "%1.%2.%3" },
-                    new LevelJustification { Val = LevelJustificationValues.Left }
-                )
-                { LevelIndex = 2 }
+            // Уровень 0: "1"
+            abstractNum.AppendChild(new Level(
+                new StartNumberingValue { Val = 1 },
+                new NumberingFormat { Val = NumberFormatValues.Decimal },
+                new LevelText { Val = "%1" },
+                new LevelJustification { Val = LevelJustificationValues.Left }
             )
-            { AbstractNumberId = abstractNumId };
+            { LevelIndex = 0 });
 
-            numberingPart.Numbering.Append(abstractNum);
+            // Уровень 1: "1.1"
+            abstractNum.AppendChild(new Level(
+                new StartNumberingValue { Val = 1 },
+                new NumberingFormat { Val = NumberFormatValues.Decimal },
+                new LevelText { Val = "%1.%2" },
+                new LevelJustification { Val = LevelJustificationValues.Left }
+            )
+            { LevelIndex = 1 });
 
+            // Уровень 2: "1.1.1"
+            abstractNum.AppendChild(new Level(
+                new StartNumberingValue { Val = 1 },
+                new NumberingFormat { Val = NumberFormatValues.Decimal },
+                new LevelText { Val = "%1.%2.%3" },
+                new LevelJustification { Val = LevelJustificationValues.Left }
+            )
+            { LevelIndex = 2 });
+
+            numbering.Append(abstractNum);
+
+            // Создаем экземпляр NumberingInstance, который ссылается на AbstractNum
             var num = new NumberingInstance(
-                new AbstractNumId { Val = abstractNumId }
+                new AbstractNumId { Val = 1007 } // Ссылка на AbstractNum
             )
-            { NumberID = int.Parse(numId) };
+            { NumberID = 1007 }; // Идентификатор NumberingInstance
 
-            numberingPart.Numbering.Append(num);
+            // Добавляем NumberingInstance в Numbering
+            numbering.Append(num);
+            numberingPart.Numbering.Save();
         }
 
         private void ApplyCorrectionToStyle(StyleDefinitionsPart stylePart, HeadingSettingsModel settings, string styleName)
