@@ -221,13 +221,11 @@ namespace FormatChanger.Services
 
                 var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().Where(p => !string.IsNullOrEmpty(p.InnerText) && !p.Ancestors<TableCell>().Any()).ToList();
                 ApplyStyle(styles, paragraphs, paragraphList);
-                
-                doc.Save();
-            }
 
-            CleanFormat(document.FilePath);
-            using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
-            {
+                doc.Save();
+
+                CleanFormat(doc);
+
                 _textCorrectionStrategy.ApplyCorrection(doc, template);
                 _headingFirstCorrectionStrategies.ApplyCorrection(doc, template);
                 _imageCorrectionStrategy.ApplyCorrection(doc, template);
@@ -237,6 +235,35 @@ namespace FormatChanger.Services
                 _headerTableCorrectionStrategies.ApplyCorrection(doc, template);
                 _tableCaptionCorrectionStrategy.ApplyCorrection(doc, template);
 
+                AddNumberingToDocument(doc);
+
+                Stack<int> levels = new Stack<int>();
+                for (int i = 0; i < paragraphs.Count; i++)
+                {
+                    var paragraph = paragraphs[i];
+                    var type = paragraphList.Where(x => x.Paragraph.ParagraphId == paragraph.ParagraphId).First().Type;
+
+                    ParagraphProperties paraProps = paragraph.Elements<ParagraphProperties>().FirstOrDefault();
+
+                    if (IsList(type))
+                    {
+                        int level = DetermineListLevel(paragraphList, levels, type, paragraph);
+                        if (type == ParagraphTypes.Dash.ToString())
+                        {
+                            ApplyNumbering(paraProps, level, 1001);
+                        }
+                        else if (type == ParagraphTypes.Period.ToString())
+                        {
+                            ApplyNumbering(paraProps, level, 1002);
+                        }
+                        else if (type == ParagraphTypes.Bracket.ToString())
+                        {
+                            ApplyNumbering(paraProps, level, 1003); ;
+                        }
+
+                    }
+                }
+
                 doc.Save();
             }
             // TODO: достать исправленный документ
@@ -245,7 +272,6 @@ namespace FormatChanger.Services
 
         public void ApplyStyle(Styles styles, List<Paragraph> paragraphs, List<ParagraphModel> paragraphList)
         {
-            var stack = new Stack<int>();
             for (int i = 0; i < paragraphs.Count; i++)
             {
                 var paragraph = paragraphs[i];
@@ -274,15 +300,12 @@ namespace FormatChanger.Services
 
                 if (IsList(type))
                 {
-                    int level = DetermineListLevel(paragraphList, stack, type, paragraph);
-                    ApplyNumbering(paraProps, level, type);
+                    type = "Normal";
                 }
-                else
-                {
-                    var styleId = styles.Elements<Style>().Where(x => x.StyleName.Val == type).First().StyleId;
 
-                    paraProps.ParagraphStyleId = new ParagraphStyleId() { Val = styleId };
-                }
+                var styleId = styles.Elements<Style>().Where(x => x.StyleName.Val == type).First().StyleId;
+
+                paraProps.ParagraphStyleId = new ParagraphStyleId() { Val = styleId };
             }
         }
 
@@ -294,41 +317,72 @@ namespace FormatChanger.Services
             {
                 var index = paragraphList.FindIndex(p => p.Paragraph.ParagraphId == paragraph.ParagraphId);
 
-                var previousParagraph = index > 0 ? paragraphList[index - 1] : null; ;
+                var previousParagraph = index > 0 ? paragraphList[index - 1] : null;
+
                 if (previousParagraph != null && IsList(previousParagraph.Type))
                 {
                     if (previousParagraph.Type != type)
                     {
-                        level = stack.Count > 0 ? stack.Pop() + 1 : 0;
+                        // Если маркер другой, то переходим на новый уровень
+                        level = stack.Count > 0 ? stack.Peek() + 1 : 0;
                     }
                     else
                     {
-                        level = stack.Count > 0 ? stack.Peek() : 0;
+                        // Если маркер тот же, уровень остается на прежнем уровне
+                        level = stack.Peek();
                     }
                 }
                 else
                 {
+                    // Если предыдущий абзац не список, начинаем новый список с уровня 0
                     level = 0;
                 }
             }
             else
             {
+                // Если стек пуст, начинаем с уровня 0
                 level = 0;
             }
 
-            stack.Push(level);
+            stack.Push(level); // Добавляем текущий уровень в стек
             return level;
         }
 
-        private void ApplyNumbering(ParagraphProperties paraProps, int level, string type)
+        private void ApplyNumbering(ParagraphProperties paraProps, int level, int numberingId)
         {
-            NumberingId numberingId = new NumberingId() { Val = level == 0 ? 1 : 2 };
             NumberingProperties numberingProperties = new NumberingProperties(
-                new NumberingLevelReference() { Val = level },
-                numberingId
+                new NumberingLevelReference { Val = level }, // Уровень нумерации
+                new NumberingId { Val = numberingId } // Идентификатор NumberingInstance
             );
 
             paraProps.Append(numberingProperties);
+
+            // Получаем или создаем элемент Indentation
+            Indentation indentation = paraProps.Elements<Indentation>().FirstOrDefault();
+
+            // Если Indentation не существует, создаем его
+            if (indentation == null)
+            {
+                indentation = new Indentation();
+                paraProps.AppendChild(indentation); // Добавляем Indentation к ParagraphProperties
+            }
+
+            // Устанавливаем отступы
+            // Слева: 1.5 * (level + 1)
+            indentation.Left = ((int)((2 + 0.5 * level) * 567)).ToString(); // Отступ слева в EMU
+
+            // Для первой строки: 0.5 EMU
+            indentation.Hanging = ((int)(0.5 * 567)).ToString();
+
+            //Indentation indentation = paraProps.Elements<Indentation>().FirstOrDefault();
+
+            //if (indentation == null)
+            //{
+            //    indentation = new Indentation()
+            //        { Left = (1.5).ToString() };
+
+            //}
+            //paraProps.AppendChild(indentation);
         }
 
         public bool IsList(string type)
@@ -342,7 +396,7 @@ namespace FormatChanger.Services
             for (int i = 0; i < types.Length; i++)
             {
                 paragraphList[i].Type = ParagraphTypesEnumExtensions.ToEnum(types[i]).ToString();
-        }
+            }
 
             using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
             {
@@ -415,48 +469,116 @@ namespace FormatChanger.Services
             paragraph.Append(new Run(commentReference));
         }
 
-        public void CleanFormat(string filePath)
+        public void CleanFormat(WordprocessingDocument doc)
         {
-            using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
+            var body = doc.MainDocumentPart.Document.Body;
+
+            foreach (var paragraph in body.Elements<Paragraph>())
             {
-                var body = doc.MainDocumentPart.Document.Body;
-
-                foreach (var paragraph in body.Elements<Paragraph>())
+                var paragraphProperties = paragraph.Elements<ParagraphProperties>().FirstOrDefault();
+                if (paragraphProperties != null)
                 {
-                    var paragraphProperties = paragraph.Elements<ParagraphProperties>().FirstOrDefault();
-                    if (paragraphProperties != null)
-                    {
-                        var styleElement = paragraphProperties.Elements<ParagraphStyleId>().FirstOrDefault();
-                        var numberingProperties = paragraphProperties.Elements<NumberingProperties>().FirstOrDefault();
-                        paragraphProperties.RemoveAllChildren();
+                    var styleElement = paragraphProperties.Elements<ParagraphStyleId>().FirstOrDefault();
+                    var numberingProperties = paragraphProperties.Elements<NumberingProperties>().FirstOrDefault();
+                    paragraphProperties.RemoveAllChildren();
 
-                        if (styleElement != null)
-                        {
-                            paragraphProperties.Append(styleElement);
-                        }
-                        if (numberingProperties != null)
-                        {
-                            paragraphProperties.Append(numberingProperties);
-                        }
+                    if (styleElement != null)
+                    {
+                        paragraphProperties.Append(styleElement);
                     }
-
-                    foreach (var run in paragraph.Elements<Run>())
+                    if (numberingProperties != null)
                     {
-                        var runProperties = run.Elements<RunProperties>().FirstOrDefault();
-                        if (runProperties != null)
-                        {
-                            var styleElement = runProperties.Elements<RunStyle>().FirstOrDefault();
-                            runProperties.RemoveAllChildren();
-                            if (styleElement != null)
-                            {
-                                runProperties.Append(styleElement);
-                            }
-                        }
+                        paragraphProperties.Append(numberingProperties);
                     }
                 }
 
-                doc.Save();
+                foreach (var run in paragraph.Elements<Run>())
+                {
+                    var runProperties = run.Elements<RunProperties>().FirstOrDefault();
+                    if (runProperties != null)
+                    {
+                        var styleElement = runProperties.Elements<RunStyle>().FirstOrDefault();
+                        runProperties.RemoveAllChildren();
+                        if (styleElement != null)
+                        {
+                            runProperties.Append(styleElement);
+                        }
+                    }
+                }
             }
+        }
+
+        public void AddNumberingToDocument(WordprocessingDocument doc)
+        {
+            // Получаем или создаем часть NumberingPart
+            var numberingPart = doc.MainDocumentPart.NumberingDefinitionsPart
+                ?? doc.MainDocumentPart.AddNewPart<NumberingDefinitionsPart>();
+
+            if (numberingPart.Numbering == null)
+            {
+                numberingPart.Numbering = new Numbering();
+            }
+
+            var numbering = numberingPart.Numbering;
+
+            // Создаем AbstractNum для маркированного списка
+            var bulletAbstractNum = new AbstractNum()
+            {
+                AbstractNumberId = 1001 // Идентификатор AbstractNum
+            };
+
+            AppendLevel(bulletAbstractNum, 0, "-", NumberFormatValues.Bullet);
+            AppendLevel(bulletAbstractNum, 1, "-", NumberFormatValues.Bullet);
+            AppendLevel(bulletAbstractNum, 2, "-", NumberFormatValues.Bullet);
+
+            // Создаем AbstractNum для нумерованного списка "1."
+            var numberedDotAbstractNum = new AbstractNum()
+            {
+                AbstractNumberId = 1002 // Идентификатор AbstractNum
+            };
+
+            AppendLevel(numberedDotAbstractNum, 0, "1.", NumberFormatValues.Decimal);
+            AppendLevel(numberedDotAbstractNum, 1, "1.", NumberFormatValues.Decimal);
+            AppendLevel(numberedDotAbstractNum, 2, "1.", NumberFormatValues.Decimal);
+
+            //// Создаем AbstractNum для нумерованного списка "1)"
+            var numberedParenthesisAbstractNum = new AbstractNum()
+            {
+                AbstractNumberId = 1003 // Идентификатор AbstractNum
+            };
+
+            AppendLevel(numberedParenthesisAbstractNum, 0, "1)", NumberFormatValues.Decimal);
+            AppendLevel(numberedParenthesisAbstractNum, 1, "1)", NumberFormatValues.Decimal);
+            AppendLevel(numberedParenthesisAbstractNum, 2, "1)", NumberFormatValues.Decimal);
+
+            // Добавляем AbstractNum в Numbering
+            numbering.Append(bulletAbstractNum);
+            numbering.Append(numberedDotAbstractNum);
+            numbering.Append(numberedParenthesisAbstractNum);
+
+            // Создаем экземпляры NumberingInstance
+            var bulletNum = new NumberingInstance(new AbstractNumId { Val = 1001 }) { NumberID = 1001 };
+            var numberedDotNum = new NumberingInstance(new AbstractNumId { Val = 1002 }) { NumberID = 1002 };
+            var numberedParenthesisNum = new NumberingInstance(new AbstractNumId { Val = 1003 }) { NumberID = 1003 };
+
+            // Добавляем NumberingInstance в Numbering
+            numbering.Append(bulletNum);
+            numbering.Append(numberedDotNum);
+            numbering.Append(numberedParenthesisNum);
+
+            // Сохраняем изменения
+            numberingPart.Numbering.Save();
+        }
+        public void AppendLevel(AbstractNum num, int level, string marker, NumberFormatValues type)
+        {
+            num.AppendChild(new Level(
+                    new StartNumberingValue { Val = 1 },
+                    new NumberingFormat { Val = type },
+                    new LevelText { Val = marker },
+                    new LevelJustification { Val = LevelJustificationValues.Left },
+                    new LevelSuffix { Val = LevelSuffixValues.Space }
+                )
+            { LevelIndex = level });
         }
     }
 }
