@@ -45,6 +45,12 @@ namespace FormatChanger.Services
 
             if (settings.StartOnNewPage)
                 paragraphProperties.AddChild(new PageBreakBefore());
+
+            paragraphProperties.AppendChild(new NumberingProperties(
+                new NumberingLevelReference { Val = settings.HeadingLevel - 1 },
+                new NumberingId { Val = 4 }
+            ));
+
             return paragraphProperties;
         }
 
@@ -54,20 +60,63 @@ namespace FormatChanger.Services
             var stylePart = doc.MainDocumentPart?.StyleDefinitionsPart;
             if (stylePart?.Styles == null) return;
 
+            var numberingPart = doc.MainDocumentPart.NumberingDefinitionsPart ?? doc.MainDocumentPart.AddNewPart<NumberingDefinitionsPart>();
+            EnsureNumbering(numberingPart);
+
             ApplyCorrectionToStyle(stylePart, settings, "heading 1");
+        }
 
-            //var style = stylePart.Styles.Elements<Style>().FirstOrDefault(style => style.StyleName.Val == "heading 1");
-            //if (style == null)
-            //{
-            //    Console.WriteLine("Style 'heading 1' not found.");
-            //    return;
-            //}
+        private void EnsureNumbering(NumberingDefinitionsPart numberingPart)
+        {
+            if (numberingPart.Numbering == null)
+            {
+                numberingPart.Numbering = new Numbering();
+            }
 
-            //style.RemoveAllChildren<StyleRunProperties>();
-            //style.RemoveAllChildren<StyleParagraphProperties>();
+            var abstractNumId = 1;
+            var numId = "1";
 
-            //style.AppendChild(new StyleRunProperties(GetRunProperties(settings)));
-            //style.AppendChild(new StyleParagraphProperties(GetParagraphProperties(settings)));
+            // Проверяем, есть ли уже такая нумерация
+            if (numberingPart.Numbering.Elements<AbstractNum>().Any(an => an.AbstractNumberId.Value == abstractNumId))
+            {
+                return;
+            }
+
+            var abstractNum = new AbstractNum(
+                new Level(
+                    new StartNumberingValue { Val = 1 },
+                    new NumberingFormat { Val = NumberFormatValues.Decimal },
+                    new LevelText { Val = "%1" },
+                    new LevelJustification { Val = LevelJustificationValues.Left }
+                )
+                { LevelIndex = 0 },
+
+                new Level(
+                    new StartNumberingValue { Val = 1 },
+                    new NumberingFormat { Val = NumberFormatValues.Decimal },
+                    new LevelText { Val = "%1.%2" },
+                    new LevelJustification { Val = LevelJustificationValues.Left }
+                )
+                { LevelIndex = 1 },
+
+                new Level(
+                    new StartNumberingValue { Val = 1 },
+                    new NumberingFormat { Val = NumberFormatValues.Decimal },
+                    new LevelText { Val = "%1.%2.%3" },
+                    new LevelJustification { Val = LevelJustificationValues.Left }
+                )
+                { LevelIndex = 2 }
+            )
+            { AbstractNumberId = abstractNumId };
+
+            numberingPart.Numbering.Append(abstractNum);
+
+            var num = new NumberingInstance(
+                new AbstractNumId { Val = abstractNumId }
+            )
+            { NumberID = int.Parse(numId) };
+
+            numberingPart.Numbering.Append(num);
         }
 
         private void ApplyCorrectionToStyle(StyleDefinitionsPart stylePart, HeadingSettingsModel settings, string styleName)
@@ -85,7 +134,6 @@ namespace FormatChanger.Services
             style.AppendChild(new StyleRunProperties(GetRunProperties(settings)));
             style.AppendChild(new StyleParagraphProperties(GetParagraphProperties(settings)));
 
-            // Если есть следующий уровень заголовка, рекурсивно исправляем его
             if (settings.NextHeadingLevel != null)
             {
                 string nextStyleName = $"heading {settings.HeadingLevel + 1}";

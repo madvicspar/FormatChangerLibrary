@@ -14,7 +14,7 @@ namespace FormatChanger.Models
         /// <summary>
         /// Уровень заголовка
         /// </summary>
-        public long HeadingLevel { get; set; }
+        public int HeadingLevel { get; set; }
         [ForeignKey("NextHeadingLevel")]
         /// <summary>
         /// Заголовок со следующим уровнем
