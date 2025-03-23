@@ -54,10 +54,28 @@ namespace FormatChanger.Services
             var stylePart = doc.MainDocumentPart?.StyleDefinitionsPart;
             if (stylePart?.Styles == null) return;
 
-            var style = stylePart.Styles.Elements<Style>().FirstOrDefault(style => style.StyleId == "1");
+            ApplyCorrectionToStyle(stylePart, settings, "heading 1");
+
+            //var style = stylePart.Styles.Elements<Style>().FirstOrDefault(style => style.StyleName.Val == "heading 1");
+            //if (style == null)
+            //{
+            //    Console.WriteLine("Style 'heading 1' not found.");
+            //    return;
+            //}
+
+            //style.RemoveAllChildren<StyleRunProperties>();
+            //style.RemoveAllChildren<StyleParagraphProperties>();
+
+            //style.AppendChild(new StyleRunProperties(GetRunProperties(settings)));
+            //style.AppendChild(new StyleParagraphProperties(GetParagraphProperties(settings)));
+        }
+
+        private void ApplyCorrectionToStyle(StyleDefinitionsPart stylePart, HeadingSettingsModel settings, string styleName)
+        {
+            var style = stylePart.Styles.Elements<Style>().FirstOrDefault(s => s.StyleName?.Val == styleName);
             if (style == null)
             {
-                Console.WriteLine("Style 'Heading' not found.");
+                Console.WriteLine($"Style '{styleName}' not found.");
                 return;
             }
 
@@ -66,6 +84,13 @@ namespace FormatChanger.Services
 
             style.AppendChild(new StyleRunProperties(GetRunProperties(settings)));
             style.AppendChild(new StyleParagraphProperties(GetParagraphProperties(settings)));
+
+            // Если есть следующий уровень заголовка, рекурсивно исправляем его
+            if (settings.NextHeadingLevel != null)
+            {
+                string nextStyleName = $"heading {settings.HeadingLevel + 1}";
+                ApplyCorrectionToStyle(stylePart, settings.NextHeadingLevel, nextStyleName);
+            }
         }
 
         public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)

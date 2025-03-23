@@ -274,7 +274,7 @@ namespace FormatChanger.Utilities.Data
             {
                 TextSettings = textSettings_h3,
                 HeadingLevel = 3,
-                StartOnNewPage = true
+                StartOnNewPage = false
             };
 
             context.HeadingSettings.Add(headingSettings3);
@@ -285,7 +285,7 @@ namespace FormatChanger.Utilities.Data
             {
                 TextSettings = textSettings_h2,
                 HeadingLevel = 2,
-                StartOnNewPage = true,
+                StartOnNewPage = false,
                 NextHeadingLevel = headingSettings3
             };
 

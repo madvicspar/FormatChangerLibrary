@@ -1,6 +1,6 @@
-﻿using FormatChanger.Models;
+﻿using DocumentFormat.OpenXml.Packaging;
+using FormatChanger.Models;
 using FormatChanger.Utilities.Data;
-using DocumentFormat.OpenXml.Packaging;
 using Microsoft.EntityFrameworkCore;
 
 public class TemplateService : ITemplateService
@@ -19,6 +19,8 @@ public class TemplateService : ITemplateService
             .Include(s => s.DocumentSettings)
             .Include(s => s.TextSettings)
             .Include(s => s.HeadingSettings).ThenInclude(t => t.TextSettings)
+            .Include(s => s.HeadingSettings).ThenInclude(n => n.NextHeadingLevel).ThenInclude(t => t.TextSettings)
+            .Include(s => s.HeadingSettings).ThenInclude(n => n.NextHeadingLevel).ThenInclude(n => n.NextHeadingLevel).ThenInclude(t => t.TextSettings)
             .Include(s => s.ListSettings)
             .Include(s => s.ImageSettings).ThenInclude(c => c.CaptionSettings).ThenInclude(t => t.TextSettings)
             .Include(s => s.TableSettings).ThenInclude(c => c.CellSettings).ThenInclude(t => t.TextSettings)
