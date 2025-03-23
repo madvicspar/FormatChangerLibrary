@@ -373,16 +373,6 @@ namespace FormatChanger.Services
 
             // Для первой строки: 0.5 EMU
             indentation.Hanging = ((int)(0.5 * 567)).ToString();
-
-            //Indentation indentation = paraProps.Elements<Indentation>().FirstOrDefault();
-
-            //if (indentation == null)
-            //{
-            //    indentation = new Indentation()
-            //        { Left = (1.5).ToString() };
-
-            //}
-            //paraProps.AppendChild(indentation);
         }
 
         public bool IsList(string type)
