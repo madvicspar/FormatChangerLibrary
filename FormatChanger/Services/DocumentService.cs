@@ -74,17 +74,80 @@ namespace FormatChanger.Services
         // Извлечение абзацев из документа
         public List<ParagraphModel>? GetDocumentParagraphs(DocumentModel document)
         {
-            // TODO: убрать рисунки и таблицы (хотя мб не убирать, а писать что вот тут фотка или изображение
             using (WordprocessingDocument doc = WordprocessingDocument.Open(document.FilePath, true))
             {
-                return doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().Where(p => !string.IsNullOrWhiteSpace(p.InnerText))
-                    .Select(p => new ParagraphModel
-                    {
-                        Paragraph = p,
-                        Type = ParagraphTypes.Normal.ToString()
-                    })
+                var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>()
                     .ToList();
+
+                if (paragraphs == null) return null;
+
+                var paragraphModels = new List<ParagraphModel>();
+
+                var styles = doc.MainDocumentPart.StyleDefinitionsPart.Styles;
+                for (int i = 0; i < paragraphs.Count; i++)
+                {
+                    var currentParagraph = paragraphs[i];
+                    var paragraphModel = new ParagraphModel
+                    {
+                        Paragraph = currentParagraph,
+                        Type = GetParagraphType(currentParagraph, paragraphs, i, styles)
+                    };
+
+                    paragraphModels.Add(paragraphModel);
+                }
+
+                return paragraphModels.Where(p => !string.IsNullOrEmpty(p.Paragraph.InnerText) && !p.Paragraph.Ancestors<TableCell>().Any()).ToList();
             }
+        }
+
+
+        private string GetParagraphType(Paragraph currentParagraph, List<Paragraph> paragraphs, int index, Styles styles)
+        {
+            var styleId = currentParagraph.ParagraphProperties?.ParagraphStyleId?.Val;
+            var style = styles.Elements<Style>().Where(x => x.StyleId == styleId)?.FirstOrDefault();
+
+            if (style != null)
+            {
+                // Проверка стиля абзаца
+                if (style.StyleName.Val == "heading 1")
+                {
+                    return ParagraphTypes.FirstH.ToString(); // Заголовок первого уровня
+                }
+                if (style.StyleName.Val == "heading 2")
+                {
+                    return ParagraphTypes.SecondH.ToString(); // Заголовок второго уровня
+                }
+                if (style.StyleName.Val == "heading 3")
+                {
+                    return ParagraphTypes.ThirdH.ToString(); // Заголовок третьего уровня
+                }
+            }
+
+            // Проверка таблицы после текущего абзаца
+            if (index < paragraphs.Count - 1 && IsTable(paragraphs[index + 1]))
+            {
+                return ParagraphTypes.TableCaption.ToString(); // Подпись к таблице
+            }
+
+            // Проверка изображения перед текущим абзацем
+            if (index > 0 && IsImage(paragraphs[index - 1]))
+            {
+                return ParagraphTypes.ImageCaption.ToString(); // Подпись к изображению
+            }
+
+            return ParagraphTypes.Normal.ToString(); // Обычный абзац
+        }
+
+        private bool IsImage(Paragraph paragraph)
+        {
+            // Проверка, является ли абзац изображением (например, на основе наличия элемента Drawing)
+            return paragraph.Descendants<Drawing>().Any();
+        }
+
+        private bool IsTable(Paragraph paragraph)
+        {
+            // Проверка, является ли абзац частью таблицы (например, на основе наличия элемента Table)
+            return paragraph.Ancestors<TableCell>().Any(); ;
         }
 
         public void AddPageNumbers(WordprocessingDocument doc)
