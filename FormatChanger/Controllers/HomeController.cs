@@ -58,7 +58,7 @@ namespace FormatChanger.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Export(long templateId, int actionId, [FromBody] string[] types)
+        public async Task<IActionResult> StartFormattingProcess(long templateId, int actionId, [FromBody] string[] types)
         {
             var documentId = (long)JsonConvert.DeserializeObject<long>(TempData["DocumentId"].ToString());
 

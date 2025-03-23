@@ -9,7 +9,7 @@ function startFormattingProcess() {
     var selectedActionId = document.getElementById('actionSelect').value;
     const paragraphData = getParagraphTypes();
 
-    fetch(`/Home/Export?templateId=${selectedTemplateId}&actionId=${selectedActionId}`, {
+    fetch(`/Home/StartFormattingProcess?templateId=${selectedTemplateId}&actionId=${selectedActionId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
