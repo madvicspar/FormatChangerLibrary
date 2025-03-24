@@ -395,15 +395,15 @@ namespace FormatChanger.Services
                 for (int i = 0; i < 1; i++)
                 {
                     var paragraph = paragraphs[i];
-                    //if (paragraphList[i].Type == ParagraphTypes.Heading.ToString())
-                    //{
-                    //    var issues = _headingFirstCorrectionStrategies.CheckFormatting(paragraph, template);
+                    if (paragraphList[i].Type == ParagraphTypes.FirstH.ToString())
+                    {
+                        var issues = _headingFirstCorrectionStrategies.CheckFormatting(paragraph, template);
 
-                    //    if (issues.Any())
-                    //    {
-                    //        AddCommentToParagraph(paragraph, issues);
-                    //    }
-                    //}
+                        if (issues.Any())
+                        {
+                            AddCommentToParagraph(paragraph, issues);
+                        }
+                    }
                 }
                 doc.Save();
             }
