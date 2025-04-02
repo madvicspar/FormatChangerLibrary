@@ -40,29 +40,8 @@
         </div>
     </article>
 
-    <div class="scroll-bar"></div>
-
     <aside class="formatting-panel">
-        <section class="panel-section">
-            <h3 class="panel-title">Тип действия</h3>
-            <div class="action-selector">
-                <label class="selector-label">
-                    <div class="selector-option">
-                        <div class="option-icon">
-                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/70edb4692955b816d2425d9a2451595f1d40491621a4d01d8e63ed2b40d12d30?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
-                                 alt="Action"
-                                 class="icon" />
-                        </div>
-                        <select name="actionId" id="actionSelect" class="form-control">
-
-                            <option class="option-text" value="1">Исправление</option>
-                            <option class="option-text" value="2">Проверка</option>
-                            <option class="option-text" value="3">Оценивание</option>
-                        </select>
-                    </div>
-                </label>
-            </div>
-
+        <section class="panel-section" style="border-right: 1px solid #f0f2f4;">
             <h3 class="panel-title">Типы абзацев</h3>
             <div class="paragraph-types">
                 <label class="type-option active" data-type="Normal">
@@ -136,108 +115,24 @@
         <section class="panel-section">
             <h3 class="panel-title">Шаблон форматирования</h3>
             <div class="template-selector">
-                <label class="selector-label">
-                    <div class="selector-option">
-                        <div class="option-icon">
-                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/70edb4692955b816d2425d9a2451595f1d40491621a4d01d8e63ed2b40d12d30?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
-                                 alt="Template"
-                                 class="icon" />
-                        </div>
-                        <select name="templateId" id="templateSelect" class="form-control">
-                            @if (templates != null)
-                            {
-                                foreach (var template in templates)
-                                {
-                                    <option value="@template.Id">@template.Title</option>
-                                }
-                            }
-                        </select>
-                    </div>
-                </label>
+                <select name="templateId" id="templateSelect" class="form-control">
+                    @if (templates != null)
+                    {
+                        foreach (var template in templates)
+                        {
+                            <option value="@template.Id">@template.Title</option>
+                        }
+                    }
+                </select>
             </div>
-            <h3 class="panel-title">Настройки документа</h3>
-            <div class="document-settings">
-                <label class="setting-option">
-                    <div class="checkbox-input">
-                        <div class="checkbox-icon">
-                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ac6b0b16e69b6b4a9ff530df653f72abf551a54c7f75c0ea495cb7d5e66864fe?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
-                                 alt="Checked"
-                                 class="icon" />
-                        </div>
-                    </div>
-                    <span class="option-text">Настройка 1</span>
-                </label>
+            <h3 class="panel-title">Тип действия</h3>
+            <div class="action-selector">
+                <select name="actionId" id="actionSelect" class="form-control">
 
-                <label class="setting-option">
-                    <div class="checkbox-input">
-                        <div class="checkbox-icon">
-                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ac6b0b16e69b6b4a9ff530df653f72abf551a54c7f75c0ea495cb7d5e66864fe?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
-                                 alt="Checked"
-                                 class="icon" />
-                        </div>
-                    </div>
-                    <span class="option-text">Настройка 2</span>
-                </label>
-
-                <label class="setting-option">
-                    <div class="checkbox-input">
-                        <div class="checkbox-icon">
-                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ac6b0b16e69b6b4a9ff530df653f72abf551a54c7f75c0ea495cb7d5e66864fe?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
-                                 alt="Checked"
-                                 class="icon" />
-                        </div>
-                    </div>
-                    <span class="option-text">Настройка 3</span>
-                </label>
-            </div>
-
-            <div class="additional-settings">
-                <label class="selector-label">
-                    <span class="setting-label">Настройка 4</span>
-                    <div class="selector-option">
-                        <div class="option-icon">
-                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/048a33bcb6395d8ae12a6b189734fa892d754141eddab3b606d12c58b2298f85?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
-                                 alt="Setting"
-                                 class="icon" />
-                        </div>
-                    </div>
-                </label>
-            </div>
-
-            <h3 class="panel-title">Еще настройки</h3>
-            <div class="more-settings">
-                <label class="setting-option">
-                    <div class="checkbox-input">
-                        <div class="checkbox-icon">
-                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ac6b0b16e69b6b4a9ff530df653f72abf551a54c7f75c0ea495cb7d5e66864fe?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
-                                 alt="Checked"
-                                 class="icon" />
-                        </div>
-                    </div>
-                    <span class="option-text">Настройка 1</span>
-                </label>
-
-                <label class="setting-option">
-                    <div class="checkbox-input">
-                        <div class="checkbox-icon">
-                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ac6b0b16e69b6b4a9ff530df653f72abf551a54c7f75c0ea495cb7d5e66864fe?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
-                                 alt="Checked"
-                                 class="icon" />
-                        </div>
-                    </div>
-                    <span class="option-text">Настройка 2</span>
-                </label>
-
-                <label class="setting-option">
-                    <div class="checkbox-input">
-                        <div class="checkbox-icon">
-                            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/ac6b0b16e69b6b4a9ff530df653f72abf551a54c7f75c0ea495cb7d5e66864fe?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
-                                 alt="Checked"
-                                 class="icon" />
-                        </div>
-                    </div>
-                    <span class="option-text">Настройка 3</span>
-                </label>
+                    <option class="option-text" value="1">Исправление</option>
+                    <option class="option-text" value="2">Проверка</option>
+                    <option class="option-text" value="3">Оценивание</option>
+                </select>
             </div>
         </section>
     </aside>

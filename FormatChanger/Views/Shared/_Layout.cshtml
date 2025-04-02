@@ -12,23 +12,12 @@
     <header class="header">
         <div class="header-content">
             <div class="logo-container">
-                <img src=""
-                     alt="Format Changer Logo"
-                     class="logo-image" />
                 <h1 class="logo-text">format.changer</h1>
             </div>
             <nav class="navigation">
-                <div class="nav-links">
-                    <a href="#" class="nav-link">Главная</a>
-                </div>
                 <div class="action-buttons">
                     <button @* asp-controller="Documents" asp-action="Index" *@ id="showUploadButton" class="action-btn upload-btn" onclick="showUploadForm()">Загрузить</button>
                     <button class="action-btn export-btn" id="exportButton" onclick="startFormattingProcess()">Экспорт</button>
-                    <button class="action-btn icon-btn">
-                        <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/551b08bab8c5619ab69f69323afcd4b3d5b9be5dd7ec43d65ffca3e852bad776?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
-                             alt="Settings"
-                             class="icon-image" />
-                    </button>
                 </div>
                 <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/266d79a16507ebfa1ec27bd9e1dab48cee39da5671e801f70ea19c28d244d301?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
                      alt="User Profile"
@@ -36,6 +25,8 @@
             </nav>
         </div>
     </header>
+
+    <hr class="separator">
 
     <div class="container">
         <main role="main" class="pb-3">
