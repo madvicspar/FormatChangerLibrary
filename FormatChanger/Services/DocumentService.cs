@@ -29,7 +29,6 @@ namespace FormatChanger.Services
             IElementCorrectionStrategy<TableCaptionSettingsModel> tableCaptionCorrectionStrategy)
         {
             _context = context;
-            //_context.ClearAndSeed(_context);
             _textCorrectionStrategy = textStrategy;
             _headingFirstCorrectionStrategies = h1Strategy;
             _imageCorrectionStrategy = imageStrategy;
@@ -38,8 +37,6 @@ namespace FormatChanger.Services
             _headerTableCorrectionStrategies = headerTableCorrectionStrategies;
             _imageCaptionCorrectionStrategy = imageCaptionCorrectionStrategy;
             _tableCaptionCorrectionStrategy = tableCaptionCorrectionStrategy;
-
-            //_context.SeedData(_context);
         }
 
         // Загрузка документа и сохранение в БД
