@@ -4,13 +4,17 @@ using FormatChanger.Models;
 
 namespace FormatChanger.Services.Interfaces
 {
-    // TODO: add other style strategies and glodal document strategy
     public interface IElementCorrectionStrategy<T>
     {
-        T GetSettings(FormattingTemplateModel template);
+        /// <summary>
+        /// Исправляет форматирование элемента на основе заданных настроек форматирования
+        /// </summary>
+        /// <param name="template">Шаблон форматирования</param>
         void ApplyCorrection(WordprocessingDocument doc, FormattingTemplateModel template);
-        RunProperties GetRunProperties(T settings);
-        ParagraphProperties GetParagraphProperties(T settings);
+        /// <summary>
+        /// Генерирует список несоответствий в форматировании элемента на основе заданных настроек форматирования
+        /// </summary>
+        /// <param name="template">Шаблон форматирования</param>
         public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template);
     }
 }
