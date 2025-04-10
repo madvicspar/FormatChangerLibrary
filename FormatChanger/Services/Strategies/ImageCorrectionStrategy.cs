@@ -1,9 +1,10 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FormatChanger.Models;
+using FormatChanger.Services.Interfaces;
 using System.Text.RegularExpressions;
 
-namespace FormatChanger.Services
+namespace FormatChanger.Services.Strategies
 {
     public class ImageCorrectionStrategy : IElementCorrectionStrategy<ImageSettingsModel>
     {

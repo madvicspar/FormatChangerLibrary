@@ -2,7 +2,7 @@
 using DocumentFormat.OpenXml.Wordprocessing;
 using FormatChanger.Models;
 
-namespace FormatChanger.Services
+namespace FormatChanger.Services.Interfaces
 {
     // TODO: add other style strategies and glodal document strategy
     public interface IElementCorrectionStrategy<T>

@@ -1,8 +1,9 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FormatChanger.Models;
+using FormatChanger.Services.Interfaces;
 
-namespace FormatChanger.Services
+namespace FormatChanger.Services.Strategies
 {
     public class TableHeaderCorrectionStrategy : IElementCorrectionStrategy<HeaderSettingsModel>
     {

@@ -1,8 +1,9 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FormatChanger.Models;
+using FormatChanger.Services.Interfaces;
 
-namespace FormatChanger.Services
+namespace FormatChanger.Services.Strategies
 {
     public class ListCorrectionStrategy : IElementCorrectionStrategy<ListSettingsModel>
     {
@@ -54,7 +55,7 @@ namespace FormatChanger.Services
 
             var paragraphList = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().ToList();
 
-            
+
             foreach (var paragraph in paragraphList)
             {
                 var paragraphProperties = paragraph.Elements<ParagraphProperties>().FirstOrDefault();
@@ -64,7 +65,7 @@ namespace FormatChanger.Services
                     var numberingProperties = paragraphProperties.Elements<NumberingProperties>().FirstOrDefault();
                     if (numberingProperties != null)
                     {
-                        
+
                     }
                 }
             }

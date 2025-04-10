@@ -1,7 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
 using FormatChanger.Models;
 
-namespace FormatChanger.Services
+namespace FormatChanger.Services.Interfaces
 {
     public interface IDocumentService
     {

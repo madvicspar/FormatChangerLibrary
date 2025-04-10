@@ -1,8 +1,9 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FormatChanger.Models;
+using FormatChanger.Services.Interfaces;
 
-namespace FormatChanger.Services
+namespace FormatChanger.Services.Strategies
 {
     public class TableCorrectionStrategy : IElementCorrectionStrategy<TableSettingsModel>
     {
@@ -65,7 +66,7 @@ namespace FormatChanger.Services
             );
 
             tableProperties.AppendChild(new TableCellVerticalAlignment { Val = TableVerticalAlignmentValues.Center });
-            tableProperties.AppendChild(new Justification { Val=JustificationValues.Center });
+            tableProperties.AppendChild(new Justification { Val = JustificationValues.Center });
             tableProperties.AppendChild(tableCellMargins);
         }
 
