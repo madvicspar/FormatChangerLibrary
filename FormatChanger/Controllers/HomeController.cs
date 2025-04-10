@@ -46,7 +46,7 @@ namespace FormatChanger.Controllers
                     return NotFound();
                 }
 
-                var paragraphs = _documentService.GetDocumentParagraphs(document);
+                var paragraphs = _documentService.ExtractParagraphs(document);
 
                 SetTemplates();
 

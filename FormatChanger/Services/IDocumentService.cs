@@ -12,7 +12,7 @@ namespace FormatChanger.Services
         Task<DocumentModel> GetDocumentByIdAsync(long id);
 
         // Метод для извлечения абзацев из документа
-        List<ParagraphModel> GetDocumentParagraphs(DocumentModel document);
+        List<ParagraphModel> ExtractParagraphs(DocumentModel document);
         // Метод для исправления форматирования документа
         Task<DocumentModel> CorrectDocumentAsync(DocumentModel document, FormattingTemplateModel template, string[] types);
         // Метод для проверки форматирования документа

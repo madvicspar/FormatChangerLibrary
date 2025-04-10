@@ -20,6 +20,12 @@ builder.Services.AddScoped<IElementCorrectionStrategy<TableCaptionSettingsModel>
 builder.Services.AddScoped<IElementCorrectionStrategy<TableSettingsModel>, TableCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<CellSettingsModel>, TableCellCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<HeaderSettingsModel>, TableHeaderCorrectionStrategy>();
+builder.Services.AddScoped<IDocumentStorage, DocumentStorageService>();
+builder.Services.AddScoped<IParagraphExtractor, ParagraphExtractor>();
+builder.Services.AddScoped<IDocumentCorrector, DocumentCorrector>();
+builder.Services.AddScoped<IDocumentChecker, DocumentChecker>();
+builder.Services.AddScoped<IParagraphStyler, ParagraphStyler>();
+builder.Services.AddScoped<IParagraphNumbering, ParagraphNumbering>();
 
 
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
