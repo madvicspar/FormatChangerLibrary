@@ -1,143 +1,25 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Vml.Office;
+﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FormatChanger.Models;
-using FormatChanger.Services.Interfaces;
 
 namespace FormatChanger.Services.Strategies
 {
-    public class HeadingFirstCorrectionStrategy : IElementCorrectionStrategy<HeadingSettingsModel>
+    public class HeadingFirstCorrectionStrategy : ElementCorrectionStrategyBase<HeadingSettingsModel>
     {
-        public HeadingSettingsModel GetSettings(FormattingTemplateModel template)
-        {
-            return template.HeadingSettings;
-        }
-        public RunProperties GetRunProperties(HeadingSettingsModel settings)
-        {
-            return new RunProperties(
-                new RunFonts { Ascii = settings.TextSettings.Font, HighAnsi = settings.TextSettings.Font },
-                new Color { Val = settings.TextSettings.Color },
-                new Bold { Val = settings.TextSettings.IsBold },
-                new Italic { Val = settings.TextSettings.IsItalic },
-                new Underline { Val = settings.TextSettings.IsUnderscore ? UnderlineValues.Single : UnderlineValues.None },
-                new FontSize { Val = (settings.TextSettings.FontSize * 2).ToString() }
-            );
-        }
+        public override HeadingSettingsModel GetSettings(FormattingTemplateModel template) =>
+            template.HeadingSettings;
 
-        public ParagraphProperties GetParagraphProperties(HeadingSettingsModel settings)
-        {
-            var paragraphProperties = new ParagraphProperties(
-            new SpacingBetweenLines
-            {
-                Line = settings.TextSettings.LineSpacing.ToString(),
-                LineRule = LineSpacingRuleValues.Auto,
-                Before = settings.TextSettings.BeforeSpacing.ToString(),
-                After = settings.TextSettings.AfterSpacing.ToString()
-            },
-            new Indentation
-            {
-                Left = settings.TextSettings.Left.ToString(),
-                Right = settings.TextSettings.Right.ToString(),
-                FirstLine = settings.TextSettings.FirstLine.ToString()
-            },
-            new Justification { Val = JustificationConverter.Parse(settings.TextSettings.Justification) },
-            new KeepNext { Val = settings.TextSettings.KeepWithNext }
-            );
-
-            if (settings.StartOnNewPage)
-                paragraphProperties.AddChild(new PageBreakBefore());
-
-            var numberingProperties = new NumberingProperties(
-                new NumberingLevelReference { Val = settings.HeadingLevel - 1 },
-                new NumberingId { Val = 1007 }
-            );
-
-            paragraphProperties.Append(numberingProperties);
-
-            return paragraphProperties;
-        }
-
-        public void ApplyCorrection(WordprocessingDocument doc, FormattingTemplateModel template)
+        public override void ApplyCorrection(WordprocessingDocument doc, FormattingTemplateModel template)
         {
             var settings = GetSettings(template);
             var stylePart = doc.MainDocumentPart?.StyleDefinitionsPart;
-            if (stylePart?.Styles == null) return;
-
-            var numberingPart = doc.MainDocumentPart.NumberingDefinitionsPart ?? doc.MainDocumentPart.AddNewPart<NumberingDefinitionsPart>();
-            EnsureNumbering(numberingPart);
-            ApplyCorrectionToStyle(stylePart, settings, "heading 1");
-        }
-
-        private void EnsureNumbering(NumberingDefinitionsPart numberingPart)
-        {
-            var numbering = numberingPart.Numbering;
-
-            var abstractNum = new AbstractNum()
-            {
-                AbstractNumberId = 1007
-            };
-
-            // Уровень 0: "1"
-            abstractNum.AppendChild(new Level(
-                new StartNumberingValue { Val = 1 },
-                new NumberingFormat { Val = NumberFormatValues.Decimal },
-                new LevelText { Val = "%1" },
-                new LevelJustification { Val = LevelJustificationValues.Left }
-            )
-            { LevelIndex = 0 });
-
-            // Уровень 1: "1.1"
-            abstractNum.AppendChild(new Level(
-                new StartNumberingValue { Val = 1 },
-                new NumberingFormat { Val = NumberFormatValues.Decimal },
-                new LevelText { Val = "%1.%2" },
-                new LevelJustification { Val = LevelJustificationValues.Left }
-            )
-            { LevelIndex = 1 });
-
-            // Уровень 2: "1.1.1"
-            abstractNum.AppendChild(new Level(
-                new StartNumberingValue { Val = 1 },
-                new NumberingFormat { Val = NumberFormatValues.Decimal },
-                new LevelText { Val = "%1.%2.%3" },
-                new LevelJustification { Val = LevelJustificationValues.Left }
-            )
-            { LevelIndex = 2 });
-
-            numbering.Append(abstractNum);
-
-            // Создаем экземпляр NumberingInstance, который ссылается на AbstractNum
-            var num = new NumberingInstance(
-                new AbstractNumId { Val = 1007 } // Ссылка на AbstractNum
-            )
-            { NumberID = 1007 }; // Идентификатор NumberingInstance
-
-            // Добавляем NumberingInstance в Numbering
-            numbering.Append(num);
-            numberingPart.Numbering.Save();
-        }
-
-        private void ApplyCorrectionToStyle(StyleDefinitionsPart stylePart, HeadingSettingsModel settings, string styleName)
-        {
-            var style = stylePart.Styles.Elements<Style>().FirstOrDefault(s => s.StyleName?.Val == styleName);
-            if (style == null)
-            {
-                Console.WriteLine($"Style '{styleName}' not found.");
+            if (stylePart?.Styles == null)
                 return;
-            }
 
-            style.RemoveAllChildren<StyleRunProperties>();
-            style.RemoveAllChildren<StyleParagraphProperties>();
-
-            style.AppendChild(new StyleRunProperties(GetRunProperties(settings)));
-            style.AppendChild(new StyleParagraphProperties(GetParagraphProperties(settings)));
-
-            if (settings.NextHeadingLevel != null)
-            {
-                string nextStyleName = $"heading {settings.HeadingLevel + 1}";
-                ApplyCorrectionToStyle(stylePart, settings.NextHeadingLevel, nextStyleName);
-            }
+            var numberingPart = doc.MainDocumentPart.NumberingDefinitionsPart
+                ?? doc.MainDocumentPart.AddNewPart<NumberingDefinitionsPart>();
+            EnsureNumbering(numberingPart);
+            ApplyRecursiveStyleCorrection(stylePart.Styles, settings, level: 1);
         }
 
         public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
@@ -145,8 +27,8 @@ namespace FormatChanger.Services.Strategies
             var issues = new List<string>();
             var settings = GetSettings(template);
 
-            var expectedRunProps = GetRunProperties(settings);
-            var expectedParaProps = GetParagraphProperties(settings);
+            var runProps = CreateRunProperties(settings.TextSettings);
+            var paraProps = CreateHeadingParagraphProperties(settings);
 
             var actualRunProps = paragraph.Descendants<RunProperties>().FirstOrDefault();
             var actualParaProps = paragraph.ParagraphProperties;
@@ -170,10 +52,71 @@ namespace FormatChanger.Services.Strategies
                 }
             }
 
-            CompareRunProperties(paragraph, actualRunProps, expectedRunProps, styles, issues);
-            CompareParagraphProperties(paragraph, actualParaProps, expectedParaProps, styles, issues);
+            CompareRunProperties(paragraph, actualRunProps, runProps, styles, issues);
+            CompareParagraphProperties(paragraph, actualParaProps, paraProps, styles, issues);
 
             return issues;
+        }
+
+        private void ApplyRecursiveStyleCorrection(Styles styles, HeadingSettingsModel settings, int level)
+        {
+            var styleName = $"heading {level}";
+            var style = styles.Elements<Style>().FirstOrDefault(s => s.StyleName?.Val == styleName);
+            if (style == null)
+                return;
+
+            var runProps = CreateRunProperties(settings.TextSettings);
+            var paraProps = CreateHeadingParagraphProperties(settings);
+
+            ApplyToStyle(styles, styleName, runProps, paraProps);
+
+            if (settings.NextHeadingLevel != null)
+            {
+                ApplyRecursiveStyleCorrection(styles, settings.NextHeadingLevel, level + 1);
+            }
+        }
+
+        private ParagraphProperties CreateHeadingParagraphProperties(HeadingSettingsModel settings)
+        {
+            var paraProps = CreateParagraphProperties(settings.TextSettings);
+
+            if (settings.StartOnNewPage)
+                paraProps.AddChild(new PageBreakBefore());
+
+            var numbering = new NumberingProperties(
+                new NumberingLevelReference { Val = settings.HeadingLevel - 1 },
+                new NumberingId { Val = 1007 }
+            );
+            paraProps.Append(numbering);
+            return paraProps;
+        }
+
+        private void EnsureNumbering(NumberingDefinitionsPart numberingPart)
+        {
+            var numbering = numberingPart.Numbering ?? new Numbering();
+
+            //TODO: брать нормальный номер
+
+            var abstractNum = new AbstractNum { AbstractNumberId = 1007 };
+
+            abstractNum.AppendChild(CreateHeadingLevel(0, "%1"));
+            abstractNum.AppendChild(CreateHeadingLevel(1, "%1.%2"));
+            abstractNum.AppendChild(CreateHeadingLevel(2, "%1.%2.%3"));
+
+            numbering.Append(abstractNum);
+            numbering.Append(new NumberingInstance(new AbstractNumId { Val = 1007 }) { NumberID = 1007 });
+            numberingPart.Numbering.Save();
+        }
+
+        private Level CreateHeadingLevel(int index, string levelText)
+        {
+            return new Level(
+                new StartNumberingValue { Val = 1 },
+                new NumberingFormat { Val = NumberFormatValues.Decimal },
+                new LevelText { Val = levelText },
+                new LevelJustification { Val = LevelJustificationValues.Left }
+            )
+            { LevelIndex = index };
         }
 
         private void CompareRunProperties(Paragraph p, RunProperties actual, RunProperties expected, IEnumerable<Style> styles, List<string> issues)

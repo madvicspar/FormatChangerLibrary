@@ -15,6 +15,6 @@ namespace FormatChanger.Services.Interfaces
         /// Генерирует список несоответствий в форматировании элемента на основе заданных настроек форматирования
         /// </summary>
         /// <param name="template">Шаблон форматирования</param>
-        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template);
+        List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template);
     }
 }
