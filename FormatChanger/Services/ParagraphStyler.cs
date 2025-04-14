@@ -1,7 +1,8 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using FormatChanger.Models;
+using FormatChanger.Extensions;
+using FormatChanger.Models.Helpers;
 using FormatChanger.Services.Interfaces;
 
 namespace FormatChanger.Services
@@ -15,7 +16,7 @@ namespace FormatChanger.Services
 
             for (int i = 0; i < types.Length; i++)
             {
-                paragraphList[i].Type = ParagraphTypesEnumExtensions.ToEnum(types[i]).ToString();
+                paragraphList[i].Type = ParagraphTypeExtensions.ToEnum(types[i]).ToString();
             }
 
             foreach (var p in paragraphs)

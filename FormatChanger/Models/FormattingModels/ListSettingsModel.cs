@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using FormatChanger.Models.Helpers;
 
-namespace FormatChanger.Models
+namespace FormatChanger.Models.FormattingModels
 {
     public class ListSettingsModel
     {

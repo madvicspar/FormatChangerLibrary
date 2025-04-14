@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace FormatChanger.Models
+namespace FormatChanger.Models.FormattingModels
 {
     public class HeadingSettingsModel
     {

@@ -1,4 +1,4 @@
-﻿namespace FormatChanger.Models
+﻿namespace FormatChanger.Models.Helpers
 {
     public enum ActionType
     {

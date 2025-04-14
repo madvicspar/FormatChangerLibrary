@@ -1,4 +1,5 @@
 ﻿using FormatChanger.Models;
+using FormatChanger.Models.FormattingModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

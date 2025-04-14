@@ -1,4 +1,6 @@
+using FormatChanger.Infrastructure.Email;
 using FormatChanger.Models;
+using FormatChanger.Models.FormattingModels;
 using FormatChanger.Services;
 using FormatChanger.Services.Interfaces;
 using FormatChanger.Services.Strategies;

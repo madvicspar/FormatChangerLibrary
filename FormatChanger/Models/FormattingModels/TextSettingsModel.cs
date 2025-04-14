@@ -1,4 +1,4 @@
-﻿namespace FormatChanger.Models
+﻿namespace FormatChanger.Models.FormattingModels
 {
     public class TextSettingsModel
     {

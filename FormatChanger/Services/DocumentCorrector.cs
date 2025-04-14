@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
-using FormatChanger.Models;
+using FormatChanger.Models.FormattingModels;
+using FormatChanger.Models.Helpers;
 using FormatChanger.Services.Interfaces;
 
 namespace FormatChanger.Services

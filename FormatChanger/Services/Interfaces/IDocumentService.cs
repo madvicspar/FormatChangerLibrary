@@ -1,5 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
 using FormatChanger.Models;
+using FormatChanger.Models.FormattingModels;
+using FormatChanger.Models.Helpers;
 
 namespace FormatChanger.Services.Interfaces
 {

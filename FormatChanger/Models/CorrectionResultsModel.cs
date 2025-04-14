@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using FormatChanger.Models.FormattingModels;
 
 namespace FormatChanger.Models
 {

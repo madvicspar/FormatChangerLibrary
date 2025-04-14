@@ -1,11 +1,9 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-using System.Reflection.Emit;
+﻿using FormatChanger.Models.Helpers;
 
-namespace FormatChanger.Models
+namespace FormatChanger.Extensions
 {
-    public static class ParagraphTypesEnumExtensions
+    public static class ParagraphTypeExtensions
     {
-        // Преобразование enum в строку
         public static string ToString(this ParagraphTypes type)
         {
             switch (type)
@@ -33,7 +31,6 @@ namespace FormatChanger.Models
             }
         }
 
-        // Преобразование строки в enum
         public static ParagraphTypes ToEnum(this string typeString)
         {
             switch (typeString)
@@ -62,24 +59,5 @@ namespace FormatChanger.Models
                     throw new ArgumentException($"Некорректное значение для типа абзаца: {typeString}");
             }
         }
-    }
-    public enum ParagraphTypes
-    {
-        Normal = 0,
-        ImageCaption = 1,
-        TableCaption = 2,
-        Period = 3,
-        Bracket = 4,
-        Dash = 5,
-        FirstH = 6,
-        SecondH = 7,
-        ThirdH = 8,
-        NoEdit = 9
-    }
-    public class ParagraphModel
-    {
-        public Paragraph Paragraph { get; set; }
-        public string Type { get; set; }
-        public string InnerText => Paragraph.InnerText;
     }
 }

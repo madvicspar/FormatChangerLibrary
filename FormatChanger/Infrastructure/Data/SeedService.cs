@@ -1,4 +1,6 @@
 ﻿using FormatChanger.Models;
+using FormatChanger.Models.FormattingModels;
+using FormatChanger.Models.Helpers;
 using Microsoft.AspNetCore.Identity;
 
 namespace FormatChanger.Utilities.Data

@@ -1,5 +1,5 @@
-﻿using FormatChanger.Models;
-using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Packaging;
+using FormatChanger.Models.FormattingModels;
 
 public interface ITemplateService
 {

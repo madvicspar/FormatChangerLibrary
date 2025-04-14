@@ -2,7 +2,7 @@
 using System.Net.Mail;
 using System.Net;
 
-namespace FormatChanger.Services
+namespace FormatChanger.Infrastructure.Email
 {
     public class EmailSender : IEmailSender
     {

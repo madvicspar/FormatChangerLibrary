@@ -1,5 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
-using FormatChanger.Models;
+using FormatChanger.Models.FormattingModels;
 using FormatChanger.Utilities.Data;
 using Microsoft.EntityFrameworkCore;
 
