@@ -6,3 +6,5 @@ FormatChanger/obj
 /FormatChanger/appsettings.json
 /FormatChanger/uploads
 /FormatChanger/appsettings.json
+/FormatChangerTests/bin/Debug/net8.0
+/FormatChangerTests/obj
