@@ -36,6 +36,12 @@
     padding: 4px 16px 12px;
     margin: 0;
     line-height: 24px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.text-block:hover {
+    border-left: 3px solid #1980e6;
 }
 
 .highlighted {

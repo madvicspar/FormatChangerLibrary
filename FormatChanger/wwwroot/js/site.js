@@ -99,4 +99,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    paragraphs.forEach((paragraph, index) => {
+        paragraph.addEventListener('click', function () {
+            currentIndex = index;
+            updateActiveParagraph();
+        });
+    });
 });
