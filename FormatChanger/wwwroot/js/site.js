@@ -1,4 +1,8 @@
-﻿// Функция для отображения формы загрузки
+﻿let currentIndex = 0;
+let paragraphs = [];
+let typeOptions = [];
+
+// Функция для отображения формы загрузки
 function showUploadForm() {
     var form = document.getElementById('uploadForm');
     form.style.display = 'block';
@@ -38,9 +42,8 @@ function getParagraphTypes() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    let currentIndex = 0; // Индекс активного параграфа
-    const paragraphs = document.querySelectorAll('#paragraphsContainer .text-block');
-    const typeOptions = document.querySelectorAll('.type-option');
+    paragraphs = document.querySelectorAll('#paragraphsContainer .text-block');
+    typeOptions = document.querySelectorAll('.type-option');
 
     // Отображаем первый параграф как активный
     if (paragraphs.length > 0) {
@@ -48,16 +51,17 @@ document.addEventListener('DOMContentLoaded', function () {
         updateActiveTypeButton(paragraphs[currentIndex]);
     }
 
-    // Функция для обновления активного параграфа
-    function updateActiveParagraph() {
-        paragraphs.forEach((p, index) => {
-            p.classList.remove('highlighted'); // Убираем активный класс у всех
-            if (index === currentIndex) {
-                p.classList.add('highlighted'); // Добавляем активный класс к текущему параграфу
-                updateActiveTypeButton(p); // Синхронизируем тип с кнопкой
-            }
+    setupParagraphNavigation();
+    setupTypeSelection();
+});
+
+function setupParagraphNavigation() {
+    paragraphs.forEach((paragraph, index) => {
+        paragraph.addEventListener('click', function () {
+            currentIndex = index;
+            updateActiveParagraph();
         });
-    }
+    });
 
     // Обработчик нажатия на кнопку "Предыдущий абзац"
     document.querySelector('.prev-btn').addEventListener('click', function () {
@@ -74,8 +78,20 @@ document.addEventListener('DOMContentLoaded', function () {
             updateActiveParagraph();
         }
     });
+}
 
+// Функция для обновления активного параграфа
+function updateActiveParagraph() {
+    paragraphs.forEach((p, index) => {
+        p.classList.remove('highlighted'); // Убираем активный класс у всех
+        if (index === currentIndex) {
+            p.classList.add('highlighted'); // Добавляем активный класс к текущему параграфу
+            updateActiveTypeButton(p); // Синхронизируем тип с кнопкой
+        }
+    });
+}
 
+function setupTypeSelection() {
     typeOptions.forEach(option => {
         option.addEventListener('click', function () {
             const highlightedParagraph = document.querySelector('.text-block.highlighted');
@@ -86,24 +102,16 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+}
 
 
+function updateActiveTypeButton(paragraph) {
+    const type = paragraph.dataset.type;
 
-    function updateActiveTypeButton(paragraph) {
-        const type = paragraph.dataset.type;
-
-        typeOptions.forEach(option => {
-            option.classList.remove('active');
-            if (option.getAttribute('data-type') === type) {
-                option.classList.add('active');
-            }
-        });
-    }
-
-    paragraphs.forEach((paragraph, index) => {
-        paragraph.addEventListener('click', function () {
-            currentIndex = index;
-            updateActiveParagraph();
-        });
+    typeOptions.forEach(option => {
+        option.classList.remove('active');
+        if (option.getAttribute('data-type') === type) {
+            option.classList.add('active');
+        }
     });
-});
+}
