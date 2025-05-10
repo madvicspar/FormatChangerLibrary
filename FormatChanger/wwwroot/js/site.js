@@ -81,9 +81,8 @@ function setupParagraphNavigation() {
 // Сделать абзац активным
 function updateActiveParagraph() {
     paragraphs.forEach((p, index) => {
-        p.classList.remove('highlighted');
+        p.classList.toggle('highlighted', index === currentIndex);
         if (index === currentIndex) {
-            p.classList.add('highlighted');
             updateActiveTypeButton(p);
         }
     });
@@ -106,11 +105,7 @@ function setupTypeSelection() {
 // Обновить выбранный тип абзаца
 function updateActiveTypeButton(paragraph) {
     const type = paragraph.dataset.type;
-
     typeOptions.forEach(option => {
-        option.classList.remove('active');
-        if (option.getAttribute('data-type') === type) {
-            option.classList.add('active');
-        }
+        option.classList.toggle('active', option.getAttribute('data-type') === type);
     });
 }
