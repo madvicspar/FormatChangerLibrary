@@ -2,12 +2,13 @@
 let paragraphs = [];
 let typeOptions = [];
 
-// Функция для отображения формы загрузки
+// Отобразить форму загрузки
 function showUploadForm() {
     var form = document.getElementById('uploadForm');
     form.style.display = 'block';
 }
 
+// Начать процесс форматирования
 function startFormattingProcess() {
     var selectedTemplateId = document.getElementById('templateSelect').value;
     var selectedActionId = document.getElementById('actionSelect').value;
@@ -30,6 +31,7 @@ function startFormattingProcess() {
         .catch(error => alert('Ошибка сети:', error));
 }
 
+// Получить типы абзацев
 function getParagraphTypes() {
     const paragraphs = document.querySelectorAll('.text-block');
     const paragraphData = [];
@@ -41,11 +43,11 @@ function getParagraphTypes() {
     return paragraphData;
 }
 
+// Обработать загрузку страницы
 document.addEventListener('DOMContentLoaded', function () {
     paragraphs = document.querySelectorAll('#paragraphsContainer .text-block');
     typeOptions = document.querySelectorAll('.type-option');
 
-    // Отображаем первый параграф как активный
     if (paragraphs.length > 0) {
         paragraphs[currentIndex].classList.add('highlighted');
         updateActiveTypeButton(paragraphs[currentIndex]);
@@ -55,7 +57,9 @@ document.addEventListener('DOMContentLoaded', function () {
     setupTypeSelection();
 });
 
+// Обеспечить навигацию между абзацами
 function setupParagraphNavigation() {
+    // Назначить активным кликнутый абзац
     paragraphs.forEach((paragraph, index) => {
         paragraph.addEventListener('click', function () {
             currentIndex = index;
@@ -63,7 +67,7 @@ function setupParagraphNavigation() {
         });
     });
 
-    // Обработчик нажатия на кнопку "Предыдущий абзац"
+    // Назначить активным предыдущий абзац
     document.querySelector('.prev-btn').addEventListener('click', function () {
         if (currentIndex > 0) {
             currentIndex--;
@@ -71,7 +75,7 @@ function setupParagraphNavigation() {
         }
     });
 
-    // Обработчик нажатия на кнопку "Следующий абзац"
+    // Назначить активным следующий абзац
     document.querySelector('.next-btn').addEventListener('click', function () {
         if (currentIndex < paragraphs.length - 1) {
             currentIndex++;
@@ -80,17 +84,18 @@ function setupParagraphNavigation() {
     });
 }
 
-// Функция для обновления активного параграфа
+// Сделать абзац активным
 function updateActiveParagraph() {
     paragraphs.forEach((p, index) => {
-        p.classList.remove('highlighted'); // Убираем активный класс у всех
+        p.classList.remove('highlighted');
         if (index === currentIndex) {
-            p.classList.add('highlighted'); // Добавляем активный класс к текущему параграфу
-            updateActiveTypeButton(p); // Синхронизируем тип с кнопкой
+            p.classList.add('highlighted');
+            updateActiveTypeButton(p);
         }
     });
 }
 
+// Обеспечить выбор типа абзаца
 function setupTypeSelection() {
     typeOptions.forEach(option => {
         option.addEventListener('click', function () {
@@ -104,7 +109,7 @@ function setupTypeSelection() {
     });
 }
 
-
+// Обновить выбранный тип абзаца
 function updateActiveTypeButton(paragraph) {
     const type = paragraph.dataset.type;
 
