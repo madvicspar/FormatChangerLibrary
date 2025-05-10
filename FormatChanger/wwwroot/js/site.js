@@ -33,14 +33,8 @@ function startFormattingProcess() {
 
 // Получить типы абзацев
 function getParagraphTypes() {
-    const paragraphs = document.querySelectorAll('.text-block');
-    const paragraphData = [];
-
-    paragraphs.forEach((paragraph) => {
-        paragraphData.push(paragraph.dataset.type); // Добавляем тип абзаца
-    });
-
-    return paragraphData;
+    return Array.from(document.querySelectorAll('.text-block'))
+        .map(paragraph => paragraph.dataset.type);
 }
 
 // Обработать загрузку страницы
