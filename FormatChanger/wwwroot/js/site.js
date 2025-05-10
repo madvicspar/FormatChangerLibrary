@@ -75,6 +75,25 @@ function setupParagraphNavigation() {
             updateActiveParagraph();
         }
     });
+
+    // Обработать навигацию по абзацам стрелками
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateActiveParagraph();
+            }
+            event.preventDefault();
+        }
+
+        if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+            if (currentIndex < paragraphs.length - 1) {
+                currentIndex++;
+                updateActiveParagraph();
+            }
+            event.preventDefault();
+        }
+    });
 }
 
 // Сделать абзац активным
