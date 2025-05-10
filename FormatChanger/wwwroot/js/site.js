@@ -92,12 +92,9 @@ function updateActiveParagraph() {
 function setupTypeSelection() {
     typeOptions.forEach(option => {
         option.addEventListener('click', function () {
-            const highlightedParagraph = document.querySelector('.text-block.highlighted');
-            if (highlightedParagraph) {
-                const newType = option.getAttribute('data-type');
-                highlightedParagraph.dataset.type = newType; // Обновляем тип абзаца
-                updateActiveTypeButton(highlightedParagraph); // Синхронизируем кнопку
-            }
+            const activeParagraph = document.querySelector('.text-block.highlighted');
+            activeParagraph.dataset.type = option.getAttribute('data-type');
+            updateActiveTypeButton(activeParagraph);
         });
     });
 }
