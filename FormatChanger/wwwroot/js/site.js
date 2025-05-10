@@ -43,8 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     typeOptions = document.querySelectorAll('.type-option');
 
     if (paragraphs.length > 0) {
-        paragraphs[currentIndex].classList.add('highlighted');
-        updateActiveTypeButton(paragraphs[currentIndex]);
+        updateActiveParagraph();
     }
 
     setupParagraphNavigation();
