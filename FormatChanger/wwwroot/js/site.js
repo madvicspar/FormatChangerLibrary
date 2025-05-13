@@ -21,14 +21,14 @@ function startFormattingProcess() {
         },
         body: JSON.stringify(paragraphData)
     })
-        .then(response => {
-            if (response.ok) {
-                
-            } else {
-                alert('Ошибка при отправке запроса');
-            }
-        })
-        .catch(error => alert('Ошибка сети:', error));
+    .then(response => {
+        if (response.ok) {
+            window.location.href = `/Home/Export`;
+        } else {
+            alert('Ошибка при отправке запроса');
+        }
+    })
+    .catch(error => alert('Ошибка сети:', error));
 }
 
 // Получить типы абзацев

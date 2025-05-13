@@ -12,12 +12,14 @@ namespace FormatChanger.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IDocumentService _documentService;
         private readonly ITemplateService _templateService;
+        private readonly IExportService _exportService;
 
-        public HomeController(ILogger<HomeController> logger, IDocumentService documentService, ITemplateService templateService)
+        public HomeController(ILogger<HomeController> logger, IDocumentService documentService, ITemplateService templateService, IExportService exportService)
         {
             _logger = logger;
             _documentService = documentService;
             _templateService = templateService;
+            _exportService = exportService;
         }
 
         public IActionResult Index(List<ParagraphModel> paragraphs = null)
@@ -86,8 +88,18 @@ namespace FormatChanger.Controllers
                     return BadRequest("Неизвестное действие");
             }
 
-            // Экспортируем документ
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Export()
+        {
+            var documentId = (long)JsonConvert.DeserializeObject<long>(TempData["DocumentId"].ToString());
+            var document = await _documentService.GetDocumentByIdAsync(documentId);
+
+            var result = await _exportService.ExportAsync(document, ExportMethod.Download);
+            Console.WriteLine("экспорт завершен");
+            return result;
         }
 
         public IActionResult Privacy()
