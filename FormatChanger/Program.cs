@@ -6,14 +6,14 @@ using FormatChanger.Services.Interfaces;
 using FormatChanger.Services.Strategies;
 using FormatChanger.Utilities.Data;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<IEmailSender, EmailSender>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<IEmailSenderCustom, EmailSender>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
@@ -41,6 +41,7 @@ builder.Services.AddIdentity<UserModel, IdentityRole>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddRazorPages();
+builder.Services.AddSession();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -69,6 +70,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

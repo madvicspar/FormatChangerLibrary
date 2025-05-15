@@ -2,7 +2,6 @@ using FormatChanger.Models;
 using FormatChanger.Models.Helpers;
 using FormatChanger.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System.Diagnostics;
 
 namespace FormatChanger.Controllers
@@ -52,7 +51,7 @@ namespace FormatChanger.Controllers
 
                 SetTemplates();
 
-                TempData["DocumentId"] = JsonConvert.SerializeObject(document.Id);
+                HttpContext.Session.SetString("DocumentId", document.Id.ToString());
 
                 return View("Index", paragraphs);
             }
@@ -62,7 +61,9 @@ namespace FormatChanger.Controllers
         [HttpPost]
         public async Task<IActionResult> StartFormattingProcess(long templateId, int actionId, [FromBody] string[] types)
         {
-            var documentId = (long)JsonConvert.DeserializeObject<long>(TempData["DocumentId"].ToString());
+            var documentIdStr = HttpContext.Session.GetString("DocumentId");
+            if (!long.TryParse(documentIdStr, out var documentId))
+                return BadRequest();
 
             var document = await _documentService.GetDocumentByIdAsync(documentId);
             if (document == null)
@@ -94,7 +95,10 @@ namespace FormatChanger.Controllers
         [HttpGet]
         public async Task<IActionResult> Export()
         {
-            var documentId = (long)JsonConvert.DeserializeObject<long>(TempData["DocumentId"].ToString());
+            var documentIdStr = HttpContext.Session.GetString("DocumentId");
+            if (!long.TryParse(documentIdStr, out var documentId))
+                return BadRequest();
+
             var document = await _documentService.GetDocumentByIdAsync(documentId);
 
             var result = await _exportService.ExportAsync(document, ExportMethod.Download);
