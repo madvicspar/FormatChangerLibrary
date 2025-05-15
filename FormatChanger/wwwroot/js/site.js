@@ -22,13 +22,22 @@ function startFormattingProcess() {
         body: JSON.stringify(paragraphData)
     })
     .then(response => {
-        if (response.ok) {
-            window.location.href = `/Home/Export`;
+        if (!response.ok)
+            throw new Error("Ошибка при процессе форматирования документа");
+        return fetch(`/Home/Export`);
+        })
+    .then(response => {
+        if (response.headers.get('content-disposition')?.includes('attachment')) {
+            window.location.href = '/Home/Export';
         } else {
-            alert('Ошибка при отправке запроса');
+            return response.json();
         }
     })
-    .catch(error => alert('Ошибка сети:', error));
+    .then(data => {
+        if (data)
+            alert(data.message || "Успешно");
+    })
+    .catch(error => alert('Ошибка при экспорте:', error));
 }
 
 // Получить типы абзацев

@@ -101,9 +101,24 @@ namespace FormatChanger.Controllers
 
             var document = await _documentService.GetDocumentByIdAsync(documentId);
 
-            var result = await _exportService.ExportAsync(document, ExportMethod.Download);
-            Console.WriteLine("экспорт завершен");
-            return result;
+            var result = await _exportService.ExportAsync(document, ExportMethod.Email);
+            if (result is FileContentResult)
+                return result;
+
+            if (result is ObjectResult objectResult)
+            {
+                return Json(new
+                {
+                    status = objectResult.StatusCode,
+                    message = objectResult.Value
+                });
+            }
+
+            return Json(new
+            {
+                status = 200,
+                message = "Ёкспорт завершен"
+            });
         }
 
         public IActionResult Privacy()
