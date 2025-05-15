@@ -2,7 +2,6 @@ using FormatChanger.Models;
 using FormatChanger.Models.Helpers;
 using FormatChanger.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System.Diagnostics;
 
 namespace FormatChanger.Controllers
@@ -12,12 +11,14 @@ namespace FormatChanger.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IDocumentService _documentService;
         private readonly ITemplateService _templateService;
+        private readonly IExportService _exportService;
 
-        public HomeController(ILogger<HomeController> logger, IDocumentService documentService, ITemplateService templateService)
+        public HomeController(ILogger<HomeController> logger, IDocumentService documentService, ITemplateService templateService, IExportService exportService)
         {
             _logger = logger;
             _documentService = documentService;
             _templateService = templateService;
+            _exportService = exportService;
         }
 
         public IActionResult Index(List<ParagraphModel> paragraphs = null)
@@ -50,7 +51,7 @@ namespace FormatChanger.Controllers
 
                 SetTemplates();
 
-                TempData["DocumentId"] = JsonConvert.SerializeObject(document.Id);
+                HttpContext.Session.SetString("DocumentId", document.Id.ToString());
 
                 return View("Index", paragraphs);
             }
@@ -60,7 +61,9 @@ namespace FormatChanger.Controllers
         [HttpPost]
         public async Task<IActionResult> StartFormattingProcess(long templateId, int actionId, [FromBody] string[] types)
         {
-            var documentId = (long)JsonConvert.DeserializeObject<long>(TempData["DocumentId"].ToString());
+            var documentIdStr = HttpContext.Session.GetString("DocumentId");
+            if (!long.TryParse(documentIdStr, out var documentId))
+                return BadRequest();
 
             var document = await _documentService.GetDocumentByIdAsync(documentId);
             if (document == null)
@@ -86,8 +89,36 @@ namespace FormatChanger.Controllers
                     return BadRequest("Неизвестное действие");
             }
 
-            // Экспортируем документ
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Export()
+        {
+            var documentIdStr = HttpContext.Session.GetString("DocumentId");
+            if (!long.TryParse(documentIdStr, out var documentId))
+                return BadRequest();
+
+            var document = await _documentService.GetDocumentByIdAsync(documentId);
+
+            var result = await _exportService.ExportAsync(document, ExportMethod.Email);
+            if (result is FileContentResult)
+                return result;
+
+            if (result is ObjectResult objectResult)
+            {
+                return Json(new
+                {
+                    status = objectResult.StatusCode,
+                    message = objectResult.Value
+                });
+            }
+
+            return Json(new
+            {
+                status = 200,
+                message = "Экспорт завершен"
+            });
         }
 
         public IActionResult Privacy()
