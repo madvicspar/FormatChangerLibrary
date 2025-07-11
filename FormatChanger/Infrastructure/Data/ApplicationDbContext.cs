@@ -37,12 +37,14 @@ namespace FormatChanger.Utilities.Data
         public DbSet<CellSettingsModel> CellSettings { get; set; } = null!;
         public DbSet<HeaderSettingsModel> HeaderSettings { get; set; } = null!;
         public DbSet<DocumentSettingsModel> DocumentSettings { get; set; } = null!;
-        public void ClearAndSeed(ApplicationDbContext _context)
+        public async Task ClearAndSeed(ApplicationDbContext _context, IServiceProvider serviceProvider,
+            UserManager<UserModel> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
 
             SeedService.SeedData(_context);
+            await SeedService.Initialize(serviceProvider, userManager, roleManager);
         }
     }
 }
