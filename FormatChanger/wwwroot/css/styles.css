@@ -44,6 +44,32 @@
     border-left: 3px solid #1980e6;
 }
 
+.text-block[data-type="FirstH"],
+.text-block[data-type="SecondH"],
+.text-block[data-type="ThirdH"] {
+    background-color: rgba(105, 90, 180, 0.1);
+    border-left: 4px solid #695ab4;
+    padding-left: 28px;
+}
+
+.text-block[data-type="Period"],
+.text-block[data-type="Bracket"],
+.text-block[data-type="Dash"] {
+    background-color: rgba(46, 204, 113, 0.08);
+    border-left: 3px dashed #2ecc71;
+    padding-left: 36px;
+}
+
+.text-block[data-type="ImageCaption"] {
+    background-color: rgba(255, 159, 67, 0.1);
+    border-left: 3px solid #ffa14d;
+}
+
+.text-block[data-type="TableCaption"] {
+    background-color: rgba(52, 152, 219, 0.08);
+    border-left: 3px solid #3498db;
+}
+
 .highlighted {
     background-color: rgba(59, 130, 246, 0.102);
     border-left: 3px solid #1980e6;
