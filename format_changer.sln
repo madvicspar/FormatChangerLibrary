@@ -3,18 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "format_changer", "format_changer\format_changer.csproj", "{544AE60B-1B01-4BA4-A21C-63DDFD598B83}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormatChanger", "FormatChanger\FormatChanger.csproj", "{9B84DF57-9DD2-4629-936A-54C214175877}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatChangerTests", "FormatChangerTests\FormatChangerTests.csproj", "{405AEA39-EA65-4A14-AD29-F749FEC4555C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{05F392A9-210E-4265-9020-508457FA14E5}"
-	ProjectSection(SolutionItems) = preProject
-		ci-build.yml = ci-build.yml
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{544AE60B-1B01-4BA4-A21C-63DDFD598B83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{544AE60B-1B01-4BA4-A21C-63DDFD598B83}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{544AE60B-1B01-4BA4-A21C-63DDFD598B83}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{544AE60B-1B01-4BA4-A21C-63DDFD598B83}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9B84DF57-9DD2-4629-936A-54C214175877}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9B84DF57-9DD2-4629-936A-54C214175877}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B84DF57-9DD2-4629-936A-54C214175877}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -37,9 +24,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{05F392A9-210E-4265-9020-508457FA14E5} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {25D430AE-11DA-4413-BD9E-A8D058DC6ACF}
