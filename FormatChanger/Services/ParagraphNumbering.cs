@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using FormatChanger.Extensions;
 using FormatChanger.Models.Helpers;
 using FormatChanger.Services.Interfaces;
 
@@ -18,6 +19,7 @@ namespace FormatChanger.Services
             .ToList();
 
             Stack<int> levels = new();
+            Stack<ParagraphTypes> markers = new();
             foreach (var paragraph in paragraphs)
             {
                 var type = paragraphList.Where(x => x.Paragraph.ParagraphId == paragraph.ParagraphId).First().Type;
@@ -26,7 +28,7 @@ namespace FormatChanger.Services
 
                 var paraProps = paragraph.Elements<ParagraphProperties>().FirstOrDefault() ?? new ParagraphProperties();
 
-                var level = DetermineListLevel(paragraphList, levels, type, paragraph);
+                var level = DetermineListLevel(paragraphList, levels, markers, type, paragraph);
                 var numberingId = type switch
                 {
                     var t when t == ParagraphTypes.Dash.ToString() => 1001,
@@ -35,7 +37,9 @@ namespace FormatChanger.Services
                     _ => 1001
                 };
                 ApplyNumbering(paraProps, level, numberingId);
+                doc.Save();
             }
+            doc.Save();
         }
         public void AddPageNumbering(WordprocessingDocument doc)
         {
@@ -66,16 +70,34 @@ namespace FormatChanger.Services
                 });
             }
         }
-        private int DetermineListLevel(List<ParagraphModel> paragraphList, Stack<int> stack, string type, Paragraph paragraph)
+        private int DetermineListLevel(List<ParagraphModel> paragraphList, Stack<int> levels, Stack<ParagraphTypes> markers, string type, Paragraph paragraph)
         {
             int level = 0;
             var index = paragraphList.FindIndex(p => p.Paragraph.ParagraphId == paragraph.ParagraphId);
             var prev = index > 0 ? paragraphList[index - 1] : null;
-            if (stack.Count > 0 && prev != null && IsList(prev.Type))
+            if (levels.Count > 0 && prev != null && IsList(prev.Type))
             {
-                level = prev.Type != type ? stack.Peek() + 1 : stack.Peek();
+                if (prev.Type == type)
+                {
+                    level = levels.Peek();
+                }
+                else if (markers.Count > 1 && markers.ElementAtOrDefault(markers.Count - 2).ToString() == type)
+                {
+                    level = levels.Pop() - 1;
+                    markers.Pop();
+                }
+                else
+                {
+                    level = levels.Peek() + 1;
+                    levels.Push(level);
+                    markers.Push(type.ToEnum());
+                }
             }
-            stack.Push(level);
+            else
+            {
+                levels.Push(level);
+                markers.Push(type.ToEnum());
+            }
             return level;
         }
         private void ApplyNumbering(ParagraphProperties paraProps, int level, int id)
@@ -86,11 +108,14 @@ namespace FormatChanger.Services
             );
 
             paraProps.Append(numberingProperties);
-            var indentation = paraProps.Elements<Indentation>().FirstOrDefault() ?? new Indentation();
+            paraProps.RemoveAllChildren<Indentation>();
 
             // Слева: 1.5 * (level + 1), в EMU
+            var indentation = new Indentation();
             indentation.Left = ((int)((2 + 0.5 * level) * 567)).ToString();
             indentation.Hanging = ((int)(0.5 * 567)).ToString();
+
+            paraProps.AppendChild(indentation);
         }
         public bool IsList(string type)
         {
@@ -111,8 +136,8 @@ namespace FormatChanger.Services
             var numbering = numberingPart.Numbering;
 
             numbering.Append(CreateAbstractNum(1001, "-", NumberFormatValues.Bullet));
-            numbering.Append(CreateAbstractNum(1002, "1.", NumberFormatValues.Decimal));
-            numbering.Append(CreateAbstractNum(1003, "1)", NumberFormatValues.Decimal));
+            numbering.Append(CreateAbstractNum(1002, "%1.", NumberFormatValues.Decimal));
+            numbering.Append(CreateAbstractNum(1003, "%1)", NumberFormatValues.Decimal));
 
             numbering.Append(new NumberingInstance(new AbstractNumId { Val = 1001 }) { NumberID = 1001 });
             numbering.Append(new NumberingInstance(new AbstractNumId { Val = 1002 }) { NumberID = 1002 });

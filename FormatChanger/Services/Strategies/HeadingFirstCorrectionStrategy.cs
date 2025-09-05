@@ -85,7 +85,7 @@ namespace FormatChanger.Services.Strategies
 
             var numbering = new NumberingProperties(
                 new NumberingLevelReference { Val = settings.HeadingLevel - 1 },
-                new NumberingId { Val = 1007 }
+                new NumberingId { Val = 1008 }
             );
             paraProps.Append(numbering);
             return paraProps;
@@ -98,25 +98,37 @@ namespace FormatChanger.Services.Strategies
             //TODO: брать нормальный номер
 
             var abstractNum = new AbstractNum { AbstractNumberId = 1007 };
+            abstractNum.Append(new MultiLevelType() { Val = MultiLevelValues.HybridMultilevel });
 
-            abstractNum.AppendChild(CreateHeadingLevel(0, "%1"));
-            abstractNum.AppendChild(CreateHeadingLevel(1, "%1.%2"));
-            abstractNum.AppendChild(CreateHeadingLevel(2, "%1.%2.%3"));
+            abstractNum.Append(CreateHeadingLevel(0, "%1"));
+            abstractNum.Append(CreateHeadingLevel(1, "%1.%2"));
+            abstractNum.Append(CreateHeadingLevel(2, "%1.%2.%3"));
 
             numbering.Append(abstractNum);
-            numbering.Append(new NumberingInstance(new AbstractNumId { Val = 1007 }) { NumberID = 1007 });
+            numbering.Append(new NumberingInstance(new AbstractNumId { Val = 1007 }) { NumberID = 1008 });
             numberingPart.Numbering.Save();
         }
 
         private Level CreateHeadingLevel(int index, string levelText)
         {
-            return new Level(
-                new StartNumberingValue { Val = 1 },
-                new NumberingFormat { Val = NumberFormatValues.Decimal },
-                new LevelText { Val = levelText },
-                new LevelJustification { Val = LevelJustificationValues.Left }
+            var level = new Level(
+                new TemplateCode { Val = levelText },
+                new NumberingFormat() { Val = NumberFormatValues.Decimal },
+                new LevelText() { Val = levelText },
+                new LevelJustification() { Val = LevelJustificationValues.Left },
+                new ParagraphProperties(
+                    new Indentation()
+                    {
+                        Left = (720 * (index + 1)).ToString(), // 720 = 0.5 inch
+                        Hanging = "360"
+                    })
             )
-            { LevelIndex = index };
+            {
+                LevelIndex = index,
+                StartNumberingValue = new StartNumberingValue() { Val = 1 }
+            };
+
+            return level;
         }
 
         private void CompareRunProperties(Paragraph p, RunProperties actual, RunProperties expected, IEnumerable<Style> styles, List<string> issues)
