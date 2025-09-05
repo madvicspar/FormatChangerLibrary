@@ -29,6 +29,6 @@ jobs:
           DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
 
       - name: Run tests with coverage
-        run: dotnet test --configuration Release --no-build --verbosity normal --logger "github"
+        run: dotnet test --configuration Release --no-build --verbosity normal --logger "GitHubActions"
         env:
           DOTNET_NOLOGO: true
