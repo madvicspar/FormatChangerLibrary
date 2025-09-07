@@ -116,6 +116,11 @@
 
         <section class="panel-section">
             <h3 class="panel-title">Шаблон форматирования</h3>
+
+            <div class="template-actions">
+                <button class="action-btn add-template-btn" data-bs-toggle="modal" data-bs-target="#formattingTemplateModal">+ Добавить шаблон</button>
+            </div>
+
             <div class="template-selector">
                 <select name="templateId" id="templateSelect" class="form-control">
                     @if (templates != null)
@@ -138,4 +143,12 @@
             </div>
         </section>
     </aside>
+
+    <div class="modal fade" id="formattingTemplateModal" tabindex="-1" aria-labelledby="formattingTemplateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            @await Html.PartialAsync("_FormattingTemplateForm", new FormattingTemplateModel())
+        </div>
+    </div>
+</div>
 </main>

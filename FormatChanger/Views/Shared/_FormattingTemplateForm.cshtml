@@ -1,0 +1,47 @@
+﻿@model FormatChanger.Models.FormattingModels.FormattingTemplateModel
+
+<form asp-action="SaveTemplate" method="post">
+    <div class="modal-header">
+        <h5 class="modal-title" id="formattingTemplateModalLabel">Создать / Редактировать шаблон форматирования</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+    </div>
+
+    <div class="modal-body">
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#doc" type="button">Документ</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#text" type="button">Обычный текст</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#headings" type="button">Заголовки</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#lists" type="button">Списки</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tables" type="button">Таблицы</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#images" type="button">Изображения</button></li>
+        </ul>
+
+        <div class="tab-content mt-3">
+            <!-- Документ -->
+            <div class="tab-pane fade show active" id="doc">
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">Название шаблона</label>
+                    <input asp-for="Title" class="form-control" />
+                </div>
+                <div class="form-check">
+                    <input asp-for="DocumentSettings.HasPageNumbers" class="form-check-input" />
+                    <label asp-for="DocumentSettings.HasPageNumbers" class="form-check-label">Номера страниц</label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="DocumentSettings.HasTableCaptions" class="form-check-input" />
+                    <label asp-for="DocumentSettings.HasTableCaptions" class="form-check-label">Подписи к таблицам</label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="DocumentSettings.HasImageCaptions" class="form-check-input" />
+                    <label asp-for="DocumentSettings.HasImageCaptions" class="form-check-label">Подписи к изображениям</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </div>
+</form>

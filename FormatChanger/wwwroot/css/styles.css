@@ -271,6 +271,17 @@
     padding-bottom: 8px;
 }
 
+.template-actions {
+    display: flex;
+    justify-content: center;
+    padding: 0 16px;
+}
+
+.add-template-btn {
+    width: 100%;
+    padding: 10px;
+}
+
 /* Responsive styles */
 @media (max-width: 991px) {
     .header {
