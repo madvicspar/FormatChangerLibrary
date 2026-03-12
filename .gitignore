@@ -10,3 +10,7 @@ FormatChanger/obj
 /FormatChangerTests/obj
 /uploads
 /.env
+/backend/bin/Debug/net8.0
+/backend/obj
+*.json
+/backend/FormatChanger.Backend.csproj.user
