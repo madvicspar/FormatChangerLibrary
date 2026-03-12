@@ -40,11 +40,8 @@ namespace FormatChanger.Utilities.Data
         public async Task ClearAndSeed(ApplicationDbContext _context, IServiceProvider serviceProvider,
             UserManager<UserModel> userManager, RoleManager<IdentityRole> roleManager)
         {
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
-            {
-                _context.Database.EnsureDeleted();
-                _context.Database.EnsureCreated();
-            }
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
 
             SeedService.SeedData(_context);
             await SeedService.Initialize(serviceProvider, userManager, roleManager);
