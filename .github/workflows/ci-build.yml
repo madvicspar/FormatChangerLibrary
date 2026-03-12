@@ -150,8 +150,8 @@ jobs:
           context: ./backend
           push: true
           tags: |
-            yourusername/formatchecker-backend:latest
-            yourusername/formatchecker-backend:${{ github.sha }}
+            madvicspar/formatchecker-backend:latest
+            madvicspar/formatchecker-backend:${{ github.sha }}
             
       - name: Build and push frontend
         uses: docker/build-push-action@v5
@@ -159,5 +159,5 @@ jobs:
           context: ./frontend
           push: true
           tags: |
-            yourusername/formatchecker-frontend:latest
-            yourusername/formatchecker-frontend:${{ github.sha }}
+            madvicspar/formatchecker-frontend:latest
+            madvicspar/formatchecker-frontend:${{ github.sha }}
