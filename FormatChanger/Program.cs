@@ -33,8 +33,7 @@ builder.Services.AddScoped<IParagraphStyler, ParagraphStyler>();
 builder.Services.AddScoped<IParagraphNumbering, ParagraphNumbering>();
 
 
-var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ??
-	builder.Configuration.GetConnectionString("DefaultConnection");
+string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options
                     => options.UseNpgsql(connectionString));
 builder.Services.AddIdentity<UserModel, IdentityRole>()

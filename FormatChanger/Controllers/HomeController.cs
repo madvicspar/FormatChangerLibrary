@@ -101,7 +101,7 @@ namespace FormatChanger.Controllers
 
             var document = await _documentService.GetDocumentByIdAsync(documentId);
 
-            var result = await _exportService.ExportAsync(document, ExportMethod.Download);
+            var result = await _exportService.ExportAsync(document, ExportMethod.Email);
             if (result is FileContentResult)
                 return result;
 
