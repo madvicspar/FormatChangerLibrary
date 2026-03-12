@@ -1,5 +1,11 @@
 name: Build and Test
 
+env:
+  DOTNET_VERSION: '8.0'
+  POSTGRES_USER: testuser
+  POSTGRES_PASSWORD: testpass
+  POSTGRES_DB: testdb
+
 on:
   push:
     branches: [ main, develop ]
@@ -61,21 +67,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Set environment variables for docker compose
+      - name: Create .env file
         run: |
-          echo "POSTGRES_USER=${{ env.POSTGRES_USER }}" >> $GITHUB_ENV
-          echo "POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}" >> $GITHUB_ENV
-          echo "POSTGRES_DB=${{ env.POSTGRES_DB }}" >> $GITHUB_ENV
+          cat > .env << EOF
+          POSTGRES_USER=${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB=${{ env.POSTGRES_DB }}
+          EOF
+          cat .env
           
       - name: Clean up previous volumes
         run: docker volume rm formatchangerlibrary_pgdata 2>/dev/null || true
         
       - name: Build and start stack
         run: docker compose up -d --build
-
-      - name: Build and start stack
-        run: docker compose up -d --build
         
+      - name: Wait for PostgreSQL
+        run: |
+          echo "Waiting for PostgreSQL..."
+          timeout 60 bash -c '
+            until docker compose exec -T db pg_isready -q 2>/dev/null; do
+              echo "⏳ DB not ready, retrying in 2s..."
+              sleep 2
+            done
+          '
+          echo "✅ PostgreSQL is ready!"
+
       - name: Wait for backend API
         run: |
           echo "Waiting for backend to be ready..."
