@@ -51,24 +51,24 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Validate docker-compose
-        run: docker-compose config
+      - name: Validate docker compose
+        run: docker compose config
 
-  # 🔹 Интеграционные тесты через Newman + docker-compose
+  # 🔹 Интеграционные тесты через Newman + docker compose
   integration-tests:
     needs: build-docker
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Set environment variables for docker-compose
+      - name: Set environment variables for docker compose
         run: |
           echo "POSTGRES_USER=${{ env.POSTGRES_USER }}" >> $GITHUB_ENV
           echo "POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}" >> $GITHUB_ENV
           echo "POSTGRES_DB=${{ env.POSTGRES_DB }}" >> $GITHUB_ENV
           
       - name: Build and start stack
-        run: docker-compose up -d --build
+        run: docker compose up -d --build
         
       - name: Wait for backend API
         run: |
@@ -102,8 +102,8 @@ jobs:
           
       - name: Show container logs on failure
         if: failure()
-        run: docker-compose logs backend db
+        run: docker compose logs backend db
         
       - name: Cleanup
         if: always()
-        run: docker-compose down -v
+        run: docker compose down -v
