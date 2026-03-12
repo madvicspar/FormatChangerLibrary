@@ -67,6 +67,12 @@ jobs:
           echo "POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}" >> $GITHUB_ENV
           echo "POSTGRES_DB=${{ env.POSTGRES_DB }}" >> $GITHUB_ENV
           
+      - name: Clean up previous volumes
+        run: docker volume rm formatchangerlibrary_pgdata 2>/dev/null || true
+        
+      - name: Build and start stack
+        run: docker compose up -d --build
+
       - name: Build and start stack
         run: docker compose up -d --build
         
