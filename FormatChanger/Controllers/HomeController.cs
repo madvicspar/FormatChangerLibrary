@@ -1,24 +1,29 @@
+using System.Diagnostics;
+
 using FormatChanger.Models;
 using FormatChanger.Models.Helpers;
+using FormatChanger.Services;
 using FormatChanger.Services.Interfaces;
+
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace FormatChanger.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IDocumentService _documentService;
+		private readonly IDocumentService _documentService;
         private readonly ITemplateService _templateService;
         private readonly IExportService _exportService;
+		private readonly DocumentCommandFactory _commandFactory;
 
-        public HomeController(ILogger<HomeController> logger, IDocumentService documentService, ITemplateService templateService, IExportService exportService)
+		public HomeController(ILogger<HomeController> logger, IDocumentService documentService, ITemplateService templateService, IExportService exportService, DocumentCommandFactory commandFactory)
         {
             _logger = logger;
             _documentService = documentService;
             _templateService = templateService;
             _exportService = exportService;
+            _commandFactory = commandFactory;
         }
 
         public IActionResult Index(List<ParagraphModel> paragraphs = null)
@@ -74,20 +79,8 @@ namespace FormatChanger.Controllers
             DocumentModel resultDocumentId;
             var template = _templateService.GetTemplateByIdAsync(templateId).Result;
 
-            switch (actionId)
-            {
-                case 1: // Исправление
-                    resultDocumentId = await _documentService.CorrectDocumentAsync(document, template, types);
-                    break;
-                case 2: // Проверка
-                    resultDocumentId = await _documentService.CheckDocumentAsync(document, template, types);
-                    break;
-                case 3: // Оценивание
-                    resultDocumentId = await _documentService.EvaluateDocumentAsync(document, template, types);
-                    break;
-                default:
-                    return BadRequest("Неизвестное действие");
-            }
+            var command = _commandFactory.Create(actionId);
+            var result = await command.ExecuteAsync(document, template, types);
 
             return RedirectToAction("Index");
         }
@@ -101,7 +94,7 @@ namespace FormatChanger.Controllers
 
             var document = await _documentService.GetDocumentByIdAsync(documentId);
 
-            var result = await _exportService.ExportAsync(document, ExportMethod.Email);
+            var result = await _exportService.ExportAsync(document, ExportMethod.Download);
             if (result is FileContentResult)
                 return result;
 

@@ -7,4 +7,9 @@ namespace FormatChanger.Services.Interfaces
     {
         List<ParagraphModel>? Extract(WordprocessingDocument doc);
     }
+
+	public interface IDocumentAdapter
+	{
+		List<ParagraphModel> Adapt(WordprocessingDocument doc);
+	}
 }

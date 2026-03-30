@@ -1,3 +1,5 @@
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+
 using FormatChanger.Infrastructure.Email;
 using FormatChanger.Models;
 using FormatChanger.Models.FormattingModels;
@@ -5,8 +7,11 @@ using FormatChanger.Services;
 using FormatChanger.Services.Interfaces;
 using FormatChanger.Services.Strategies;
 using FormatChanger.Utilities.Data;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
+using static FormatChanger.Services.CheckDocumentCommand;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +19,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IEmailSenderCustom, EmailSender>();
-builder.Services.AddScoped<IDocumentService, DocumentService>();
+
+builder.Services.AddScoped<DocumentStorage>();
+
+builder.Services.AddScoped<IDocumentStorage>(provider =>
+{
+	var realStorage = provider.GetRequiredService<DocumentStorage>();
+	return new DocumentStorageProxy(realStorage);
+});
+
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
 builder.Services.AddScoped<IElementCorrectionStrategy<TextSettingsModel>, TextCorrectionStrategy>();
@@ -25,15 +38,20 @@ builder.Services.AddScoped<IElementCorrectionStrategy<TableCaptionSettingsModel>
 builder.Services.AddScoped<IElementCorrectionStrategy<TableSettingsModel>, TableCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<CellSettingsModel>, TableCellCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<HeaderSettingsModel>, TableHeaderCorrectionStrategy>();
-builder.Services.AddScoped<IDocumentStorage, DocumentStorageService>();
+builder.Services.AddScoped<IDocumentStorage, DocumentStorage>();
 builder.Services.AddScoped<IParagraphExtractor, ParagraphExtractor>();
 builder.Services.AddScoped<IDocumentCorrector, DocumentCorrector>();
 builder.Services.AddScoped<IDocumentChecker, DocumentChecker>();
 builder.Services.AddScoped<IParagraphStyler, ParagraphStyler>();
 builder.Services.AddScoped<IParagraphNumbering, ParagraphNumbering>();
+builder.Services.AddScoped<CorrectDocumentCommand>();
+builder.Services.AddScoped<CheckDocumentCommand>();
+builder.Services.AddScoped<EvaluateDocumentCommand>();
+builder.Services.AddScoped<DocumentCommandFactory>();
 
 
-string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ??
+	builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options
                     => options.UseNpgsql(connectionString));
 builder.Services.AddIdentity<UserModel, IdentityRole>()

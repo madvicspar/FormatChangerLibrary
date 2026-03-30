@@ -1,0 +1,13 @@
+{
+  "id": "test-env",
+  "name": "CI Environment",
+  "values": [
+    {
+      "key": "base_url",
+      "value": "http://localhost",
+      "enabled": true,
+      "type": "default"
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}

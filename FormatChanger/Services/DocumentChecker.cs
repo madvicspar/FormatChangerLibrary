@@ -1,13 +1,14 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+
 using FormatChanger.Models.FormattingModels;
 using FormatChanger.Models.Helpers;
 using FormatChanger.Services.Interfaces;
 
 namespace FormatChanger.Services
 {
-    public class DocumentChecker : IDocumentChecker
+	public class DocumentChecker : IDocumentChecker
     {
         private readonly IElementCorrectionStrategy<HeadingSettingsModel> _headingStrategy;
 
