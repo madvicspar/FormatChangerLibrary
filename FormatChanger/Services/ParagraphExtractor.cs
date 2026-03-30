@@ -172,4 +172,18 @@ namespace FormatChanger.Services
             }
         }
     }
+    public class OpenXmlDocumentAdapter : IDocumentAdapter
+    {
+        private readonly IParagraphExtractor _extractor;
+
+        public OpenXmlDocumentAdapter(IParagraphExtractor extractor)
+        {
+            _extractor = extractor;
+        }
+
+        public List<ParagraphModel> Adapt(WordprocessingDocument doc)
+        {
+            return _extractor.Extract(doc);
+        }
+    }
 }

@@ -4,10 +4,10 @@ using FormatChanger.Utilities.Data;
 
 namespace FormatChanger.Services
 {
-    public class DocumentStorageService : IDocumentStorage
+    public class DocumentStorage : IDocumentStorage
     {
         private readonly ApplicationDbContext _context;
-        public DocumentStorageService(ApplicationDbContext context) => _context = context;
+        public DocumentStorage(ApplicationDbContext context) => _context = context;
         public async Task<DocumentModel> SaveAsync(IFormFile file)
         {
             var user = _context.Users.First();
