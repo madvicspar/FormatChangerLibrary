@@ -24,5 +24,15 @@ namespace FormatChanger.Models.FormattingModels
         public virtual ListSettingsModel ListSettings { get; set; }
         public virtual ImageSettingsModel ImageSettings { get; set; }
         public virtual DocumentSettingsModel DocumentSettings { get; set; }
+
+        public FormattingTemplateModel()
+        {
+            TextSettings = new TextSettingsModel();
+            HeadingSettings = new HeadingSettingsModel();
+            TableSettings = new TableSettingsModel();
+            ListSettings = new ListSettingsModel();
+            ImageSettings = new ImageSettingsModel();
+            DocumentSettings = new DocumentSettingsModel();
+        }
     }
 }
