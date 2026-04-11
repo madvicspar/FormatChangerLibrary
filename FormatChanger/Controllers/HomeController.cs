@@ -1,8 +1,11 @@
+using System.Diagnostics;
+
 using FormatChanger.Models;
+using FormatChanger.Models.FormattingModels;
 using FormatChanger.Models.Helpers;
 using FormatChanger.Services.Interfaces;
+
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace FormatChanger.Controllers
 {
@@ -74,7 +77,12 @@ namespace FormatChanger.Controllers
             DocumentModel resultDocumentId;
             var template = _templateService.GetTemplateByIdAsync(templateId).Result;
 
-            switch (actionId)
+			if (template.HeadingSettings != null)
+			{
+				template.HeadingLevelsEdit = FlattenHeadings(template.HeadingSettings);
+			}
+
+			switch (actionId)
             {
                 case 1: // Исправление
                     resultDocumentId = await _documentService.CorrectDocumentAsync(document, template, types);
@@ -101,7 +109,7 @@ namespace FormatChanger.Controllers
 
             var document = await _documentService.GetDocumentByIdAsync(documentId);
 
-            var result = await _exportService.ExportAsync(document, ExportMethod.Email);
+            var result = await _exportService.ExportAsync(document, ExportMethod.Download);
             if (result is FileContentResult)
                 return result;
 
@@ -131,5 +139,45 @@ namespace FormatChanger.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-    }
+
+		private List<HeadingLevelEditItem> FlattenHeadings(HeadingSettingsModel head)
+		{
+			var list = new List<HeadingLevelEditItem>();
+			var current = head;
+			while (current != null)
+			{
+				list.Add(new HeadingLevelEditItem
+				{
+					Id = current.Id,
+					HeadingLevel = current.HeadingLevel,
+					StartOnNewPage = current.StartOnNewPage,
+					TextSettings = current.TextSettings ?? new TextSettingsModel()
+				});
+				current = current.NextHeadingLevel;
+			}
+			return list;
+		}
+
+		private HeadingSettingsModel BuildHeadingChain(List<HeadingLevelEditItem> items)
+		{
+			if (items == null || items.Count == 0) return null;
+
+			HeadingSettingsModel first = null;
+			HeadingSettingsModel prev = null;
+
+			foreach (var item in items.OrderBy(i => i.HeadingLevel))
+			{
+				var heading = new HeadingSettingsModel
+				{
+					HeadingLevel = item.HeadingLevel,
+					StartOnNewPage = item.StartOnNewPage,
+					TextSettings = item.TextSettings
+				};
+				if (first == null) first = heading;
+				if (prev != null) prev.NextHeadingLevel = heading;
+				prev = heading;
+			}
+			return first;
+		}
+	}
 }

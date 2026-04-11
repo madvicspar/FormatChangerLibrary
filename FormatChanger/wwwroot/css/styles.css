@@ -366,6 +366,11 @@
     list-style-type: disc; /* Для отображения точек вместо номеров */
 }
 
-    .document-list li {
-        margin-bottom: 8px; /* Добавьте отступы между элементами списка */
-    }
+.document-list li {
+    margin-bottom: 8px; /* Добавьте отступы между элементами списка */
+}
+
+.modal-body .tab-pane{
+    max-height: 65vh;
+    overflow-y: auto;
+}

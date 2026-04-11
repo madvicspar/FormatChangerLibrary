@@ -24,8 +24,10 @@ namespace FormatChanger.Models.FormattingModels
         public virtual ListSettingsModel ListSettings { get; set; }
         public virtual ImageSettingsModel ImageSettings { get; set; }
         public virtual DocumentSettingsModel DocumentSettings { get; set; }
+		[NotMapped]
+		public List<HeadingLevelEditItem> HeadingLevelsEdit { get; set; } = [];
 
-        public FormattingTemplateModel()
+		public FormattingTemplateModel()
         {
             TextSettings = new TextSettingsModel();
             HeadingSettings = new HeadingSettingsModel();

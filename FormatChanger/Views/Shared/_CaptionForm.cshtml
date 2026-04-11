@@ -1,0 +1,14 @@
+﻿@model FormatChanger.Models.FormattingModels.ICaptionSettingsModel
+
+<h6>Настройки текста подписи</h6>
+<partial name="_TextSettingsForm" model="new FormatChanger.Models.FormattingModels.TextSettingsModel()" />
+
+<div class="col-md-6">
+    <label asp-for="TextTemplate" class="form-label">Шаблон подписи</label>
+    <input asp-for="TextTemplate" class="form-control" />
+</div>
+
+<div class="col-md-6">
+    <label asp-for="Discriminator" class="form-label">Знак конца (по дефолту отсутствует)</label>
+    <input asp-for="Discriminator" class="form-control" />
+</div>

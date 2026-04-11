@@ -133,3 +133,134 @@ function updateActiveTypeButton(paragraph) {
         option.classList.toggle('active', option.getAttribute('data-type') === type);
     });
 }
+
+// ========== Управление уровнями заголовков в модальном окне ==========
+// Эти функции работают с динамически создаваемыми карточками заголовков
+
+function reindexCards() {
+    const cards = document.querySelectorAll('#headings-list .heading-card');
+    cards.forEach((card, idx) => {
+        const headerSpan = card.querySelector('.card-header span');
+        if (headerSpan) headerSpan.innerText = `Заголовок уровня ${idx + 1}`;
+
+        const hiddenLevel = card.querySelector('.heading-level');
+        if (hiddenLevel) hiddenLevel.value = idx + 1;
+
+        const settingsTitle = card.querySelector('.card-body h6');
+        if (settingsTitle) settingsTitle.innerText = `Настройки текста заголовка уровня ${idx + 1}`;
+
+        card.querySelectorAll('[name]').forEach(el => {
+            let oldName = el.getAttribute('name');
+            let newName = oldName.replace(/HeadingLevelsEdit\[\d+\]/, `HeadingLevelsEdit[${idx}]`);
+            el.setAttribute('name', newName);
+        });
+
+        const removeBtn = card.querySelector('.remove-heading');
+        if (idx === 0) {
+            if (removeBtn) removeBtn.remove();
+        } else {
+            if (!removeBtn) {
+                const header = card.querySelector('.card-header');
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn-close remove-heading';
+                btn.setAttribute('aria-label', 'Удалить');
+                header.appendChild(btn);
+            }
+        }
+    });
+    attachRemoveHandlers();
+}
+
+function attachRemoveHandlers() {
+    document.querySelectorAll('.remove-heading').forEach(btn => {
+        btn.removeEventListener('click', removeHandler);
+        btn.addEventListener('click', removeHandler);
+    });
+}
+
+function removeHandler(e) {
+    const card = e.target.closest('.heading-card');
+    if (!card) return;
+    const totalCards = document.querySelectorAll('.heading-card').length;
+    if (totalCards <= 1) {
+        alert('Нельзя удалить единственный уровень заголовка');
+        return;
+    }
+    card.remove();
+    reindexCards();
+}
+
+function initHeadingsEditor() {
+    // Проверяем, что контейнер с карточками существует
+    const container = document.getElementById('headings-list');
+    if (!container) return;
+
+    // Если нет ни одной карточки, возможно, нужно создать дефолтную (но обычно сервер отдаёт хотя бы одну)
+    if (document.querySelectorAll('.heading-card').length === 0) {
+        // Можно добавить заглушку, но лучше чтобы сервер всегда отдавал хотя бы один уровень
+        return;
+    }
+
+    reindexCards();
+
+    // Навешиваем обработчик на кнопку добавления (если она есть)
+    const addBtn = document.getElementById('add-heading-btn');
+    if (addBtn) {
+        addBtn.removeEventListener('click', addHeadingHandler);
+        addBtn.addEventListener('click', addHeadingHandler);
+    }
+}
+
+function addHeadingHandler() {
+    const container = document.getElementById('headings-list');
+    const currentCards = document.querySelectorAll('.heading-card');
+    const newIndex = currentCards.length;
+    const newId = -Date.now(); // временный отрицательный ID
+
+    const firstCard = document.querySelector('.heading-card');
+    if (!firstCard) return;
+
+    const clone = firstCard.cloneNode(true);
+    // Очищаем значения полей
+    clone.querySelectorAll('input, select, textarea').forEach(input => {
+        if (input.type === 'checkbox' || input.type === 'radio') {
+            input.checked = false;
+        } else if (input.type === 'color') {
+            input.value = '#000000';
+        } else {
+            input.value = '';
+        }
+    });
+    const startNewPageChk = clone.querySelector('.start-new-page');
+    if (startNewPageChk) startNewPageChk.checked = false;
+
+    const hiddenId = clone.querySelector('.heading-id');
+    if (hiddenId) hiddenId.value = newId;
+    const hiddenLevel = clone.querySelector('.heading-level');
+    if (hiddenLevel) hiddenLevel.value = newIndex + 1;
+
+    const span = clone.querySelector('.card-header span');
+    if (span) span.innerText = `Заголовок уровня ${newIndex + 1}`;
+    const titleH6 = clone.querySelector('.card-body h6');
+    if (titleH6) titleH6.innerText = `Настройки текста заголовка уровня ${newIndex + 1}`;
+
+    container.appendChild(clone);
+    reindexCards();
+}
+
+// Инициализация при открытии модального окна (Bootstrap)
+const modalElement = document.getElementById('formattingTemplateModal');
+if (modalElement) {
+    modalElement.addEventListener('shown.bs.modal', function () {
+        initHeadingsEditor();
+    });
+}
+
+// Также инициализируем при переключении на вкладку "Заголовки" (на случай, если содержимое подгружается позже)
+const headingsTab = document.querySelector('button[data-bs-target="#headings"]');
+if (headingsTab) {
+    headingsTab.addEventListener('shown.bs.tab', function () {
+        initHeadingsEditor();
+    });
+}

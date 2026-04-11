@@ -1,0 +1,14 @@
+﻿@model FormatChanger.Models.FormattingModels.ImageSettingsModel
+
+<div class="form-check mb-3">
+    <input class="form-check-input start-new-page" type="checkbox" name="KeepWithNext" @(Model.KeepWithNext ? "checked" : "") />
+    <label class="form-check-label">Не отрывать от следующего</label>
+</div>
+
+<h6>Текстовые настройки изображений</h6>
+<partial name="_TextSettingsForm" model="new FormatChanger.Models.FormattingModels.TextSettingsModel()" />
+
+@* только если в документе указано, что подписи есть *@
+@* подписи могут быть не только выше, но и ниже.. уж молчу про вертикальное расположение *@
+<h6>Настройки подписи к изображению</h6>
+<partial name="_CaptionForm" model="new FormatChanger.Models.FormattingModels.ICaptionSettingsModel()" />
