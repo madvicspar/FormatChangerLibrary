@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using FormatChanger.Models;
 using FormatChanger.Models.FormattingModels;
 
 namespace FormatChanger.Services.Strategies
@@ -22,50 +23,54 @@ namespace FormatChanger.Services.Strategies
             ApplyRecursiveStyleCorrection(stylePart.Styles, settings, level: 1);
         }
 
-        public override List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
-        {
-            var issues = new List<string>();
-            var settings = GetSettings(template);
+		public override List<string> CheckFormatting(ParagraphStyleProperties actual, FormattingTemplateModel template)
+		{
+			var issues = new List<string>();
+			var expected = GetSettings(template);
 
-            var runProps = CreateRunProperties(settings.TextSettings);
-            var paraProps = CreateHeadingParagraphProperties(settings);
+			if (actual.RunStyle.Bold != expected.TextSettings.IsBold)
+				issues.Add(expected.TextSettings.IsBold
+					? "Должен быть полужирным"
+					: "Не должен быть полужирным");
 
-            var actualRunProps = paragraph.Descendants<RunProperties>().FirstOrDefault();
-            var actualParaProps = paragraph.ParagraphProperties;
+			if (actual.RunStyle.Italic != expected.TextSettings.IsItalic)
+				issues.Add(expected.TextSettings.IsItalic
+					? "Должен быть курсивом"
+					: "Не должен быть курсивом");
 
-            string styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val;
-            Style style = null;
-            StyleRunProperties styleRunProps = null;
-            StyleParagraphProperties styleParagraphProps = null;
+			if (!CompareNullable(actual.RunStyle.Color, expected.TextSettings.Color))
+				issues.Add($"Цвет текста должен быть {expected.TextSettings.Color}");
 
-            IEnumerable<Style> styles = new List<Style>();
-            var document = paragraph.Ancestors<Document>().FirstOrDefault();
-            if (document != null)
-            {
-                var stylePart = document.MainDocumentPart?.StyleDefinitionsPart;
-                if (stylePart != null)
-                {
-                    styles = stylePart.Styles.Elements<Style>();
-                    style = stylePart.Styles.Elements<Style>().FirstOrDefault(s => s.StyleId == styleId);
-                    styleRunProps = style?.StyleRunProperties;
-                    styleParagraphProps = style?.StyleParagraphProperties;
-                }
-            }
+			if (!CompareNullable(actual.RunStyle.FontSize, expected.TextSettings.FontSize.ToString()))
+				issues.Add($"Размер шрифта должен быть {expected.TextSettings.FontSize}");
 
-            CompareRunProperties(paragraph, actualRunProps, runProps, styles, issues);
-            CompareParagraphProperties(paragraph, actualParaProps, paraProps, styles, issues);
+			CompareProperty("Междустрочный интервал", actual.SpacingLine, expected.TextSettings.LineSpacing.ToString(), issues);
+			CompareProperty("Интервал перед", actual.SpacingBefore, expected.TextSettings.BeforeSpacing.ToString(), issues);
+			CompareProperty("Интервал после", actual.SpacingAfter, expected.TextSettings.AfterSpacing.ToString(), issues);
 
-			var text = paragraph.InnerText?.Trim();
-
-			if (!HasNumbering(text))
-			{
-				issues.Add("Отсутствует нумерация заголовка");
-			}
+			CompareProperty("Отступ первой строки", actual.IndentFirstLine, expected.TextSettings.FirstLine.ToString(), issues);
+			CompareProperty("Отступ слева", actual.IndentLeft, expected.TextSettings.Left.ToString(), issues);
+			CompareProperty("Отступ справа", actual.IndentRight, expected.TextSettings.Right.ToString(), issues);
 
 			return issues;
-        }
+		}
 
-        private void ApplyRecursiveStyleCorrection(Styles styles, HeadingSettingsModel settings, int level)
+		private static void CompareProperty(string name, string actual, string expected, List<string> issues)
+		{
+			if (!CompareNullable(actual, expected))
+			{
+				if (expected == "0" && actual == null) return;
+
+				issues.Add($"{name}: {actual ?? "не задан"}, должен быть {expected}");
+			}
+		}
+
+		private static bool CompareNullable(string actual, string expected)
+		{
+			return (actual ?? "") == (expected ?? "");
+		}
+
+		private void ApplyRecursiveStyleCorrection(Styles styles, HeadingSettingsModel settings, int level)
         {
             var styleName = $"heading {level}";
             var style = styles.Elements<Style>().FirstOrDefault(s => s.StyleName?.Val == styleName);
@@ -136,207 +141,6 @@ namespace FormatChanger.Services.Strategies
             };
 
             return level;
-        }
-
-        private void CompareRunProperties(Paragraph p, RunProperties actual, RunProperties expected, IEnumerable<Style> styles, List<string> issues)
-        {
-            var actualFont = actual?.RunFonts?.Ascii?.Value ?? GetPropertyValue(p, styles, rp => rp?.RunFonts?.Ascii?.Value, srp => srp?.RunFonts?.Ascii?.Value);
-            var actualFontSize = actual?.FontSize?.Val ?? GetPropertyValue(p, styles, rp => rp?.FontSize?.Val, srp => srp?.FontSize?.Val);
-            var actualColor = actual?.Color?.Val ?? GetPropertyValue(p, styles, rp => rp?.Color?.Val, srp => srp?.Color?.Val);
-            var actualBold = actual?.Bold ?? GetBold(p, styles);
-            var actualItalic = actual?.Italic ?? GetItalic(p, styles);
-
-            var expectedFontSize = (int.Parse(expected.FontSize?.Val) / 2).ToString();
-            actualFontSize = (int.Parse(actualFontSize) / 2).ToString();
-
-
-            CompareProperty("Шрифт", actualFont, expected.RunFonts?.Ascii?.Value, issues);
-            CompareProperty("Размер шрифта", actualFontSize, expectedFontSize, issues);
-            CompareProperty("Цвет текста", actualColor, expected.Color?.Val, issues);
-            CompareBoldAndItalic(actualBold, expected.Bold, actualItalic, expected.Italic, issues);
-        }
-
-        private void CompareProperty(string propertyName, string actualValue, string expectedValue, List<string> issues)
-        {
-            if (actualValue != expectedValue)
-            {
-                if (expectedValue == "0" && actualValue == null)
-                    return;
-                issues.Add($"{propertyName}: {actualValue ?? "не задан"}, должен быть {expectedValue}");
-            }
-        }
-
-        private void CompareBoldAndItalic(Bold? actualBold, Bold? expectedBold, Italic? actualItalic, Italic? expectedItalic, List<string> issues)
-        {
-            if (actualBold.Val != expectedBold.Val)
-            {
-                issues.Add(expectedBold.Val ? "Должен быть полужирным" : "Не должен быть полужирным");
-            }
-
-            if (actualItalic != expectedItalic)
-            {
-                issues.Add(expectedItalic.Val ? "Должен быть курсивом" : "Не должен быть курсивом");
-            }
-        }
-
-        private T GetPropertyValue<T>(
-            Paragraph p,
-            IEnumerable<Style> styles,
-            Func<RunProperties, T> runPropSelector,
-            Func<StyleRunProperties, T> stylePropSelector)
-            where T : class
-        {
-            var actual = runPropSelector(p.Descendants<RunProperties>().FirstOrDefault());
-            if (actual != null)
-                return actual;
-
-            var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val;
-            if (string.IsNullOrEmpty(styleId)) return null;
-
-            // Ищем стиль по ID
-            var style = styles.FirstOrDefault(s => s.StyleId == styleId);
-            if (style != null)
-            {
-                var fromStyle = stylePropSelector(style.StyleRunProperties);
-                if (fromStyle != null)
-                    return fromStyle;
-            }
-
-            // Если стиль не найден, проверяем на основе родительского стиля
-            styleId = styles.FirstOrDefault(s => s.StyleId == styleId)?.BasedOn?.Val;
-            while (!string.IsNullOrEmpty(styleId))
-            {
-                var parentStyle = styles.FirstOrDefault(s => s.StyleId == styleId);
-                if (parentStyle == null) break;
-
-                var parentStyleProp = stylePropSelector(parentStyle.StyleRunProperties);
-                if (parentStyleProp != null)
-                    return parentStyleProp;
-
-                styleId = parentStyle.BasedOn?.Val;
-            }
-
-            return null;
-        }
-
-        private T GetPropertyValue<T>(
-            Paragraph p,
-            IEnumerable<Style> styles,
-            Func<ParagraphProperties, T> runPropSelector,
-            Func<StyleParagraphProperties, T> stylePropSelector)
-            where T : class
-        {
-            var actual = runPropSelector(p.Descendants<ParagraphProperties>().FirstOrDefault());
-            if (actual != null)
-                return actual;
-
-            var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val;
-            if (string.IsNullOrEmpty(styleId)) return null;
-
-            // Ищем стиль по ID
-            var style = styles.FirstOrDefault(s => s.StyleId == styleId);
-            if (style != null)
-            {
-                var fromStyle = stylePropSelector(style.StyleParagraphProperties);
-                if (fromStyle != null)
-                    return fromStyle;
-            }
-
-            // Если стиль не найден, проверяем на основе родительского стиля
-            styleId = styles.FirstOrDefault(s => s.StyleId == styleId)?.BasedOn?.Val;
-            while (!string.IsNullOrEmpty(styleId))
-            {
-                var parentStyle = styles.FirstOrDefault(s => s.StyleId == styleId);
-                if (parentStyle == null) break;
-
-                var parentStyleProp = stylePropSelector(parentStyle.StyleParagraphProperties);
-                if (parentStyleProp != null)
-                    return parentStyleProp;
-
-                styleId = parentStyle.BasedOn?.Val;
-            }
-
-            return null;
-        }
-
-        private void CompareParagraphProperties(Paragraph p, ParagraphProperties actual, ParagraphProperties expected, IEnumerable<Style> styles, List<string> issues)
-        {
-            // Функция для извлечения и преобразования значений
-            string GetSpacingValue(string value, double denominator)
-            {
-                if (double.TryParse(value, out double parsedValue))
-                {
-                    return Math.Round(parsedValue / denominator, 2).ToString();
-                }
-                return null;
-            }
-
-            // Получение значений и преобразование для межстрочного интервала и отступов
-            var actualSpacingLine = GetSpacingValue(actual?.SpacingBetweenLines?.Line ?? GetPropertyValue(p, styles, rp => rp?.SpacingBetweenLines?.Line, srp => srp?.SpacingBetweenLines?.Line), 240);
-            var expectedSpacingLine = GetSpacingValue(expected.SpacingBetweenLines.Line, 240);
-            var actualSpacingBefore = GetSpacingValue(actual?.SpacingBetweenLines?.Before?.Value ?? GetPropertyValue(p, styles, rp => rp?.SpacingBetweenLines?.Before?.Value, srp => srp?.SpacingBetweenLines?.Before?.Value), 20);
-            var expectedSpacingBefore = GetSpacingValue(expected.SpacingBetweenLines.Before?.Value, 20);
-            var actualSpacingAfter = GetSpacingValue(actual?.SpacingBetweenLines?.After?.Value ?? GetPropertyValue(p, styles, rp => rp?.SpacingBetweenLines?.After?.Value, srp => srp?.SpacingBetweenLines?.After?.Value), 20);
-            var expectedSpacingAfter = GetSpacingValue(expected.SpacingBetweenLines.After?.Value, 20);
-            var actualIndentationFirstLine = GetSpacingValue(actual?.Indentation?.FirstLine?.Value ?? GetPropertyValue(p, styles, rp => rp?.Indentation?.FirstLine?.Value, srp => srp?.Indentation?.FirstLine?.Value), 567);
-            var expectedIndentationFirstLine = GetSpacingValue(expected.Indentation?.FirstLine?.Value, 567);
-            var actualIndentationLeft = GetSpacingValue(actual?.Indentation?.Left?.Value ?? GetPropertyValue(p, styles, rp => rp?.Indentation?.Left?.Value, srp => srp?.Indentation?.Left?.Value), 567);
-            var expectedIndentationLeft = GetSpacingValue(expected.Indentation?.Left?.Value, 567);
-            var actualIndentationRight = GetSpacingValue(actual?.Indentation?.Right?.Value ?? GetPropertyValue(p, styles, rp => rp?.Indentation?.Right?.Value, srp => srp?.Indentation?.Right?.Value), 567);
-            var expectedIndentationRight = GetSpacingValue(expected.Indentation?.Right?.Value, 567);
-
-            CompareProperty("Междустрочный интервал", actualSpacingLine, expectedSpacingLine, issues);
-            CompareProperty("Интервал перед", actualSpacingBefore, expectedSpacingBefore, issues);
-            CompareProperty("Интервал после", actualSpacingAfter, expectedSpacingAfter, issues);
-            CompareProperty("Отступ первой строки", actualIndentationFirstLine, expectedIndentationFirstLine, issues);
-            CompareProperty("Отступ слева", actualIndentationLeft, expectedIndentationLeft, issues);
-            CompareProperty("Отступ справа", actualIndentationRight, expectedIndentationRight, issues);
-
-            //if (actual?.KeepNext?.Val != expected.KeepNext?.Val)
-            //    issues.Add("Некорректный параметр KeepWithNext");
-
-            //if (actual?.PageBreakBefore != null != (expected.PageBreakBefore != null))
-            //    issues.Add("Неверный разрыв страницы перед параграфом");
-        }
-
-        Bold GetBold(Paragraph p, IEnumerable<Style> styles)
-        {
-            // если styleId = null, то проверяем стиль обычный
-            var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val;
-            if (styleId == null)
-                return new Bold() { Val = false };
-
-            Style style = null;
-
-            do
-            {
-                if (style == null) // Выход, если стиль не найден
-                    return new Bold() { Val = false };
-                style = styles.First(s => s.StyleId == styleId);
-                styleId = style?.BasedOn?.Val;
-            } while (style.StyleRunProperties?.Bold?.Val == null);
-
-            return style?.StyleRunProperties?.Bold;
-        }
-
-        Italic GetItalic(Paragraph p, IEnumerable<Style> styles)
-        {
-            // если styleId = null, то проверяем стиль обычный
-            var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val;
-            if (styleId == null)
-                return new Italic() { Val = false };
-
-            Style style = null;
-
-            do
-            {
-                if (style == null) // Выход, если стиль не найден
-                    return new Italic() { Val = false };
-                style = styles.First(s => s.StyleId == styleId);
-                styleId = style?.BasedOn?.Val;
-            } while (style.StyleRunProperties?.Italic?.Val == null);
-
-            return style?.StyleRunProperties?.Italic;
         }
 
 		private bool HasNumbering(string text)

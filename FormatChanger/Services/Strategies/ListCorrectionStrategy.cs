@@ -1,13 +1,13 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using FormatChanger.Models;
 using FormatChanger.Models.FormattingModels;
-using FormatChanger.Services.Interfaces;
 
 namespace FormatChanger.Services.Strategies
 {
-    public class ListCorrectionStrategy : IElementCorrectionStrategy<ListSettingsModel>
+    public class ListCorrectionStrategy : ElementCorrectionStrategyBase<ListSettingsModel>
     {
-        public ListSettingsModel GetSettings(FormattingTemplateModel template)
+        public override ListSettingsModel GetSettings(FormattingTemplateModel template)
         {
             return template.ListSettings;
         }
@@ -47,7 +47,7 @@ namespace FormatChanger.Services.Strategies
             return paragraphProperties;
         }
 
-        public void ApplyCorrection(WordprocessingDocument doc, FormattingTemplateModel template)
+        public override void ApplyCorrection(WordprocessingDocument doc, FormattingTemplateModel template)
         {
             // тут меняем стиль - шрифт, отступы, интервалы и тд
             // проходимся по параграфам и меняем уровни нумерации на основе стиля соседних параграфов
@@ -71,7 +71,7 @@ namespace FormatChanger.Services.Strategies
             }
         }
 
-        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
+        public override List<string> CheckFormatting(ParagraphStyleProperties actual, FormattingTemplateModel template)
         {
             throw new NotImplementedException();
         }

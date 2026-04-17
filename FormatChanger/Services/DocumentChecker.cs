@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FormatChanger.Models.FormattingModels;
 using FormatChanger.Models.Helpers;
@@ -9,12 +8,14 @@ namespace FormatChanger.Services
 {
     public class DocumentChecker : IDocumentChecker
     {
-        private readonly IElementCorrectionStrategy<HeadingSettingsModel> _headingStrategy;
+		private readonly FormattingResolver _resolver;
+		private readonly IElementCorrectionStrategy<HeadingSettingsModel> _headingStrategy;
 		private readonly IElementCorrectionStrategy<TextSettingsModel> _textStrategy;
 
-        public DocumentChecker(IElementCorrectionStrategy<HeadingSettingsModel> headingStrategy, IElementCorrectionStrategy<TextSettingsModel> textStrategy)
+        public DocumentChecker(IElementCorrectionStrategy<HeadingSettingsModel> headingStrategy, IElementCorrectionStrategy<TextSettingsModel> textStrategy, FormattingResolver resolver)
         {
-            _headingStrategy = headingStrategy;
+			_resolver = resolver;
+			_headingStrategy = headingStrategy;
             _textStrategy = textStrategy;
         }
 
@@ -22,23 +23,30 @@ namespace FormatChanger.Services
         {
 			foreach (var paragraphModel in paragraphList)
 			{
-                var issues = new List<string>();
                 if (paragraphModel.Paragraph == null)
-                    issues.Add("Как может не быть абзаца?");
-                else if (paragraphModel.Type == ParagraphTypes.FirstH.ToString())
-                {
-					issues = _headingStrategy.CheckFormatting(paragraphModel.Paragraph, template);
-				}
-                else
-                    issues = _textStrategy.CheckFormatting(paragraphModel.Paragraph, template);
+                    continue;
 
-				if (issues.Any())
+				var paragraph = paragraphModel.Paragraph;
+				var issues = new List<string>();
+				var resolved = _resolver.ResolveParagraph(paragraph);
+
+				//if (paragraphModel.Paragraph == null)
+    //                issues.Add("Как может не быть абзаца?"); // TODO: такая ситуация вообще мб?
+                if (paragraphModel.Type == ParagraphTypes.FirstH.ToString())
+                {
+                    issues = _headingStrategy.CheckFormatting(resolved, template);
+                }
+                else
+                    issues = _textStrategy.CheckFormatting(resolved, template);
+
+				if (issues.Count != 0)
 					AddComment(paragraphModel.Paragraph, issues);
 			}
 			doc.Save();
         }
         private static void AddComment(Paragraph paragraph, List<string> commentText)
         {
+            // TODO: мэтчится со стилем обычного текста, что логично, но может быть неправильным (например, как в тестовом примере - красный текст)
             var mainPart = paragraph.Ancestors<Document>().First().MainDocumentPart;
             var commentsPart = mainPart.GetPartsOfType<WordprocessingCommentsPart>().FirstOrDefault();
 

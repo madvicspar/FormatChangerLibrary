@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using FormatChanger.Models;
 using FormatChanger.Models.FormattingModels;
 using FormatChanger.Services.Interfaces;
 
@@ -11,7 +12,7 @@ namespace FormatChanger.Services.Strategies
 
         public abstract void ApplyCorrection(WordprocessingDocument doc, FormattingTemplateModel template);
 
-        public virtual List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
+        public virtual List<string> CheckFormatting(ParagraphStyleProperties actual, FormattingTemplateModel template)
         {
             throw new NotImplementedException();
         }

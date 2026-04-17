@@ -1,5 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
+using FormatChanger.Models;
 using FormatChanger.Models.FormattingModels;
 
 namespace FormatChanger.Services.Interfaces
@@ -15,6 +15,6 @@ namespace FormatChanger.Services.Interfaces
         /// Генерирует список несоответствий в форматировании элемента на основе заданных настроек форматирования
         /// </summary>
         /// <param name="template">Шаблон форматирования</param>
-        List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template);
+        List<string> CheckFormatting(ParagraphStyleProperties actual, FormattingTemplateModel template);
     }
 }
