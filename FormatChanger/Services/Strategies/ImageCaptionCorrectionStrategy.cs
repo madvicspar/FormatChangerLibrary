@@ -1,5 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
+using FormatChanger.Models;
 using FormatChanger.Models.FormattingModels;
 using FormatChanger.Models.Helpers;
 
@@ -24,9 +24,10 @@ namespace FormatChanger.Services.Strategies
             ApplyToStyle(styles, ParagraphTypes.ImageCaption.ToString(), runProps, paraProps);
         }
 
-        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
+        public override List<string> CheckFormatting(ParagraphStyleProperties actual, FormattingTemplateModel template)
         {
-            throw new NotImplementedException();
-        }
-    }
+			var expected = GetSettings(template);
+			return FormattingChecker.Check(actual, expected.TextSettings);
+		}
+	}
 }

@@ -10,12 +10,16 @@ namespace FormatChanger.Services
     {
 		private readonly FormattingResolver _resolver;
 		private readonly IElementCorrectionStrategy<HeadingSettingsModel> _headingStrategy;
+		private readonly IElementCorrectionStrategy<ImageCaptionSettingsModel> _imageCaptionStrategy;
+		private readonly IElementCorrectionStrategy<TableCaptionSettingsModel> _tableCaptionStrategy;
 		private readonly IElementCorrectionStrategy<TextSettingsModel> _textStrategy;
 
-        public DocumentChecker(IElementCorrectionStrategy<HeadingSettingsModel> headingStrategy, IElementCorrectionStrategy<TextSettingsModel> textStrategy, FormattingResolver resolver)
+        public DocumentChecker(IElementCorrectionStrategy<HeadingSettingsModel> headingStrategy, IElementCorrectionStrategy<ImageCaptionSettingsModel> imageCaptionStrategy, IElementCorrectionStrategy<TableCaptionSettingsModel> tableCaptionStrategy, IElementCorrectionStrategy<TextSettingsModel> textStrategy, FormattingResolver resolver)
         {
 			_resolver = resolver;
 			_headingStrategy = headingStrategy;
+            _imageCaptionStrategy = imageCaptionStrategy;
+            _tableCaptionStrategy = tableCaptionStrategy;
             _textStrategy = textStrategy;
         }
 
@@ -33,10 +37,12 @@ namespace FormatChanger.Services
 				//if (paragraphModel.Paragraph == null)
     //                issues.Add("Как может не быть абзаца?"); // TODO: такая ситуация вообще мб?
                 if (paragraphModel.Type == ParagraphTypes.FirstH.ToString())
-                {
                     issues = _headingStrategy.CheckFormatting(resolved, template);
-                }
-                else
+                else if (paragraphModel.Type == ParagraphTypes.ImageCaption.ToString())
+                    issues = _imageCaptionStrategy.CheckFormatting(resolved, template);
+				else if (paragraphModel.Type == ParagraphTypes.TableCaption.ToString())
+					issues = _tableCaptionStrategy.CheckFormatting(resolved, template);
+				else
                     issues = _textStrategy.CheckFormatting(resolved, template);
 
 				if (issues.Count != 0)
