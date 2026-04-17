@@ -22,7 +22,7 @@ namespace FormatChanger.Services.Strategies
             ApplyRecursiveStyleCorrection(stylePart.Styles, settings, level: 1);
         }
 
-        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
+        public override List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
         {
             var issues = new List<string>();
             var settings = GetSettings(template);
@@ -55,7 +55,14 @@ namespace FormatChanger.Services.Strategies
             CompareRunProperties(paragraph, actualRunProps, runProps, styles, issues);
             CompareParagraphProperties(paragraph, actualParaProps, paraProps, styles, issues);
 
-            return issues;
+			var text = paragraph.InnerText?.Trim();
+
+			if (!HasNumbering(text))
+			{
+				issues.Add("Отсутствует нумерация заголовка");
+			}
+
+			return issues;
         }
 
         private void ApplyRecursiveStyleCorrection(Styles styles, HeadingSettingsModel settings, int level)
@@ -153,6 +160,8 @@ namespace FormatChanger.Services.Strategies
         {
             if (actualValue != expectedValue)
             {
+                if (expectedValue == "0" && actualValue == null)
+                    return;
                 issues.Add($"{propertyName}: {actualValue ?? "не задан"}, должен быть {expectedValue}");
             }
         }
@@ -329,5 +338,22 @@ namespace FormatChanger.Services.Strategies
 
             return style?.StyleRunProperties?.Italic;
         }
-    }
+
+		private bool HasNumbering(string text)
+		{
+            // TODO: сделать нормальную проверку нумерации со всеми ее сложностями
+			if (string.IsNullOrWhiteSpace(text))
+				return false;
+
+			text = text.Trim();
+
+			if (char.IsDigit(text[0]))
+				return true;
+
+			if (text.StartsWith("Глава ", StringComparison.OrdinalIgnoreCase))
+				return true;
+
+			return false;
+		}
+	}
 }
