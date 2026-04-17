@@ -10,24 +10,32 @@ namespace FormatChanger.Services
     public class DocumentChecker : IDocumentChecker
     {
         private readonly IElementCorrectionStrategy<HeadingSettingsModel> _headingStrategy;
+		private readonly IElementCorrectionStrategy<TextSettingsModel> _textStrategy;
 
-        public DocumentChecker(IElementCorrectionStrategy<HeadingSettingsModel> headingStrategy)
-            => _headingStrategy = headingStrategy;
+        public DocumentChecker(IElementCorrectionStrategy<HeadingSettingsModel> headingStrategy, IElementCorrectionStrategy<TextSettingsModel> textStrategy)
+        {
+            _headingStrategy = headingStrategy;
+            _textStrategy = textStrategy;
+        }
+
         public async Task CheckAndCommentAsync(WordprocessingDocument doc, FormattingTemplateModel template, List<ParagraphModel> paragraphList, string[] types)
         {
-            var paragraphs = doc.MainDocumentPart?.Document?.Body?.Descendants<Paragraph>().Where(p => !string.IsNullOrWhiteSpace(p.InnerText)).ToList();
-            for (int i = 0; i < 1; i++)
-            {
-                var paragraph = paragraphs[i];
-                if (paragraphList[i].Type == ParagraphTypes.FirstH.ToString())
+			foreach (var paragraphModel in paragraphList)
+			{
+                var issues = new List<string>();
+                if (paragraphModel.Paragraph == null)
+                    issues.Add("Как может не быть абзаца?");
+                else if (paragraphModel.Type == ParagraphTypes.FirstH.ToString())
                 {
-                    var issues = _headingStrategy.CheckFormatting(paragraph, template);
+					issues = _headingStrategy.CheckFormatting(paragraphModel.Paragraph, template);
+				}
+                else
+                    issues = _textStrategy.CheckFormatting(paragraphModel.Paragraph, template);
 
-                    if (issues.Any())
-                        AddComment(paragraph, issues);
-                }
-            }
-            doc.Save();
+				if (issues.Any())
+					AddComment(paragraphModel.Paragraph, issues);
+			}
+			doc.Save();
         }
         private static void AddComment(Paragraph paragraph, List<string> commentText)
         {
