@@ -25,49 +25,8 @@ namespace FormatChanger.Services.Strategies
 
 		public override List<string> CheckFormatting(ParagraphStyleProperties actual, FormattingTemplateModel template)
 		{
-			var issues = new List<string>();
 			var expected = GetSettings(template);
-
-			if (actual.RunStyle.Bold != expected.TextSettings.IsBold)
-				issues.Add(expected.TextSettings.IsBold
-					? "Должен быть полужирным"
-					: "Не должен быть полужирным");
-
-			if (actual.RunStyle.Italic != expected.TextSettings.IsItalic)
-				issues.Add(expected.TextSettings.IsItalic
-					? "Должен быть курсивом"
-					: "Не должен быть курсивом");
-
-			if (!CompareNullable(actual.RunStyle.Color, expected.TextSettings.Color))
-				issues.Add($"Цвет текста должен быть {expected.TextSettings.Color}");
-
-			if (!CompareNullable(actual.RunStyle.FontSize, expected.TextSettings.FontSize.ToString()))
-				issues.Add($"Размер шрифта должен быть {expected.TextSettings.FontSize}");
-
-			CompareProperty("Междустрочный интервал", actual.SpacingLine, expected.TextSettings.LineSpacing.ToString(), issues);
-			CompareProperty("Интервал перед", actual.SpacingBefore, expected.TextSettings.BeforeSpacing.ToString(), issues);
-			CompareProperty("Интервал после", actual.SpacingAfter, expected.TextSettings.AfterSpacing.ToString(), issues);
-
-			CompareProperty("Отступ первой строки", actual.IndentFirstLine, expected.TextSettings.FirstLine.ToString(), issues);
-			CompareProperty("Отступ слева", actual.IndentLeft, expected.TextSettings.Left.ToString(), issues);
-			CompareProperty("Отступ справа", actual.IndentRight, expected.TextSettings.Right.ToString(), issues);
-
-			return issues;
-		}
-
-		private static void CompareProperty(string name, string actual, string expected, List<string> issues)
-		{
-			if (!CompareNullable(actual, expected))
-			{
-				if (expected == "0" && actual == null) return;
-
-				issues.Add($"{name}: {actual ?? "не задан"}, должен быть {expected}");
-			}
-		}
-
-		private static bool CompareNullable(string actual, string expected)
-		{
-			return (actual ?? "") == (expected ?? "");
+			return FormattingChecker.Check(actual, expected.TextSettings);
 		}
 
 		private void ApplyRecursiveStyleCorrection(Styles styles, HeadingSettingsModel settings, int level)
