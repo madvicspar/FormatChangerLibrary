@@ -50,6 +50,8 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+	dbContext.Database.Migrate();
     await dbContext.ClearAndSeed(dbContext, scope.ServiceProvider, userManager, roleManager);
 }
 
