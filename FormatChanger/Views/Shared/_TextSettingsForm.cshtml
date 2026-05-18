@@ -1,54 +1,105 @@
-﻿@model FormatChanger.Models.FormattingModels.TextSettingsModel
+@model FormatChanger.Models.FormattingModels.TextSettingsModel
 
-<div class="row">
-    <div class="col-md-6">
+<div class="row g-2 align-items-end mb-3">
+    <div class="col-md-5">
         <label asp-for="Font" class="form-label">Шрифт</label>
-        <input asp-for="Font" class="form-control" />
+        <select asp-for="Font" class="form-select">
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Calibri">Calibri</option>
+            <option value="Arial">Arial</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Courier New">Courier New</option>
+        </select>
     </div>
     <div class="col-md-2">
-        <label asp-for="FontSize" class="form-label">Размер</label>
-        <input asp-for="FontSize" type="number" class="form-control" />
+        <label asp-for="FontSize" class="form-label">Размер (пт)</label>
+        <select asp-for="FontSize" class="form-select">
+            @for (int sz = 8; sz <= 26; sz++) {
+                <option value="@sz">@sz</option>
+            }
+        </select>
     </div>
-    <div class="col-md-4">
-        <label asp-for="Color" class="form-label">Цвет</label>
-        <input asp-for="Color" type="color" class="form-control form-control-color" />
+    <div class="col-auto">
+        <label asp-for="Color" class="form-label d-block">Цвет</label>
+        <input asp-for="Color" type="color" class="form-control form-control-color color-square" />
     </div>
-</div>
-
-<div class="mt-2">
-    <label class="form-label">Стиль</label><br />
-    <div class="form-check form-check-inline">
-        <input asp-for="IsBold" class="form-check-input" type="checkbox" />
-        <label asp-for="IsBold" class="form-check-label">Жирный</label>
-    </div>
-    <div class="form-check form-check-inline">
-        <input asp-for="IsItalic" class="form-check-input" type="checkbox" />
-        <label asp-for="IsItalic" class="form-check-label">Курсив</label>
-    </div>
-    <div class="form-check form-check-inline">
-        <input asp-for="IsUnderscore" class="form-check-input" type="checkbox" />
-        <label asp-for="IsUnderscore" class="form-check-label">Подчёркнутый</label>
+    <div class="col d-flex align-items-end pb-2">
+        <div class="form-check ms-2">
+            <input asp-for="KeepWithNext" class="form-check-input" type="checkbox" />
+            <label asp-for="KeepWithNext" class="form-check-label small text-nowrap">Не отрывать</label>
+        </div>
     </div>
 </div>
 
-<hr />
+<div class="mb-3">
+    <label class="form-label mb-1">Начертание</label><br />
+    <div class="btn-group">
+        <input type="checkbox" class="btn-check" asp-for="IsBold" autocomplete="off" />
+        <label asp-for="IsBold" class="btn btn-outline-secondary style-bold">B</label>
 
-<div class="row mt-2">
-    <div class="col-md-4">
-        <label asp-for="LineSpacing" class="form-label">Междустрочный интервал</label>
-        <input asp-for="LineSpacing" type="number" step="0.1" class="form-control" />
-    </div>
-    <div class="col-md-4">
-        <label asp-for="BeforeSpacing" class="form-label">Интервал до</label>
-        <input asp-for="BeforeSpacing" type="number" step="0.1" class="form-control" />
-    </div>
-    <div class="col-md-4">
-        <label asp-for="AfterSpacing" class="form-label">Интервал после</label>
-        <input asp-for="AfterSpacing" type="number" step="0.1" class="form-control" />
+        <input type="checkbox" class="btn-check" asp-for="IsItalic" autocomplete="off" />
+        <label asp-for="IsItalic" class="btn btn-outline-secondary style-italic">I</label>
+
+        <input type="checkbox" class="btn-check" asp-for="IsUnderscore" autocomplete="off" />
+        <label asp-for="IsUnderscore" class="btn btn-outline-secondary style-underline">U</label>
     </div>
 </div>
 
-<div class="row mt-2">
+<div class="mb-3 first-line-wrapper">
+    <label class="form-label">Первая строка</label>
+    <div class="d-flex gap-2 align-items-center">
+        <select asp-for="FirstLineType" class="form-select first-line-type">
+            <option value="none">Нет</option>
+            <option value="indent">Отступ</option>
+            <option value="hanging">Выступ</option>
+        </select>
+        <div class="first-line-value-wrapper flex-shrink-0" style="display:none">
+            <div class="input-group">
+                <input asp-for="FirstLine" type="number" min="0" max="55" step="0.1" class="form-control" style="width:80px" />
+                <span class="input-group-text">см</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mb-3 line-spacing-row">
+    <label asp-for="LineSpacingType" class="form-label">Межстрочный интервал</label>
+    <div class="d-flex gap-2 align-items-center">
+        <select asp-for="LineSpacingType" class="form-select line-spacing-type">
+            <option value="single">Одинарный</option>
+            <option value="onehalf">Полуторный</option>
+            <option value="double">Двойной</option>
+            <option value="multiple">Множитель...</option>
+        </select>
+        <div class="line-spacing-multiplier-field flex-shrink-0" style="display:none">
+            <input asp-for="LineSpacing" type="number" min="0.06" max="132" step="0.01" class="form-control" style="width:100px" />
+        </div>
+    </div>
+</div>
+
+<div class="row g-2">
+    <div class="col-md-4">
+        <div class="mb-2">
+            <label asp-for="Left" class="form-label">Отступ слева</label>
+            <input asp-for="Left" type="number" min="0" max="1584" step="0.1" class="form-control" />
+        </div>
+        <div>
+            <label asp-for="Right" class="form-label">Отступ справа</label>
+            <input asp-for="Right" type="number" min="0" max="1584" step="0.1" class="form-control" />
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-2">
+            <label asp-for="BeforeSpacing" class="form-label">Интервал перед</label>
+            <input asp-for="BeforeSpacing" type="number" min="0" max="1584" step="0.1" class="form-control" />
+        </div>
+        <div>
+            <label asp-for="AfterSpacing" class="form-label">Интервал после</label>
+            <input asp-for="AfterSpacing" type="number" min="0" max="1584" step="0.1" class="form-control" />
+        </div>
+    </div>
     <div class="col-md-4">
         <label asp-for="Justification" class="form-label">Выравнивание</label>
         <select asp-for="Justification" class="form-select">
@@ -57,26 +108,5 @@
             <option value="right">По правому краю</option>
             <option value="justify">По ширине</option>
         </select>
-    </div>
-    <div class="col-md-4">
-        <label asp-for="Left" class="form-label">Отступ слева</label>
-        <input asp-for="Left" type="number" step="0.1" class="form-control" />
-    </div>
-    <div class="col-md-4">
-        <label asp-for="Right" class="form-label">Отступ справа</label>
-        <input asp-for="Right" type="number" step="0.1" class="form-control" />
-    </div>
-</div>
-
-<div class="row mt-2">
-    <div class="col-md-4">
-        <label asp-for="FirstLine" class="form-label">Отступ первой строки</label>
-        <input asp-for="FirstLine" type="number" step="0.1" class="form-control" />
-    </div>
-    <div class="col-md-4 d-flex align-items-center">
-        <div class="form-check mt-3">
-            <input asp-for="KeepWithNext" class="form-check-input" type="checkbox" />
-            <label asp-for="KeepWithNext" class="form-check-label">Не отрывать от следующего</label>
-        </div>
     </div>
 </div>

@@ -32,7 +32,7 @@ namespace FormatChanger.Controllers
 
         public void SetTemplates()
         {
-            // TODO: убрать из типов подпись, если ее не должно быть, после чего поменять логику классификации
+            // TODO: пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             var templates = _templateService.GetTemplatesAsync();
             ViewBag.Templates = templates.Result;
         }
@@ -84,17 +84,17 @@ namespace FormatChanger.Controllers
 
 			switch (actionId)
             {
-                case 1: // Исправление
+                case 1: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     resultDocumentId = await _documentService.CorrectDocumentAsync(document, template, types);
                     break;
-                case 2: // Проверка
+                case 2: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     resultDocumentId = await _documentService.CheckDocumentAsync(document, template, types);
                     break;
-                case 3: // Оценивание
+                case 3: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     resultDocumentId = await _documentService.EvaluateDocumentAsync(document, template, types);
                     break;
                 default:
-                    return BadRequest("Неизвестное действие");
+                    return BadRequest("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
             }
 
             return RedirectToAction("Index");
@@ -125,7 +125,7 @@ namespace FormatChanger.Controllers
             return Json(new
             {
                 status = 200,
-                message = "Экспорт завершен"
+                message = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
             });
         }
 
@@ -139,6 +139,65 @@ namespace FormatChanger.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+		[HttpPost, ValidateAntiForgeryToken]
+		public async Task<IActionResult> SaveTemplate(FormattingTemplateModel model)
+		{
+			if (!ModelState.IsValid)
+				return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+			var id = await _templateService.SaveTemplateAsync(model);
+			return Json(new { success = true, id });
+		}
+
+		[HttpPost, ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteTemplate(long id)
+		{
+			await _templateService.DeleteTemplateAsync(id);
+			return Json(new { success = true });
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetTemplateForEdit(long id)
+		{
+			FormattingTemplateModel model;
+			if (id == 0)
+			{
+				model = CreateDefaultModel();
+			}
+			else
+			{
+				model = await _templateService.GetTemplateByIdAsync(id);
+				if (model == null) return NotFound();
+				if (model.HeadingSettings != null)
+					model.HeadingLevelsEdit = FlattenHeadings(model.HeadingSettings);
+			}
+			return PartialView("_FormattingTemplateForm", model);
+		}
+
+		private static FormattingTemplateModel CreateDefaultModel() => new()
+		{
+			DocumentSettings = new DocumentSettingsModel(),
+			TextSettings = new TextSettingsModel(),
+			ListSettings = new ListSettingsModel
+			{
+				TextSettings = new TextSettingsModel(),
+				BulletListSettings = new BulletListSettingsModel(),
+				NumberedListSettings = new NumberedListSettingsModel()
+			},
+			TableSettings = new TableSettingsModel
+			{
+				CaptionSettings = new TableCaptionSettingsModel { TextSettings = new TextSettingsModel() },
+				CellSettings = new CellSettingsModel { TextSettings = new TextSettingsModel() },
+				HeaderSettings = new HeaderSettingsModel
+				{
+					CellSettings = new CellSettingsModel { TextSettings = new TextSettingsModel() }
+				}
+			},
+			ImageSettings = new ImageSettingsModel
+			{
+				CaptionSettings = new ImageCaptionSettingsModel { TextSettings = new TextSettingsModel() }
+			}
+		};
 
 		private List<HeadingLevelEditItem> FlattenHeadings(HeadingSettingsModel head)
 		{

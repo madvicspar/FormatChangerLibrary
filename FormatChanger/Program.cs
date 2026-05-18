@@ -11,7 +11,8 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+    options.ModelBinderProviders.Insert(0, new FormatChanger.Infrastructure.ModelBinders.FloatModelBinderProvider()));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IEmailSenderCustom, EmailSender>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
@@ -49,7 +50,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await dbContext.ClearAndSeed(dbContext, scope.ServiceProvider, userManager, roleManager);
+    //await dbContext.ClearAndSeed(dbContext, scope.ServiceProvider, userManager, roleManager);
 }
 
 // Configure the HTTP request pipeline.

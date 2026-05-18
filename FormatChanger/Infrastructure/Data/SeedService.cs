@@ -368,17 +368,17 @@ namespace FormatChanger.Utilities.Data
             context.SaveChanges();
 
             // маркированный список просто
-            var listSettings = new ListSettingsModel
-            {
-                EndType = Ends.Semicolon,
-                IsNumeric = false,
-                MarkerType = "-",
-                ListLevel = 0,
-                TextSettings = textSettings_list
-            };
+            //var listSettings = new ListSettingsModel
+            //{
+            //    EndType = Ends.Semicolon,
+            //    IsNumeric = false,
+            //    MarkerType = "-",
+            //    ListLevel = 0,
+            //    TextSettings = textSettings_list
+            //};
 
-            context.ListSettings.Add(listSettings);
-            context.SaveChanges();
+            //context.ListSettings.Add(listSettings);
+            //context.SaveChanges();
 
             // TODO: пофиксить логику шаблона - заголовки например вплоть до 8 уровня, списки - хотя бы три варианта
             // **3. Данные для шаблона форматирования**
@@ -388,7 +388,7 @@ namespace FormatChanger.Utilities.Data
                 TextSettings = textSettings,
                 TableSettings = tableSettings,
                 HeadingSettings = headingSettings1,
-                ListSettings = listSettings,
+                //ListSettings = listSettings,
                 ImageSettings = imageSettings,
                 DocumentSettings = documentSettings
             };
