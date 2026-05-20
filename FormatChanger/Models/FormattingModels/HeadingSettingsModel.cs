@@ -21,6 +21,6 @@ namespace FormatChanger.Models.FormattingModels
         /// </summary>
         public long? NextHeadingLevelId { get; set; }
         public virtual TextSettingsModel TextSettings { get; set; }
-        public virtual HeadingSettingsModel? NextHeadingLevel { get; set; }
+		public virtual HeadingSettingsModel? NextHeadingLevel { get; set; }
     }
 }

@@ -8,3 +8,6 @@ FormatChanger/obj
 /FormatChanger/appsettings.json
 /FormatChangerTests/bin/Debug/net8.0
 /FormatChangerTests/obj
+/backend
+/uploads
+*.env

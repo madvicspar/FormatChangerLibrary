@@ -24,7 +24,7 @@ body {
     padding: 0;
 }
 
-/* ����� */
+/* ����� */
 .header {
     width: 100%;
     padding: 12px 40px 13px;
@@ -77,7 +77,7 @@ body {
     text-decoration: none;
 }
 
-/* ������ */
+/* ������ */
 .action-buttons {
     display: flex;
     gap: 8px;
@@ -139,4 +139,108 @@ body {
     height: 40px;
     border-radius: 50%;
     object-fit: contain;
+}
+
+.settings-block {
+    background: #f8f9fa;
+    border: 1px solid #e0e4e8;
+    border-radius: 8px;
+}
+
+.settings-block-header {
+    padding: 8px 16px;
+    background: #e9ecef;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    color: #495057;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 7px 7px 0 0;
+}
+
+.settings-block-header.collapsed {
+    border-bottom: none;
+    border-radius: 7px;
+}
+
+.settings-block-body {
+    padding: 16px;
+}
+
+/* Модальное окно шаблона */
+#formattingTemplateModal .modal-dialog {
+    max-width: 960px;
+}
+
+#formattingTemplateModal .modal-body {
+    padding: 1rem 1.25rem;
+}
+
+/* Иконка подсказки */
+.hint-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #6c757d;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: help;
+    vertical-align: middle;
+    margin-left: 2px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+/* Кнопки начертания (B / I / U) */
+.style-bold {
+    font-weight: bold;
+    min-width: 2.5rem;
+}
+
+.style-italic {
+    font-style: italic;
+    min-width: 2.5rem;
+}
+
+.style-underline {
+    text-decoration: underline;
+    min-width: 2.5rem;
+}
+
+/* Квадратный color picker */
+input[type="color"].color-square {
+    width: calc(1.5em + 0.75rem + 2px);
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.2rem;
+    cursor: pointer;
+}
+
+/* Кнопка «Добавить следующий уровень» */
+.btn-add-level {
+    display: block;
+    width: 100%;
+    padding: 0.55rem 1rem;
+    border: 2px dashed #9ec5fe;
+    border-radius: 8px;
+    background: transparent;
+    color: #0d6efd;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-add-level:hover {
+    background: #e7f1ff;
+    border-color: #6ea8fe;
+}
+
+.btn-add-level:focus-visible {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
 }

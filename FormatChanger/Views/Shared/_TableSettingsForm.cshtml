@@ -1,0 +1,164 @@
+@model FormatChanger.Models.FormattingModels.TableSettingsModel
+
+@{
+    var savedPrefix = ViewData.TemplateInfo.HtmlFieldPrefix;
+}
+
+<div class="settings-block mb-3">
+    <div class="settings-block-header">Интервалы</div>
+    <div class="settings-block-body">
+        <div class="row g-2">
+            <div class="col-md-6">
+                <label asp-for="BeforeSpacing" class="form-label">Интервал до таблицы</label>
+                <input asp-for="BeforeSpacing" type="number" min="0" max="1584" step="0.1" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="AfterSpacing" class="form-label">Интервал после таблицы</label>
+                <input asp-for="AfterSpacing" type="number" min="0" max="1584" step="0.1" class="form-control" />
+            </div>
+        </div>
+        <div class="form-text mt-1">
+            Применяется к подписи (если есть) или к соседнему абзацу.
+        </div>
+    </div>
+</div>
+
+<div class="settings-block mb-3">
+    <div class="settings-block-header d-flex justify-content-between align-items-center"
+         data-bs-toggle="collapse" data-bs-target="#table-caption-collapse"
+         aria-expanded="true" style="cursor:pointer">
+        <span>Подпись к таблице</span>
+        <span class="collapse-chevron">▼</span>
+    </div>
+    <div class="collapse show" id="table-caption-collapse">
+        <div class="settings-block-body">
+            <div class="row g-2 mb-3">
+                <div class="col-md-5">
+                    <label asp-for="CaptionSettings.TextTemplate" class="form-label">Шаблон подписи</label>
+                    <input asp-for="CaptionSettings.TextTemplate" class="form-control" placeholder="Таблица N" />
+                    <div class="form-text">«N» заменяется на порядковый номер</div>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="CaptionSettings.Separator" class="form-label">Разделитель</label>
+                    <input asp-for="CaptionSettings.Separator" class="form-control" placeholder=" — " />
+                    <div class="form-text">Между номером и содержанием</div>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="CaptionSettings.Position" class="form-label">Расположение</label>
+                    <select asp-for="CaptionSettings.Position" class="form-select">
+                        <option value="0">Снизу</option>
+                        <option value="1">Сверху</option>
+                    </select>
+                </div>
+            </div>
+            <hr class="my-2" />
+            <h6 class="text-muted mb-2 small">Настройки текста подписи</h6>
+            @{
+                ViewData.TemplateInfo.HtmlFieldPrefix = savedPrefix + ".CaptionSettings.TextSettings";
+            }
+            <partial name="_TextSettingsForm" model="Model.CaptionSettings?.TextSettings ?? new FormatChanger.Models.FormattingModels.TextSettingsModel()" />
+            @{
+                ViewData.TemplateInfo.HtmlFieldPrefix = savedPrefix;
+            }
+        </div>
+    </div>
+</div>
+
+<div class="settings-block mb-3">
+    <div class="settings-block-header d-flex justify-content-between align-items-center collapsed"
+         data-bs-toggle="collapse" data-bs-target="#table-cells-collapse"
+         aria-expanded="false" style="cursor:pointer">
+        <span>Ячейки таблицы</span>
+    </div>
+    <div class="collapse" id="table-cells-collapse">
+        <div class="settings-block-body">
+            <div class="row g-2 mb-3">
+                <div class="col-md-4">
+                    <label asp-for="CellSettings.VerticalAlignment" class="form-label">Вертикальное выравнивание</label>
+                    <select asp-for="CellSettings.VerticalAlignment" class="form-select">
+                        <option value="top">По верху</option>
+                        <option value="center">По центру</option>
+                        <option value="bottom">По низу</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="CellSettings.TopPadding" class="form-label">Сверху</label>
+                    <input asp-for="CellSettings.TopPadding" type="number" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="CellSettings.BottomPadding" class="form-label">Снизу</label>
+                    <input asp-for="CellSettings.BottomPadding" type="number" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="CellSettings.LeftPadding" class="form-label">Слева</label>
+                    <input asp-for="CellSettings.LeftPadding" type="number" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="CellSettings.RightPadding" class="form-label">Справа</label>
+                    <input asp-for="CellSettings.RightPadding" type="number" class="form-control" />
+                </div>
+            </div>
+            <h6 class="text-muted mb-2 small">Настройки текста в ячейках</h6>
+            @{
+                ViewData.TemplateInfo.HtmlFieldPrefix = savedPrefix + ".CellSettings.TextSettings";
+            }
+            <partial name="_TextSettingsForm" model="Model.CellSettings?.TextSettings ?? new FormatChanger.Models.FormattingModels.TextSettingsModel()" />
+            @{
+                ViewData.TemplateInfo.HtmlFieldPrefix = savedPrefix;
+            }
+        </div>
+    </div>
+</div>
+
+<div class="settings-block">
+    <div class="settings-block-header d-flex justify-content-between align-items-center collapsed"
+         data-bs-toggle="collapse" data-bs-target="#table-header-collapse"
+         aria-expanded="false" style="cursor:pointer">
+        <span>Строка заголовка</span>
+        <span class="collapse-chevron">▼</span>
+    </div>
+    <div class="collapse" id="table-header-collapse">
+        <div class="settings-block-body">
+            <div class="form-check mb-3">
+                <input asp-for="HeaderSettings.HasRepetitions" class="form-check-input" type="checkbox" />
+                <label asp-for="HeaderSettings.HasRepetitions" class="form-check-label">
+                    Повторять строку заголовка на каждой странице
+                </label>
+            </div>
+            <div class="row g-2 mb-3">
+                <div class="col-md-4">
+                    <label asp-for="HeaderSettings.CellSettings.VerticalAlignment" class="form-label">Вертикальное выравнивание</label>
+                    <select asp-for="HeaderSettings.CellSettings.VerticalAlignment" class="form-select">
+                        <option value="top">По верху</option>
+                        <option value="center">По центру</option>
+                        <option value="bottom">По низу</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="HeaderSettings.CellSettings.TopPadding" class="form-label">Сверху</label>
+                    <input asp-for="HeaderSettings.CellSettings.TopPadding" type="number" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="HeaderSettings.CellSettings.BottomPadding" class="form-label">Снизу</label>
+                    <input asp-for="HeaderSettings.CellSettings.BottomPadding" type="number" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="HeaderSettings.CellSettings.LeftPadding" class="form-label">Слева</label>
+                    <input asp-for="HeaderSettings.CellSettings.LeftPadding" type="number" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="HeaderSettings.CellSettings.RightPadding" class="form-label">Справа</label>
+                    <input asp-for="HeaderSettings.CellSettings.RightPadding" type="number" class="form-control" />
+                </div>
+            </div>
+            <h6 class="text-muted mb-2 small">Настройки текста в строке заголовка</h6>
+            @{
+                ViewData.TemplateInfo.HtmlFieldPrefix = savedPrefix + ".HeaderSettings.CellSettings.TextSettings";
+            }
+            <partial name="_TextSettingsForm" model="Model.HeaderSettings?.CellSettings?.TextSettings ?? new FormatChanger.Models.FormattingModels.TextSettingsModel()" />
+            @{
+                ViewData.TemplateInfo.HtmlFieldPrefix = savedPrefix;
+            }
+        </div>
+    </div>
+</div>
