@@ -50,7 +50,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    //await dbContext.ClearAndSeed(dbContext, scope.ServiceProvider, userManager, roleManager);
+    await dbContext.ClearAndSeed(dbContext, scope.ServiceProvider, userManager, roleManager);
 }
 
 // Configure the HTTP request pipeline.
