@@ -118,33 +118,22 @@
             <h3 class="panel-title">Шаблон форматирования</h3>
 
             <div class="template-actions">
-                <button class="action-btn add-template-btn" onclick="openNewTemplateModal()">+ Добавить шаблон</button>
+                <button class="action-btn add-template-btn" onclick="openNewTemplateModal()">Добавить</button>
+                <button class="action-btn add-template-btn" onclick="openEditSelectedTemplateModal()">Изменить</button>
             </div>
 
             <input type="hidden" id="selectedTemplateId" value="@(templates?.FirstOrDefault()?.Id ?? 0)" />
 
-            <div class="template-list" id="template-list">
+            <div class="template-selector">
+                <select name="templateId" id="templateSelect" class="form-control">
                 @if (templates != null)
                 {
-                    bool isFirst = true;
                     foreach (var template in templates)
                     {
-                        <div class="template-row @(isFirst ? "selected" : "")"
-                             data-id="@template.Id"
-                             onclick="selectTemplate(@template.Id, this)">
-                            <span class="template-row-title">@template.Title</span>
-                            <div class="template-row-btns">
-                                <button type="button" class="btn-icon-sm"
-                                        onclick="event.stopPropagation(); openEditTemplateModal(@template.Id)"
-                                        title="Редактировать">&#x270E;</button>
-                                <button type="button" class="btn-icon-sm btn-icon-danger"
-                                        onclick="event.stopPropagation(); deleteTemplate(@template.Id)"
-                                        title="Удалить">&#x2715;</button>
-                            </div>
-                        </div>
-                        isFirst = false;
+                            <option value="@template.Id">@template.Title</option>
                     }
                 }
+                </select>
             </div>
 
             <h3 class="panel-title">Тип действия</h3>

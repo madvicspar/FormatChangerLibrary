@@ -105,6 +105,49 @@ function deleteTemplate(id) {
         .catch(() => alert('Ошибка при удалении шаблона.'));
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+    const templateSelect = document.getElementById('templateSelect');
+    if (templateSelect) {
+        templateSelect.addEventListener('change', function () {
+            document.getElementById('selectedTemplateId').value = this.value;
+        });
+    }
+});
+
+function openEditSelectedTemplateModal() {
+    const id = parseInt(document.getElementById('selectedTemplateId').value);
+    if (id > 0) openEditTemplateModal(id);
+}
+
+function deleteTemplateFromModal(id) {
+    const row = document.querySelector(`.template-row[data-id="${id}"]`);
+    const title = row?.querySelector('.template-row-title')?.textContent?.trim() || 'этот шаблон';
+    if (!confirm(`Удалить шаблон «${title}»?`)) return;
+
+    const tokenInput = document.querySelector('#csrf-form [name="__RequestVerificationToken"]');
+    const data = new FormData();
+    data.append('id', id);
+    if (tokenInput) data.append('__RequestVerificationToken', tokenInput.value);
+
+    fetch('/Home/DeleteTemplate', { method: 'POST', body: data })
+        .then(r => r.json())
+        .then(result => {
+            if (result.success) {
+                bootstrap.Modal.getInstance(document.getElementById('formattingTemplateModal')).hide();
+                row?.remove();
+                const hiddenInput = document.getElementById('selectedTemplateId');
+                const remaining = document.querySelector('.template-row');
+                if (remaining) {
+                    hiddenInput.value = remaining.dataset.id;
+                    remaining.classList.add('selected');
+                } else {
+                    hiddenInput.value = 0;
+                }
+            }
+        })
+        .catch(() => alert('Ошибка при удалении шаблона.'));
+}
+
 // Начать процесс форматирования
 function startFormattingProcess() {
     var selectedTemplateId = document.getElementById('selectedTemplateId').value;

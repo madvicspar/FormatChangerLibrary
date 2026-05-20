@@ -3,7 +3,7 @@
 <form asp-action="SaveTemplate" method="post" id="template-save-form">
     <input type="hidden" asp-for="Id" />
     <div class="modal-header">
-        <h5 class="modal-title" id="formattingTemplateModalLabel">Создать / Редактировать шаблон форматирования</h5>
+        <h5 class="modal-title" id="formattingTemplateModalLabel">Шаблон форматирования</h5>
     </div>
 
     <div class="modal-body">
@@ -104,7 +104,11 @@
     </div>
 
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+        @if (Model.Id > 0)
+        {
+            <button type="button" class="btn btn-outline-danger me-auto" onclick="deleteTemplateFromModal(@Model.Id)">Удалить</button>
+        }
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
         <button type="submit" class="btn btn-primary">Сохранить</button>
     </div>
 </form>
