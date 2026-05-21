@@ -1,14 +1,13 @@
 using System.Diagnostics;
-
 using FormatChanger.Models;
 using FormatChanger.Models.FormattingModels;
 using FormatChanger.Models.Helpers;
 using FormatChanger.Services.Interfaces;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 namespace FormatChanger.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -22,6 +21,14 @@ namespace FormatChanger.Controllers
             _documentService = documentService;
             _templateService = templateService;
             _exportService = exportService;
+        }
+
+        [AllowAnonymous]
+        public IActionResult Landing()
+        {
+            if (User.Identity?.IsAuthenticated == true)
+                return RedirectToAction(nameof(Index));
+            return View();
         }
 
         public IActionResult Index(List<ParagraphModel> paragraphs = null)
@@ -129,11 +136,13 @@ namespace FormatChanger.Controllers
             });
         }
 
+        [AllowAnonymous]
         public IActionResult Privacy()
         {
             return View();
         }
 
+        [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
