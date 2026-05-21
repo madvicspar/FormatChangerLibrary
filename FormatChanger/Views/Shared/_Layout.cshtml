@@ -9,20 +9,28 @@
     <link rel="stylesheet" href="~/FormatChanger.styles.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        var currentPage = ViewContext.View.Path;
+        var hideRightHeader = currentPage.Contains("Login") || currentPage.Contains("Register");
+    }
+
     <header class="header">
         <div class="header-content">
             <div class="logo-container">
                 <h1 class="logo-text">format.changer</h1>
             </div>
-            <nav class="navigation">
-                <div class="action-buttons">
+            @if (!hideRightHeader)
+            {
+                <nav class="navigation">
+                    <div class="action-buttons">
                     <button @* asp-controller="Documents" asp-action="Index" *@ id="showUploadButton" class="action-btn upload-btn" onclick="showUploadForm()">Загрузить</button>
                     <button class="action-btn export-btn" id="exportButton" onclick="startFormattingProcess()">Экспорт</button>
                 </div>
                 <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/266d79a16507ebfa1ec27bd9e1dab48cee39da5671e801f70ea19c28d244d301?placeholderIfAbsent=true&apiKey=a03ea75d5a1e42c8aa0f3316a7f8081b"
                      alt="User Profile"
                      class="profile-image" />
-            </nav>
+                </nav>
+            }
         </div>
     </header>
 
