@@ -3,10 +3,12 @@
     public class EvaluationSystemModel
     {
         public long Id { get; set; }
-        /// <summary>
-        /// Вес заголовков от о до 100
-        /// </summary>
-        public int HeaderWeight { get; set; }
+		public string Title { get; set; }
+
+		/// <summary>
+		/// Вес заголовков от о до 100
+		/// </summary>
+		public int HeaderWeight { get; set; }
 
         /// <summary>
         /// Вес обычного текста от о до 100
@@ -37,6 +39,12 @@
         /// Свободный коэффициент от о до 100
         /// </summary>
         public int FreeCoefficient { get; set; }
+
+        /// <summary>
+        /// Веса правил внутри каждого типа, сериализованные как JSON.
+        /// </summary>
+        public string? RuleWeightsJson { get; set; }
+
         /// <summary>
         /// Метод для проверки, что сумма всех коэффициентов равна 100.
         /// </summary>

@@ -1,10 +1,12 @@
 ﻿@using DocumentFormat.OpenXml.Wordprocessing;
+@using FormatChanger.Models;
 @using FormatChanger.Models.FormattingModels;
 @using FormatChanger.Models.Helpers;
 @model List<ParagraphModel>
 @{
     ViewData["Title"] = "Home Page";
     var templates = ViewBag.Templates as List<FormattingTemplateModel>;
+    var scorings = ViewBag.Scorings as List<EvaluationSystemModel>;
 }
 
 <head>
@@ -88,11 +90,6 @@
                     <div class="radio-input"></div>
                     <span class="option-text">Подпись к таблице</span>
                 </label>
-
-                <label class="type-option" data-type="no-edit">
-                    <div class="radio-input"></div>
-                    <span class="option-text">Не трогать!</span>
-                </label>
             </div>
 
             <div class="navigation-buttons">
@@ -109,8 +106,6 @@
                          class="btn-icon" />
                     <span>Следующий абзац</span>
                 </button>
-
-                <button class="action-btn get-btn">Получить</button>
             </div>
         </section>
 
@@ -126,13 +121,13 @@
 
             <div class="template-selector">
                 <select name="templateId" id="templateSelect" class="form-control">
-                @if (templates != null)
-                {
-                    foreach (var template in templates)
+                    @if (templates != null)
                     {
+                        foreach (var template in templates)
+                        {
                             <option value="@template.Id">@template.Title</option>
+                        }
                     }
-                }
                 </select>
             </div>
 
@@ -144,6 +139,27 @@
                     <option class="option-text" value="3">Оценивание</option>
                 </select>
             </div>
+
+            <h3 class="panel-title">Система оценивания</h3>
+
+            <div class="template-actions">
+                <button class="action-btn add-template-btn" onclick="openNewScoringModal()">Добавить</button>
+                <button class="action-btn add-template-btn" onclick="openEditSelectedScoringModal()">Изменить</button>
+            </div>
+
+            <input type="hidden" id="selectedScoringId" value="@(scorings?.FirstOrDefault()?.Id ?? 0)" />
+
+            <div class="template-selector">
+                <select name="scoringId" id="scoringSelect" class="form-control">
+                    @if (scorings != null)
+                    {
+                        foreach (var scoring in scorings)
+                        {
+                            <option value="@scoring.Id">@scoring.Title</option>
+                        }
+                    }
+                </select>
+            </div>
         </section>
     </aside>
 
@@ -152,6 +168,13 @@
     <div class="modal fade" id="formattingTemplateModal" tabindex="-1" aria-labelledby="formattingTemplateModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content" id="template-modal-content">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="scoringSystemModal" tabindex="-1" aria-labelledby="scoringSystemModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content" id="scoring-modal-content">
             </div>
         </div>
     </div>

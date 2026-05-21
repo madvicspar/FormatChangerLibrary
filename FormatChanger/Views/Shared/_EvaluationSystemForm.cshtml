@@ -1,0 +1,90 @@
+@model FormatChanger.Models.EvaluationSystemModel
+
+<form asp-action="SaveScoring" method="post" id="scoring-save-form">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" id="scoring-weight-normal"       name="TextWeight"      value="@Model.TextWeight" />
+    <input type="hidden" id="scoring-weight-heading"      name="HeaderWeight"    value="@Model.HeaderWeight" />
+    <input type="hidden" id="scoring-weight-list"         name="ListWeight"      value="@Model.ListWeight" />
+    <input type="hidden" id="scoring-weight-image"        name="ImageWeight"     value="@Model.ImageWeight" />
+    <input type="hidden" id="scoring-weight-table"        name="TableWeight"     value="@Model.TableWeight" />
+    <input type="hidden" id="scoring-rule-weights-json"   name="RuleWeightsJson" value="@Model.RuleWeightsJson" />
+
+    <div class="modal-header">
+        <h5 class="modal-title" id="scoringSystemModalLabel">Система оценивания</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+    </div>
+
+    <div class="modal-body">
+        <div class="mb-3">
+            <label class="form-label">Название</label>
+            <input type="text" class="form-control" id="scoring-name" name="Title"
+                   value="@Model.Title" placeholder="Название системы оценивания" />
+        </div>
+
+        <ul class="nav nav-tabs" id="scoring-nav-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#scoring-tab-types" type="button">Веса типов</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#scoring-tab-rules" type="button">Веса правил</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#scoring-tab-preview" type="button">Предпросмотр</button>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-3">
+
+            <div class="tab-pane fade show active" id="scoring-tab-types">
+                <p class="form-text mb-3">Задайте долю итогового балла для каждого типа элемента. Сумма должна равняться 100.</p>
+                <div class="scoring-total-bar">
+                    <span class="scoring-total-bar-label">Сумма весов типов:</span>
+                    <span class="scoring-total-val ok" id="scoring-total-val">100</span>
+                </div>
+                <div class="scoring-type-grid" id="scoring-type-grid"></div>
+            </div>
+
+            <div class="tab-pane fade" id="scoring-tab-rules">
+                <p class="form-text mb-2">Выберите тип и задайте относительные веса правил внутри него. Правила с весом 0 не проверяются.</p>
+                <div class="d-flex flex-wrap gap-2 mb-3" id="scoring-rule-type-tabs"></div>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Правило</th>
+                            <th>Вес</th>
+                            <th style="text-align:right">%</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoring-rules-body"></tbody>
+                </table>
+            </div>
+
+            <div class="tab-pane fade" id="scoring-tab-preview">
+                <p class="form-text mb-2">Итоговые веса правил (w<sub>r</sub> = вес типа × вес правила). Используются при расчёте балла.</p>
+                <div class="scoring-preview-score" id="scoring-preview-score">—</div>
+                <div class="scoring-preview-label">Пример балла для документа без нарушений</div>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Тип элемента</th>
+                            <th>Правило</th>
+                            <th style="text-align:right">w<sub>r</sub></th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoring-preview-body"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        @if (Model.Id > 0)
+        {
+            <button type="button" class="btn btn-outline-danger me-auto"
+                    onclick="deleteScoringFromModal(@Model.Id)">Удалить</button>
+        }
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </div>
+</form>

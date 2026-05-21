@@ -18,6 +18,7 @@ builder.Services.AddSingleton<IEmailSenderCustom, EmailSender>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
+builder.Services.AddScoped<IScoringService, ScoringService>();
 builder.Services.AddScoped<IElementCorrectionStrategy<TextSettingsModel>, TextCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<HeadingSettingsModel>, HeadingFirstCorrectionStrategy>();
 builder.Services.AddScoped<IElementCorrectionStrategy<ImageSettingsModel>, ImageCorrectionStrategy>();
