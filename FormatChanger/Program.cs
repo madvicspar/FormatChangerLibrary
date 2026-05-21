@@ -6,14 +6,17 @@ using FormatChanger.Services.Interfaces;
 using FormatChanger.Services.Strategies;
 using FormatChanger.Utilities.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+    options.ModelBinderProviders.Insert(0, new FormatChanger.Infrastructure.ModelBinders.FloatModelBinderProvider()));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IEmailSenderCustom, EmailSender>();
+builder.Services.AddSingleton<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();

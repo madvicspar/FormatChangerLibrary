@@ -273,7 +273,8 @@ namespace FormatChanger.Utilities.Data
             var tableCaptionSettings = new TableCaptionSettingsModel
             {
                 TextSettings = textSettings_tableCaption,
-                TextTemplate = "Таблица\\s+\\d+\\s+-\\s+(.+)"
+                TextTemplate = "Таблица\\s+(\\d+)",
+                Separator = "-"
             };
 
             context.CaptionSettings.Add(tableCaptionSettings);
@@ -283,7 +284,8 @@ namespace FormatChanger.Utilities.Data
             var imageCaptionSettings = new ImageCaptionSettingsModel
             {
                 TextSettings = textSettings_imageCaption,
-                TextTemplate = "Рисунок\\s+\\d+\\s+-\\s+(.+)"
+                TextTemplate = "Рисунок\\s+(\\d+)",
+                Separator = "-"
             };
 
             context.CaptionSettings.Add(imageCaptionSettings);
@@ -367,16 +369,32 @@ namespace FormatChanger.Utilities.Data
             context.DocumentSettings.Add(documentSettings);
             context.SaveChanges();
 
-            // маркированный список просто
-            var listSettings = new ListSettingsModel
+			// **. Данные для настроек маркированного списка**
+			var bulletListSettings = new BulletListSettingsModel
             {
-                EndType = Ends.Semicolon,
-                IsNumeric = false,
-                MarkerType = "-",
-                ListLevel = 0,
-                TextSettings = textSettings_list
+                EndType = Ends.Semicolon
             };
+            context.BulletListSettings.Add(bulletListSettings);
+            context.SaveChanges();
 
+			// **. Данные для настроек нумерованного списка**
+			var numberedListSettings = new NumberedListSettingsModel
+            {
+                Level1MarkerType = NumberedMarkerType.Dot,
+                Level1EndType = Ends.Semicolon,
+                Level2EndType = Ends.Semicolon,
+                Level3EndType = Ends.Semicolon
+            };
+            context.NumberedListSettings.Add(numberedListSettings);
+            context.SaveChanges();
+
+			// **. Данные для настроек списка**
+			var listSettings = new ListSettingsModel
+            {
+                TextSettings = textSettings_list,
+                BulletListSettings = bulletListSettings,
+                NumberedListSettings = numberedListSettings
+            };
             context.ListSettings.Add(listSettings);
             context.SaveChanges();
 

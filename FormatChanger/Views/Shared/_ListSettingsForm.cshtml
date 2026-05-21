@@ -1,0 +1,109 @@
+@model FormatChanger.Models.FormattingModels.ListSettingsModel
+@using FormatChanger.Models.Helpers
+
+@{
+    var savedPrefix = ViewData.TemplateInfo.HtmlFieldPrefix;
+}
+
+<div class="settings-block mb-4">
+    <div class="settings-block-header">Настройки текста</div>
+    <div class="settings-block-body">
+        @{
+            ViewData.TemplateInfo.HtmlFieldPrefix = savedPrefix + ".TextSettings";
+        }
+        <partial name="_TextSettingsForm" model="Model.TextSettings ?? new FormatChanger.Models.FormattingModels.TextSettingsModel()" />
+        @{
+            ViewData.TemplateInfo.HtmlFieldPrefix = savedPrefix;
+        }
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header fw-semibold">Маркированный список</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label text-muted">Маркер</label>
+                    <div class="fw-bold fs-5 ps-1">— (тире, фиксированный)</div>
+                </div>
+                <div>
+                    <label class="form-label">Знак конца элемента</label>
+                    <select asp-for="BulletListSettings.EndType" class="form-select">
+                        <option value="0">— ничего</option>
+                        <option value="1">. точка</option>
+                        <option value="2">; точка с запятой</option>
+                        <option value="3">, запятая</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header fw-semibold">Нумерованный список</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Маркер 1-го уровня</label>
+                    <select asp-for="NumberedListSettings.Level1MarkerType" class="form-select level1-marker-select">
+                        <option value="0">N) скобка</option>
+                        <option value="1">N. точка</option>
+                    </select>
+                    <div class="form-text">Уровни 2 и 3 чередуются автоматически</div>
+                </div>
+
+                <table class="table table-sm table-bordered mb-1">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:70px">Уровень</th>
+                            <th style="width:75px">Маркер</th>
+                            <th>Знак конца</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var l1IsBracket = Model.NumberedListSettings?.Level1MarkerType != NumberedMarkerType.Dot;
+                        }
+                        <tr>
+                            <td class="align-middle">1</td>
+                            <td class="align-middle fw-bold numbered-marker-display" data-level="1">@(l1IsBracket ? "N)" : "N.")</td>
+                            <td>
+                                <select asp-for="NumberedListSettings.Level1EndType" class="form-select form-select-sm">
+                                    <option value="0">— ничего</option>
+                                    <option value="1">. точка</option>
+                                    <option value="2">; точка с запятой</option>
+                                    <option value="3">, запятая</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle">2</td>
+                            <td class="align-middle fw-bold numbered-marker-display" data-level="2">@(!l1IsBracket ? "N)" : "N.")</td>
+                            <td>
+                                <select asp-for="NumberedListSettings.Level2EndType" class="form-select form-select-sm">
+                                    <option value="0">— ничего</option>
+                                    <option value="1">. точка</option>
+                                    <option value="2">; точка с запятой</option>
+                                    <option value="3">, запятая</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle">3</td>
+                            <td class="align-middle fw-bold numbered-marker-display" data-level="3">@(l1IsBracket ? "N)" : "N.")</td>
+                            <td>
+                                <select asp-for="NumberedListSettings.Level3EndType" class="form-select form-select-sm">
+                                    <option value="0">— ничего</option>
+                                    <option value="1">. точка</option>
+                                    <option value="2">; точка с запятой</option>
+                                    <option value="3">, запятая</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

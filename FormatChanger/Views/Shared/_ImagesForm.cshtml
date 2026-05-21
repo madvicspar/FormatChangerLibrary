@@ -1,0 +1,75 @@
+@model FormatChanger.Models.FormattingModels.ImageSettingsModel
+
+@{
+    var savedPrefix = ViewData.TemplateInfo.HtmlFieldPrefix;
+}
+
+<div class="settings-block mb-4">
+    <div class="settings-block-header">Настройки абзаца с изображением</div>
+    <div class="settings-block-body">
+        <div class="row mb-3 g-2">
+            <div class="col-md-4">
+                <label asp-for="LineSpacing" class="form-label">Междустрочный интервал</label>
+                <input asp-for="LineSpacing" type="number" step="0.1" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="BeforeSpacing" class="form-label">Интервал до</label>
+                <input asp-for="BeforeSpacing" type="number" step="0.1" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="AfterSpacing" class="form-label">Интервал после</label>
+                <input asp-for="AfterSpacing" type="number" step="0.1" class="form-control" />
+            </div>
+        </div>
+        <div class="row mb-3 g-2">
+            <div class="col-md-4">
+                <label asp-for="Justification" class="form-label">Выравнивание</label>
+                <select asp-for="Justification" class="form-select">
+                    <option value="left">По левому краю</option>
+                    <option value="center">По центру</option>
+                    <option value="right">По правому краю</option>
+                    <option value="justify">По ширине</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Left" class="form-label">Отступ слева</label>
+                <input asp-for="Left" type="number" step="0.1" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Right" class="form-label">Отступ справа</label>
+                <input asp-for="Right" type="number" step="0.1" class="form-control" />
+            </div>
+        </div>
+        <div class="row g-2">
+            <div class="col-md-4">
+                <label asp-for="FirstLine" class="form-label">Отступ первой строки</label>
+                <input asp-for="FirstLine" type="number" step="0.1" class="form-control" />
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <div class="form-check mb-2">
+                    <input asp-for="KeepWithNext" class="form-check-input" type="checkbox" />
+                    <label asp-for="KeepWithNext" class="form-check-label">Не отрывать от следующего</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="settings-block">
+    <div class="settings-block-header">Подпись к изображению</div>
+    <div class="settings-block-body">
+        @{
+            ViewData.TemplateInfo.HtmlFieldPrefix = (savedPrefix.Length > 0 ? savedPrefix + "." : "") + "CaptionSettings";
+        }
+        <partial name="_CaptionForm" model="Model.CaptionSettings ?? new FormatChanger.Models.FormattingModels.ICaptionSettingsModel()" />
+        <hr class="my-3" />
+        <h6 class="text-muted mb-2">Настройки текста подписи</h6>
+        @{
+            ViewData.TemplateInfo.HtmlFieldPrefix = (savedPrefix.Length > 0 ? savedPrefix + "." : "") + "CaptionSettings.TextSettings";
+        }
+        <partial name="_TextSettingsForm" model="Model.CaptionSettings?.TextSettings ?? new FormatChanger.Models.FormattingModels.TextSettingsModel()" />
+        @{
+            ViewData.TemplateInfo.HtmlFieldPrefix = savedPrefix;
+        }
+    </div>
+</div>

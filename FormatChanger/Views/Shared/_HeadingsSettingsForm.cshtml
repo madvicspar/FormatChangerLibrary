@@ -1,0 +1,91 @@
+@model FormatChanger.Models.FormattingModels.FormattingTemplateModel
+
+<div class="alert alert-info py-2 mb-3 small">
+    Обрабатывается не более <strong>3 уровней</strong> заголовков. Добавлять и удалять уровни можно только последовательно — удаление доступно только для последнего уровня.
+</div>
+
+<div id="headings-editor">
+    <div id="headings-list">
+        @if (Model.HeadingLevelsEdit != null && Model.HeadingLevelsEdit.Any())
+        {
+            for (int i = 0; i < Model.HeadingLevelsEdit.Count; i++)
+            {
+                var level = Model.HeadingLevelsEdit[i];
+                var collapseId = $"heading-collapse-{i}";
+                <div class="card mb-3 heading-card">
+                    <div class="card-header d-flex justify-content-between align-items-center"
+                         data-bs-toggle="collapse"
+                         data-bs-target="#@collapseId"
+                         aria-expanded="true"
+                         style="cursor:pointer">
+                        <span class="fw-semibold">Заголовок уровня @level.HeadingLevel</span>
+                        <div class="d-flex align-items-center gap-2">
+                            @if (i > 0 && i == Model.HeadingLevelsEdit.Count - 1)
+                            {
+                                <button type="button" class="btn-close remove-heading" aria-label="Удалить"></button>
+                            }
+                        </div>
+                    </div>
+                    <div class="collapse show" id="@collapseId">
+                        <div class="card-body">
+                            <input type="hidden" class="heading-id" name="HeadingLevelsEdit[@i].Id" value="@level.Id" />
+                            <input type="hidden" class="heading-level" name="HeadingLevelsEdit[@i].HeadingLevel" value="@level.HeadingLevel" />
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input start-new-page" type="checkbox"
+                                       name="HeadingLevelsEdit[@i].StartOnNewPage"
+                                       @(level.StartOnNewPage ? "checked" : "") />
+                                <label class="form-check-label">Начинать с новой страницы</label>
+                            </div>
+
+                            <h6 class="text-muted mb-2">Настройки текста заголовка уровня @level.HeadingLevel</h6>
+                            @{
+                                ViewData.TemplateInfo.HtmlFieldPrefix = $"HeadingLevelsEdit[{i}].TextSettings";
+                            }
+                            <partial name="_TextSettingsForm" model="level.TextSettings" />
+                            @{
+                                ViewData.TemplateInfo.HtmlFieldPrefix = "";
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="card mb-3 heading-card">
+                <div class="card-header d-flex justify-content-between align-items-center"
+                     data-bs-toggle="collapse"
+                     data-bs-target="#heading-collapse-0"
+                     aria-expanded="true"
+                     style="cursor:pointer">
+                    <span class="fw-semibold">Заголовок уровня 1</span>
+                </div>
+                <div class="collapse show" id="heading-collapse-0">
+                    <div class="card-body">
+                        <input type="hidden" class="heading-id" name="HeadingLevelsEdit[0].Id" value="0" />
+                        <input type="hidden" class="heading-level" name="HeadingLevelsEdit[0].HeadingLevel" value="1" />
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input start-new-page" type="checkbox" name="HeadingLevelsEdit[0].StartOnNewPage" />
+                            <label class="form-check-label">Начинать с новой страницы</label>
+                        </div>
+
+                        <h6 class="text-muted mb-2">Настройки текста заголовка уровня 1</h6>
+                        @{
+                            ViewData.TemplateInfo.HtmlFieldPrefix = "HeadingLevelsEdit[0].TextSettings";
+                        }
+                        <partial name="_TextSettingsForm" model="new FormatChanger.Models.FormattingModels.TextSettingsModel()" />
+                        @{
+                            ViewData.TemplateInfo.HtmlFieldPrefix = "";
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <button type="button" id="add-heading-btn" class="btn-add-level mt-3">
+        + Добавить следующий уровень
+    </button>
+</div>

@@ -116,21 +116,29 @@
 
         <section class="panel-section">
             <h3 class="panel-title">Шаблон форматирования</h3>
+
+            <div class="template-actions">
+                <button class="action-btn add-template-btn" onclick="openNewTemplateModal()">Добавить</button>
+                <button class="action-btn add-template-btn" onclick="openEditSelectedTemplateModal()">Изменить</button>
+            </div>
+
+            <input type="hidden" id="selectedTemplateId" value="@(templates?.FirstOrDefault()?.Id ?? 0)" />
+
             <div class="template-selector">
                 <select name="templateId" id="templateSelect" class="form-control">
-                    @if (templates != null)
+                @if (templates != null)
+                {
+                    foreach (var template in templates)
                     {
-                        foreach (var template in templates)
-                        {
                             <option value="@template.Id">@template.Title</option>
-                        }
                     }
+                }
                 </select>
             </div>
+
             <h3 class="panel-title">Тип действия</h3>
             <div class="action-selector">
                 <select name="actionId" id="actionSelect" class="form-control">
-
                     <option class="option-text" value="1">Исправление</option>
                     <option class="option-text" value="2">Проверка</option>
                     <option class="option-text" value="3">Оценивание</option>
@@ -138,4 +146,13 @@
             </div>
         </section>
     </aside>
+
+    <form id="csrf-form" style="display:none">@Html.AntiForgeryToken()</form>
+
+    <div class="modal fade" id="formattingTemplateModal" tabindex="-1" aria-labelledby="formattingTemplateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content" id="template-modal-content">
+            </div>
+        </div>
+    </div>
 </main>

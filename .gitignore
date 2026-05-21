@@ -10,3 +10,6 @@ FormatChanger/obj
 /FormatChangerTests/obj
 /uploads
 /.env
+/backend
+/uploads
+*.env
