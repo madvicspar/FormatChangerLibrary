@@ -1,0 +1,367 @@
+@{
+    ViewData["Title"] = "Автоматическое форматирование документов";
+    Layout = "_LandingLayout";
+}
+
+<!-- HERO -->
+<section class="l-hero">
+    <div class="l-hero-grid">
+        <div class="hero-content">
+            <h1 class="l-hero-title">
+                Форматирование&nbsp;документов<br>
+                <em>без&nbsp;ручной&nbsp;правки</em>
+            </h1>
+            <p class="l-hero-sub">
+                Загрузи .docx — система сама найдёт ошибки, исправит форматирование
+                по выбранному шаблону и вернёт готовый документ за секунды
+            </p>
+            <div class="l-hero-cta">
+                <a asp-area="Identity" asp-page="/Account/Register" class="action-btn upload-btn l-btn-lg">
+                    Попробовать бесплатно →
+                </a>
+                <a href="#how" class="l-btn-ghost">Как это работает</a>
+            </div>
+            <div class="l-hero-note">Работает в браузере. Без установки. Формат DOCX</div>
+        </div>
+
+        <div>
+            <div class="l-demo-win">
+                <div class="l-demo-bar">
+                    <div class="l-demo-dots">
+                        <div class="l-demo-dot r"></div>
+                        <div class="l-demo-dot y"></div>
+                        <div class="l-demo-dot g"></div>
+                    </div>
+                    <div class="l-demo-url">formatchanger.app / workspace</div>
+                </div>
+                <div>
+                    <div class="l-demo-ui">
+                        <div class="l-demo-main">
+                            <div class="l-demo-main-title">Документ: ВКР_Иванов.docx</div>
+                            <div class="l-para heading">
+                                1 Введение
+                                <span class="l-type-tag" style="background:#eff6ff;color:#1d4ed8;">Заголовок 1</span>
+                            </div>
+                            <div class="l-para body">
+                                Целью данной работы является разработка системы...
+                                <span class="l-type-tag" style="background:#f8fafc;color:#637488;">Текст</span>
+                            </div>
+                            <div class="l-para error">
+                                Объектом автоматизации является процесс...
+                                <span class="l-type-tag" style="background:#fef2f2;color:#991b1b;">⚠ Ошибка</span>
+                            </div>
+                            <div class="l-para list">
+                                — анализ предметной области;
+                                <span class="l-type-tag" style="background:#f0fdf4;color:#065f46;">Список</span>
+                            </div>
+                            <div class="l-para caption">
+                                Рисунок 1 – Архитектура системы
+                                <span class="l-type-tag" style="background:#fff7ed;color:#92400e;">Подпись</span>
+                            </div>
+                        </div>
+                        <div class="l-demo-sidebar">
+                            <div class="l-demo-sidebar-title">Результат</div>
+                            <div class="l-demo-stat"><span>Абзацев</span><strong>148</strong></div>
+                            <div class="l-demo-stat"><span>Ошибок</span><strong style="color:#ef4444;">23</strong></div>
+                            <div class="l-demo-stat"><span>Шаблон</span><strong>ГОСТ 7.32</strong></div>
+                            <div class="l-demo-stat"><span>Оценка</span><strong style="color:#2ecc71;">78 / 100</strong></div>
+                        </div>
+                    </div>
+                    <div class="l-demo-actions">
+                        <div class="l-demo-btn primary">✓ Исправить всё</div>
+                        <div class="l-demo-btn sec">↓ Скачать</div>
+                        <div class="l-demo-btn sec">⚙ Шаблоны</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STATS -->
+<section class="l-stats">
+    <div class="l-stats-inner">
+        <div class="l-stat-item">
+            <div class="l-stat-num"><span>68</span>%</div>
+            <div class="l-stat-label">работ содержат ошибки шрифта — самое частое нарушение</div>
+        </div>
+        <div class="l-stat-item">
+            <div class="l-stat-num"><span>30</span>–40 мин</div>
+            <div class="l-stat-label">уходит на ручную проверку одного документа</div>
+        </div>
+        <div class="l-stat-item">
+            <div class="l-stat-num"><span>67</span>%</div>
+            <div class="l-stat-label">студентов повторяют одни и те же ошибки в следующей работе</div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="l-section l-bg-white" id="how">
+    <div class="l-section-inner">
+        <div class="l-reveal">
+            <div class="l-section-label">Процесс</div>
+            <h2 class="l-section-title">Четыре шага до готового документа</h2>
+            <p class="l-section-sub">Без изучения ГОСТов и ручной правки каждого абзаца</p>
+        </div>
+        <div class="l-steps">
+            <div class="l-step l-reveal">
+                <div class="l-step-num">📄</div>
+                <div class="l-step-title">Загрузи</div>
+                <div class="l-step-desc">Перетащи .docx в систему или выбери с компьютера. Документ сохраняется и готов к обработке</div>
+            </div>
+            <div class="l-step l-reveal" style="transition-delay:.1s;">
+                <div class="l-step-num">🔍</div>
+                <div class="l-step-title">Проверь</div>
+                <div class="l-step-desc">Система автоматически классифицирует каждый абзац и находит несоответствия выбранному шаблону</div>
+            </div>
+            <div class="l-step l-reveal" style="transition-delay:.2s;">
+                <div class="l-step-num">⚙️</div>
+                <div class="l-step-title">Настрой</div>
+                <div class="l-step-desc">Выбери шаблон правил (ГОСТ, стандарт вуза) или создай свой. Скорректируй классификацию вручную</div>
+            </div>
+            <div class="l-step l-reveal" style="transition-delay:.3s;">
+                <div class="l-step-num">✅</div>
+                <div class="l-step-title">Скачай</div>
+                <div class="l-step-desc">Одно нажатие — документ исправлен. Скачай на компьютер или получи на <br /> e-mail</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- DEMO VIDEO -->
+<section class="l-section l-bg-light" id="demo">
+    <div class="l-section-inner">
+        <div class="l-reveal" style="text-align:center;">
+            <div class="l-section-label">Демонстрация</div>
+            <h2 class="l-section-title">Смотри, как это работает</h2>
+            <p class="l-section-sub" style="margin:0 auto;">Загрузка документа, цветовая разметка абзацев и автоматическое исправление за 30 секунд</p>
+        </div>
+        <div class="l-demo-frame l-reveal">
+            <div class="l-demo-frame-bar">
+                <div class="l-demo-dots">
+                    <div class="l-demo-dot r"></div>
+                    <div class="l-demo-dot y"></div>
+                    <div class="l-demo-dot g"></div>
+                </div>
+                <div class="l-demo-url">formatchanger.app</div>
+            </div>
+            <div class="l-video-area">
+                <!--
+                    Замените этот блок на видео или GIF:
+                    <video autoplay muted loop playsinline style="width:100%;max-height:400px;">
+                        <source src="~/media/demo.mp4" type="video/mp4">
+                    </video>
+                    или
+                    <img src="~/media/demo.gif" alt="Демонстрация Format Changer" style="width:100%;max-height:400px;object-fit:contain;">
+                -->
+                <div class="l-video-placeholder">
+                    <div class="l-video-placeholder-icon">▶</div>
+                    <p>Сюда загрузи видео или GIF с демонстрацией</p>
+                    <small>Рекомендуемый формат: MP4, autoplay, без звука, loop · Длительность: 20–40 секунд</small>
+                </div>
+            </div>
+            <div class="l-demo-caps">
+                <div class="l-demo-cap">
+                    <div class="l-demo-cap-dot" style="background:#1980e6;"></div>
+                    <div>
+                        <div class="l-demo-cap-title">Цветовая разметка типов</div>
+                        <div class="l-demo-cap-desc">Заголовки, текст, списки, подписи — каждый тип выделяется своим цветом</div>
+                    </div>
+                </div>
+                <div class="l-demo-cap">
+                    <div class="l-demo-cap-dot" style="background:#f59e0b;"></div>
+                    <div>
+                        <div class="l-demo-cap-title">Список нарушений</div>
+                        <div class="l-demo-cap-desc">Система показывает каждую ошибку с указанием типа и места в документе</div>
+                    </div>
+                </div>
+                <div class="l-demo-cap">
+                    <div class="l-demo-cap-dot" style="background:#2ecc71;"></div>
+                    <div>
+                        <div class="l-demo-cap-title">Исправление одним кликом</div>
+                        <div class="l-demo-cap-desc">Форматирование применяется автоматически по правилам выбранного шаблона</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="l-section l-bg-white" id="features">
+    <div class="l-section-inner">
+        <div class="l-reveal">
+            <div class="l-section-label">Возможности</div>
+            <h2 class="l-section-title">Всё необходимое для нормоконтроля</h2>
+            <p class="l-section-sub">Полный цикл: от загрузки документа до экспорта исправленной версии</p>
+        </div>
+        <div class="l-features-grid">
+            <div class="l-feature-card l-reveal">
+                <div class="l-feature-icon">🧠</div>
+                <div class="l-feature-title">Автоклассификация абзацев</div>
+                <div class="l-feature-desc">Сервисопределяет тип каждого абзаца: заголовок, текст, список, таблица, подпись к рисунку. Точность 87%</div>
+                <div class="l-feature-tag">Структура</div>
+            </div>
+            <div class="l-feature-card l-reveal" style="transition-delay:.1s;">
+                <div class="l-feature-icon">🔎</div>
+                <div class="l-feature-title">Детальная проверка</div>
+                <div class="l-feature-desc">Система формирует перечень всех несоответствий с указанием типа ошибки и местоположения в документе</div>
+                <div class="l-feature-tag">Полный отчёт</div>
+            </div>
+            <div class="l-feature-card l-reveal" style="transition-delay:.2s;">
+                <div class="l-feature-icon">✏️</div>
+                <div class="l-feature-title">Автоисправление</div>
+                <div class="l-feature-desc">Создаёт стили, очищает прямое форматирование, применяет значения параметров, устанавливает нумерацию списков</div>
+                <div class="l-feature-tag">Один клик</div>
+            </div>
+            <div class="l-feature-card l-reveal" style="transition-delay:.1s;">
+                <div class="l-feature-icon">📋</div>
+                <div class="l-feature-title">Настраиваемые шаблоны</div>
+                <div class="l-feature-desc">Создавай и редактируй правила форматирования для разных стандартов: ГОСТ 7.32, требования вуза, стиль издательства</div>
+                <div class="l-feature-tag">Любой ГОСТ</div>
+            </div>
+            <div class="l-feature-card l-reveal" style="transition-delay:.2s;">
+                <div class="l-feature-icon">📊</div>
+                <div class="l-feature-title">Оценивание с баллами</div>
+                <div class="l-feature-desc">Гибкая система весовых коэффициентов нарушений. Итоговая оценка форматирования по шкале проверяющего</div>
+                <div class="l-feature-tag">Для преподавателей</div>
+            </div>
+            <div class="l-feature-card l-reveal" style="transition-delay:.3s;">
+                <div class="l-feature-icon">📤</div>
+                <div class="l-feature-title">Экспорт документа</div>
+                <div class="l-feature-desc">Скачай готовый .docx на компьютер или получи на электронную почту</div>
+                <div class="l-feature-tag">docx</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOR WHO -->
+<section class="l-section l-bg-light" id="for-who">
+    <div class="l-section-inner">
+        <div class="l-reveal" style="text-align:center;">
+            <div class="l-section-label">Аудитория</div>
+            <h2 class="l-section-title">Для кого создан format.changer</h2>
+        </div>
+        <div class="l-roles-grid">
+            <div class="l-role-card student l-reveal">
+                <div class="l-role-emoji">👨‍🎓</div>
+                <div class="l-role-title">Студентам и авторам</div>
+                <div class="l-role-desc">
+                    Тратишь часы на приведение курсовой к требованиям кафедры?
+                    Загрузи документ — система сделает всё за тебя
+                </div>
+                <ul class="l-role-list">
+                    <li>Исправление форматирования по шаблону вуза</li>
+                    <li>Проверка перед сдачей без участия преподавателя</li>
+                    <li>Ручная корректировка классификации абзацев</li>
+                    <li>Скачивание исправленного документа</li>
+                </ul>
+            </div>
+            <div class="l-role-card teacher l-reveal" style="transition-delay:.1s;">
+                <div class="l-role-emoji">👩‍🏫</div>
+                <div class="l-role-title">Преподавателям и проверяющим</div>
+                <div class="l-role-desc">
+                    Проверка форматирования одной работы занимает до 40 минут?
+                    Система оценивает объективно — по заданным правилам
+                </div>
+                <ul class="l-role-list">
+                    <li>Создание системы оценивания с весовыми коэффициентами</li>
+                    <li>Итоговая оценка форматирования в баллах</li>
+                    <li>Выбор собственного шаблона правил</li>
+                    <li>Объективность без человеческого фактора</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="l-cta">
+    <div class="l-cta-inner l-reveal">
+        <div class="l-cta-label">Начни прямо сейчас</div>
+        <h2 class="l-cta-title">Перестань тратить время<br>на ручное форматирование</h2>
+        <p class="l-cta-sub">Зарегистрируйся и загрузи первый документ. Всё работает в браузере — ничего устанавливать не нужно</p>
+        <div class="l-cta-btns">
+            <a asp-area="Identity" asp-page="/Account/Register" class="l-btn-white">Зарегистрироваться →</a>
+            <a asp-area="Identity" asp-page="/Account/Login" class="l-btn-outline-white">Уже есть аккаунт</a>
+        </div>
+        <div class="l-cta-perks">
+            <span class="l-cta-perk">Бесплатно</span>
+            <span class="l-cta-perk">Только браузер</span>
+            <span class="l-cta-perk">Формат .docx</span>
+            <span class="l-cta-perk">Без установки</span>
+        </div>
+    </div>
+</section>
+
+<!-- FEEDBACK -->
+<section class="l-section l-bg-white" id="feedback">
+    <div class="l-section-inner">
+        <div style="max-width:520px;margin:0 auto;">
+            <div class="l-reveal" style="text-align:center;">
+                <div class="l-section-label">Обратная связь</div>
+                <h2 class="l-section-title">Есть вопросы или идеи?</h2>
+                <p class="l-section-sub" style="margin:0 auto;">Напиши — постараемся ответить</p>
+            </div>
+            <div class="l-feedback-form l-reveal">
+                <div class="mb-3">
+                    <label class="auth-label" for="fb-email">Ваш e-mail</label>
+                    <input type="email" id="fb-email" class="form-control" placeholder="example@edu.hse.ru" />
+                </div>
+                <div class="mb-3">
+                    <label class="auth-label" for="fb-msg">Сообщение</label>
+                    <textarea id="fb-msg" class="form-control" rows="4" placeholder="Вопрос, предложение или баг-репорт..."></textarea>
+                </div>
+                <button class="auth-btn" onclick="submitFeedback(event)">Отправить</button>
+                <div class="l-form-success" id="form-success">✓ Спасибо! Ваше сообщение отправлено.</div>
+                <p class="form-note mt-3" style="font-size:12px;color:#94a3b8;text-align:center;">
+                    Или напрямую: <a href="mailto:vmakkuzina@edu.hse.ru" style="color:#1980e6;">vmakkuzina@edu.hse.ru</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+                observer.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.l-reveal').forEach(el => observer.observe(el));
+
+    // Nav active link highlight
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.lnav-links a');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(s => {
+            if (window.scrollY >= s.offsetTop - 120) current = s.getAttribute('id');
+        });
+        navLinks.forEach(a => {
+            const href = a.getAttribute('href');
+            a.classList.toggle('active', href === '#' + current);
+        });
+    }, { passive: true });
+
+    // Feedback mailto fallback
+    function submitFeedback(e) {
+        e.preventDefault();
+        const email = document.getElementById('fb-email').value.trim();
+        const msg = document.getElementById('fb-msg').value.trim();
+        if (!email || !msg) return;
+        const subject = encodeURIComponent('format.changer — обратная связь');
+        const body = encodeURIComponent('От: ' + email + '\n\n' + msg);
+        window.location.href = 'mailto:viktoria.akkuzina@yandex.ru?subject=' + subject + '&body=' + body;
+        e.target.style.display = 'none';
+        document.getElementById('form-success').style.display = 'block';
+    }
+</script>
+}

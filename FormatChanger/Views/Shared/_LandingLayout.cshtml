@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] != null ? ViewData["Title"] + " — " : "")format.changer</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/landing.css" asp-append-version="true" />
+</head>
+<body class="landing-body">
+
+    <nav class="lnav">
+        <div class="lnav-inner">
+            <a href="/" class="lnav-logo">format<span>.changer</span></a>
+            <ul class="lnav-links">
+                <li><a href="#how">Как работает</a></li>
+                <li><a href="#features">Возможности</a></li>
+                <li><a href="#for-who">Для кого</a></li>
+                <li><a href="#feedback">Контакты</a></li>
+            </ul>
+            <div class="lnav-actions">
+                <a asp-area="Identity" asp-page="/Account/Login" class="action-btn export-btn">Войти</a>
+                <a asp-area="Identity" asp-page="/Account/Register" class="action-btn upload-btn">Начать бесплатно</a>
+            </div>
+        </div>
+    </nav>
+
+    @RenderBody()
+
+    <footer class="lfooter">
+        <div class="lfooter-inner">
+            <a href="/" class="lnav-logo">format<span>.changer</span></a>
+            <div class="lfooter-links">
+                <a href="/docs/guide.pdf" target="_blank">Руководство пользователя</a>
+                <a href="#feedback">Контакты</a>
+                <a asp-area="Identity" asp-page="/Account/Login">Войти</a>
+            </div>
+            <span class="lfooter-copy">© 2026 НИУ ВШЭ Пермь</span>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
