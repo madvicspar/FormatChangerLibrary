@@ -1,9 +1,10 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace FormatChanger.Infrastructure.Email
 {
-    public class EmailSender : IEmailSenderCustom
+    public class EmailSender : IEmailSender, IEmailSenderCustom
     {
         private readonly IConfiguration _configuration;
 

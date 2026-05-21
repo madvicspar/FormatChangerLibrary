@@ -219,6 +219,158 @@ input[type="color"].color-square {
     cursor: pointer;
 }
 
+/* Auth pages */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 130px);
+    padding: 24px 16px;
+}
+
+.auth-card {
+    background: #ffffff;
+    border: 1px solid #dce0e5;
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.auth-brand {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1980e6;
+    letter-spacing: -0.24px;
+    margin-bottom: 28px;
+    display: block;
+}
+
+.auth-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111418;
+    letter-spacing: -0.33px;
+    margin-bottom: 6px;
+}
+
+.auth-subtitle {
+    font-size: 14px;
+    color: #637488;
+    margin-bottom: 28px;
+}
+
+.auth-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #111418;
+    margin-bottom: 6px;
+}
+
+.auth-card .form-control {
+    border: 1px solid #dce0e5;
+    border-radius: 12px;
+    padding: 11px 14px;
+    font-size: 14px;
+    color: #111418;
+    background-color: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.auth-card .form-control:focus {
+    border-color: #1980e6;
+    box-shadow: 0 0 0 3px rgba(25, 128, 230, 0.1);
+}
+
+.auth-card .form-control::placeholder {
+    color: #adb5bd;
+}
+
+.auth-remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #111418;
+    cursor: pointer;
+    user-select: none;
+}
+
+.auth-remember .form-check-input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+    border-color: #dce0e5;
+}
+
+.auth-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #1980e6;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.21px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.auth-btn:hover {
+    background-color: #1666b8;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(25, 128, 230, 0.25);
+    color: #ffffff;
+}
+
+.auth-btn:active {
+    background-color: #145ca6;
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.auth-link {
+    color: #1980e6;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.auth-link:hover {
+    color: #1666b8;
+    text-decoration: underline;
+}
+
+.auth-footer {
+    font-size: 14px;
+    color: #637488;
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 16px;
+    color: #adb5bd;
+    font-size: 13px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: #dce0e5;
+}
+
 /* Кнопка «Добавить следующий уровень» */
 .btn-add-level {
     display: block;
