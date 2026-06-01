@@ -30,7 +30,9 @@ namespace FormatChanger.Utilities.Data
         public DbSet<EvaluationResultsModel> EvaluationResults { get; set; } = null!;
         public DbSet<TextSettingsModel> TextSettings { get; set; } = null!;
         public DbSet<HeadingSettingsModel> HeadingSettings { get; set; } = null!;
-        public DbSet<ListSettingsModel> ListSettings { get; set; } = null!;
+        public DbSet<BulletListSettingsModel> BulletListSettings { get; set; } = null!;
+		public DbSet<NumberedListSettingsModel> NumberedListSettings { get; set; } = null!;
+		public DbSet<ListSettingsModel> ListSettings { get; set; } = null!;
         public DbSet<ICaptionSettingsModel> CaptionSettings { get; set; } = null!;
         public DbSet<ImageSettingsModel> ImageSettings { get; set; } = null!;
         public DbSet<TableSettingsModel> TableSettings { get; set; } = null!;
@@ -40,8 +42,11 @@ namespace FormatChanger.Utilities.Data
         public async Task ClearAndSeed(ApplicationDbContext _context, IServiceProvider serviceProvider,
             UserManager<UserModel> userManager, RoleManager<IdentityRole> roleManager)
         {
-            _context.Database.EnsureDeleted();
-            _context.Database.EnsureCreated();
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                _context.Database.EnsureDeleted();
+                _context.Database.EnsureCreated();
+            }
 
             SeedService.SeedData(_context);
             await SeedService.Initialize(serviceProvider, userManager, roleManager);

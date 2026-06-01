@@ -6,15 +6,18 @@ using FormatChanger.Services.Interfaces;
 using FormatChanger.Services.Strategies;
 using FormatChanger.Utilities.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+    options.ModelBinderProviders.Insert(0, new FormatChanger.Infrastructure.ModelBinders.FloatModelBinderProvider()));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<FormattingResolver>();
 builder.Services.AddSingleton<IEmailSenderCustom, EmailSender>();
+builder.Services.AddSingleton<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
@@ -34,7 +37,8 @@ builder.Services.AddScoped<IParagraphStyler, ParagraphStyler>();
 builder.Services.AddScoped<IParagraphNumbering, ParagraphNumbering>();
 
 
-string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ??
+	builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options
                     => options.UseNpgsql(connectionString));
 builder.Services.AddIdentity<UserModel, IdentityRole>()
@@ -50,7 +54,9 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await dbContext.ClearAndSeed(dbContext, scope.ServiceProvider, userManager, roleManager);
+    if (!app.Environment.IsDevelopment())
+		dbContext.Database.Migrate();
+	await dbContext.ClearAndSeed(dbContext, scope.ServiceProvider, userManager, roleManager);
 }
 
 // Configure the HTTP request pipeline.
@@ -74,6 +80,6 @@ app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Landing}/{id?}");
 
 app.Run();

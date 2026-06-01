@@ -3,6 +3,7 @@ using System;
 using FormatChanger.Utilities.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FormatChanger.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260515183046_TemplatesUpdate")]
+    partial class TemplatesUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,7 +176,7 @@ namespace FormatChanger.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BulletListSettings");
+                    b.ToTable("BulletListSettingsModel");
                 });
 
             modelBuilder.Entity("FormatChanger.Models.FormattingModels.CellSettingsModel", b =>
@@ -438,7 +441,7 @@ namespace FormatChanger.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NumberedListSettings");
+                    b.ToTable("NumberedListSettingsModel");
                 });
 
             modelBuilder.Entity("FormatChanger.Models.FormattingModels.TableSettingsModel", b =>

@@ -1,0 +1,21 @@
+@model FormatChanger.Models.FormattingModels.ICaptionSettingsModel
+
+<div class="row">
+    <div class="col-md-5">
+        <label asp-for="TextTemplate" class="form-label">Шаблон подписи</label>
+        <input asp-for="TextTemplate" class="form-control" placeholder="Таблица N" />
+        <div class="form-text">«N» будет заменено на порядковый номер</div>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Separator" class="form-label">Разделитель</label>
+        <input asp-for="Separator" class="form-control" placeholder=" — " />
+        <div class="form-text">Между номером и содержанием</div>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Position" class="form-label">Расположение</label>
+        <select asp-for="Position" class="form-select">
+            <option value="0">Снизу</option>
+            <option value="1">Сверху</option>
+        </select>
+    </div>
+</div>

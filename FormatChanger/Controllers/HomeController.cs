@@ -1,11 +1,13 @@
+using System.Diagnostics;
 using FormatChanger.Models;
+using FormatChanger.Models.FormattingModels;
 using FormatChanger.Models.Helpers;
 using FormatChanger.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-
 namespace FormatChanger.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -21,6 +23,14 @@ namespace FormatChanger.Controllers
             _exportService = exportService;
         }
 
+        [AllowAnonymous]
+        public IActionResult Landing()
+        {
+            if (User.Identity?.IsAuthenticated == true)
+                return RedirectToAction(nameof(Index));
+            return View();
+        }
+
         public IActionResult Index(List<ParagraphModel> paragraphs = null)
         {
             SetTemplates();
@@ -29,7 +39,7 @@ namespace FormatChanger.Controllers
 
         public void SetTemplates()
         {
-            // TODO: убрать из типов подпись, если ее не должно быть, после чего поменять логику классификации
+            // TODO: пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             var templates = _templateService.GetTemplatesAsync();
             ViewBag.Templates = templates.Result;
         }
@@ -74,19 +84,24 @@ namespace FormatChanger.Controllers
             DocumentModel resultDocumentId;
             var template = _templateService.GetTemplateByIdAsync(templateId).Result;
 
-            switch (actionId)
+			if (template.HeadingSettings != null)
+			{
+				template.HeadingLevelsEdit = FlattenHeadings(template.HeadingSettings);
+			}
+
+			switch (actionId)
             {
-                case 1: // Исправление
+                case 1: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     resultDocumentId = await _documentService.CorrectDocumentAsync(document, template, types);
                     break;
-                case 2: // Проверка
+                case 2: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     resultDocumentId = await _documentService.CheckDocumentAsync(document, template, types);
                     break;
-                case 3: // Оценивание
+                case 3: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     resultDocumentId = await _documentService.EvaluateDocumentAsync(document, template, types);
                     break;
                 default:
-                    return BadRequest("Неизвестное действие");
+                    return BadRequest("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
             }
 
             return RedirectToAction("Index");
@@ -117,19 +132,120 @@ namespace FormatChanger.Controllers
             return Json(new
             {
                 status = 200,
-                message = "Экспорт завершен"
+                message = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
             });
         }
 
+        [AllowAnonymous]
         public IActionResult Privacy()
         {
             return View();
         }
 
+        [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-    }
+
+		[HttpPost, ValidateAntiForgeryToken]
+		public async Task<IActionResult> SaveTemplate(FormattingTemplateModel model)
+		{
+			if (!ModelState.IsValid)
+				return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+			var id = await _templateService.SaveTemplateAsync(model);
+			return Json(new { success = true, id });
+		}
+
+		[HttpPost, ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteTemplate(long id)
+		{
+			await _templateService.DeleteTemplateAsync(id);
+			return Json(new { success = true });
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetTemplateForEdit(long id)
+		{
+			FormattingTemplateModel model;
+			if (id == 0)
+			{
+				model = CreateDefaultModel();
+			}
+			else
+			{
+				model = await _templateService.GetTemplateByIdAsync(id);
+				if (model == null) return NotFound();
+				if (model.HeadingSettings != null)
+					model.HeadingLevelsEdit = FlattenHeadings(model.HeadingSettings);
+			}
+			return PartialView("_FormattingTemplateForm", model);
+		}
+
+		private static FormattingTemplateModel CreateDefaultModel() => new()
+		{
+			DocumentSettings = new DocumentSettingsModel(),
+			TextSettings = new TextSettingsModel(),
+			ListSettings = new ListSettingsModel
+			{
+				TextSettings = new TextSettingsModel(),
+				BulletListSettings = new BulletListSettingsModel(),
+				NumberedListSettings = new NumberedListSettingsModel()
+			},
+			TableSettings = new TableSettingsModel
+			{
+				CaptionSettings = new TableCaptionSettingsModel { TextSettings = new TextSettingsModel() },
+				CellSettings = new CellSettingsModel { TextSettings = new TextSettingsModel() },
+				HeaderSettings = new HeaderSettingsModel
+				{
+					CellSettings = new CellSettingsModel { TextSettings = new TextSettingsModel() }
+				}
+			},
+			ImageSettings = new ImageSettingsModel
+			{
+				CaptionSettings = new ImageCaptionSettingsModel { TextSettings = new TextSettingsModel() }
+			}
+		};
+
+		private List<HeadingLevelEditItem> FlattenHeadings(HeadingSettingsModel head)
+		{
+			var list = new List<HeadingLevelEditItem>();
+			var current = head;
+			while (current != null)
+			{
+				list.Add(new HeadingLevelEditItem
+				{
+					Id = current.Id,
+					HeadingLevel = current.HeadingLevel,
+					StartOnNewPage = current.StartOnNewPage,
+					TextSettings = current.TextSettings ?? new TextSettingsModel()
+				});
+				current = current.NextHeadingLevel;
+			}
+			return list;
+		}
+
+		private HeadingSettingsModel BuildHeadingChain(List<HeadingLevelEditItem> items)
+		{
+			if (items == null || items.Count == 0) return null;
+
+			HeadingSettingsModel first = null;
+			HeadingSettingsModel prev = null;
+
+			foreach (var item in items.OrderBy(i => i.HeadingLevel))
+			{
+				var heading = new HeadingSettingsModel
+				{
+					HeadingLevel = item.HeadingLevel,
+					StartOnNewPage = item.StartOnNewPage,
+					TextSettings = item.TextSettings
+				};
+				if (first == null) first = heading;
+				if (prev != null) prev.NextHeadingLevel = heading;
+				prev = heading;
+			}
+			return first;
+		}
+	}
 }

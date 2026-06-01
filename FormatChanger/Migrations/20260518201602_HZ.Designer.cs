@@ -3,6 +3,7 @@ using System;
 using FormatChanger.Utilities.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FormatChanger.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260518201602_HZ")]
+    partial class HZ
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,22 +163,6 @@ namespace FormatChanger.Migrations
                     b.ToTable("EvaluationSystems");
                 });
 
-            modelBuilder.Entity("FormatChanger.Models.FormattingModels.BulletListSettingsModel", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("EndType")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("BulletListSettings");
-                });
-
             modelBuilder.Entity("FormatChanger.Models.FormattingModels.CellSettingsModel", b =>
                 {
                     b.Property<long>("Id")
@@ -320,13 +307,6 @@ namespace FormatChanger.Migrations
                         .HasMaxLength(21)
                         .HasColumnType("character varying(21)");
 
-                    b.Property<int>("Position")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Separator")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<long>("TextSettingsId")
                         .HasColumnType("bigint");
 
@@ -396,49 +376,26 @@ namespace FormatChanger.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("BulletListSettingsId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("EndType")
+                        .HasColumnType("integer");
 
-                    b.Property<long?>("NumberedListSettingsId")
-                        .HasColumnType("bigint");
+                    b.Property<bool>("IsNumeric")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ListLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MarkerType")
+                        .HasColumnType("text");
 
                     b.Property<long>("TextSettingsId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BulletListSettingsId");
-
-                    b.HasIndex("NumberedListSettingsId");
-
                     b.HasIndex("TextSettingsId");
 
                     b.ToTable("ListSettings");
-                });
-
-            modelBuilder.Entity("FormatChanger.Models.FormattingModels.NumberedListSettingsModel", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("Level1EndType")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Level1MarkerType")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Level2EndType")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Level3EndType")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NumberedListSettings");
                 });
 
             modelBuilder.Entity("FormatChanger.Models.FormattingModels.TableSettingsModel", b =>
@@ -942,23 +899,11 @@ namespace FormatChanger.Migrations
 
             modelBuilder.Entity("FormatChanger.Models.FormattingModels.ListSettingsModel", b =>
                 {
-                    b.HasOne("FormatChanger.Models.FormattingModels.BulletListSettingsModel", "BulletListSettings")
-                        .WithMany()
-                        .HasForeignKey("BulletListSettingsId");
-
-                    b.HasOne("FormatChanger.Models.FormattingModels.NumberedListSettingsModel", "NumberedListSettings")
-                        .WithMany()
-                        .HasForeignKey("NumberedListSettingsId");
-
                     b.HasOne("FormatChanger.Models.FormattingModels.TextSettingsModel", "TextSettings")
                         .WithMany()
                         .HasForeignKey("TextSettingsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("BulletListSettings");
-
-                    b.Navigation("NumberedListSettings");
 
                     b.Navigation("TextSettings");
                 });
