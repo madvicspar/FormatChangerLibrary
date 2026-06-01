@@ -47,6 +47,9 @@ namespace FormatChanger.Services.Strategies
             return paragraphProperties;
         }
 
+        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template) =>
+            new List<string>();
+
         public void ApplyCorrection(WordprocessingDocument doc, FormattingTemplateModel template)
         {
             // тут меняем стиль - шрифт, отступы, интервалы и тд

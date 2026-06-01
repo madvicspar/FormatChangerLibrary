@@ -37,28 +37,44 @@ namespace FormatChanger.Controllers
             ViewBag.Templates = templates.Result;
         }
 
+        private const long MaxFileSizeBytes = 20 * 1024 * 1024;
+        private static readonly string[] AllowedExtensions = { ".docx" };
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upload(IFormFile file)
         {
-            if (file != null)
+            if (file == null || file.Length == 0)
             {
-                var document = await _documentService.UploadDocumentAsync(file);
-                var _document = await _documentService.GetDocumentByIdAsync(document.Id);
-                if (_document == null)
-                {
-                    return NotFound();
-                }
-
-                var paragraphs = _documentService.ExtractParagraphs(document);
-
+                ModelState.AddModelError("file", "Please select a file.");
                 SetTemplates();
-
-                HttpContext.Session.SetString("DocumentId", document.Id.ToString());
-
-                return View("Index", paragraphs);
+                return View("Index");
             }
-            return RedirectToAction("Index");
+
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!AllowedExtensions.Contains(extension))
+            {
+                ModelState.AddModelError("file", "Only .docx files are supported.");
+                SetTemplates();
+                return View("Index");
+            }
+
+            if (file.Length > MaxFileSizeBytes)
+            {
+                ModelState.AddModelError("file", "File size must not exceed 20 MB.");
+                SetTemplates();
+                return View("Index");
+            }
+
+            _logger.LogInformation("Uploading document: {FileName} ({Size} bytes)", file.FileName, file.Length);
+
+            var document = await _documentService.UploadDocumentAsync(file);
+            var paragraphs = _documentService.ExtractParagraphs(document);
+
+            HttpContext.Session.SetString("DocumentId", document.Id.ToString());
+
+            SetTemplates();
+            return View("Index", paragraphs);
         }
 
         [HttpPost]

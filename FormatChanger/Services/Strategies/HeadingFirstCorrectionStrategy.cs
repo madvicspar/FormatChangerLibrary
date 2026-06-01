@@ -22,7 +22,7 @@ namespace FormatChanger.Services.Strategies
             ApplyRecursiveStyleCorrection(stylePart.Styles, settings, level: 1);
         }
 
-        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
+        public override List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
         {
             var issues = new List<string>();
             var settings = GetSettings(template);
