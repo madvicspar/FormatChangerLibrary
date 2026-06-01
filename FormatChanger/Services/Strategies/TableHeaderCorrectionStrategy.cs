@@ -84,9 +84,5 @@ namespace FormatChanger.Services.Strategies
             props.AppendChild(new TableCellVerticalAlignment { Val = TableVerticalAlignmentValues.Top });
         }
 
-        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

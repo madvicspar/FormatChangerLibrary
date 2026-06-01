@@ -13,7 +13,7 @@ namespace FormatChanger.Services.Strategies
 
         public virtual List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
         {
-            throw new NotImplementedException();
+            return new List<string>();
         }
 
         protected RunProperties CreateRunProperties(TextSettingsModel settings)

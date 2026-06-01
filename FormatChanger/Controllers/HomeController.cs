@@ -74,27 +74,26 @@ namespace FormatChanger.Controllers
                 return NotFound();
             }
 
-            DocumentModel resultDocumentId;
-            var template = _templateService.GetTemplateByIdAsync(templateId).Result;
+            if (actionId == 3)
+                return StatusCode(501, "Document evaluation is not yet available.");
 
-			if (template.HeadingSettings != null)
-			{
-				template.HeadingLevelsEdit = FlattenHeadings(template.HeadingSettings);
-			}
+            var template = await _templateService.GetTemplateByIdAsync(templateId);
+            if (template == null)
+                return NotFound("Template not found.");
 
-			switch (actionId)
+            if (template.HeadingSettings != null)
+                template.HeadingLevelsEdit = FlattenHeadings(template.HeadingSettings);
+
+            switch (actionId)
             {
-                case 1: // �����������
-                    resultDocumentId = await _documentService.CorrectDocumentAsync(document, template, types);
+                case 1:
+                    await _documentService.CorrectDocumentAsync(document, template, types);
                     break;
-                case 2: // ��������
-                    resultDocumentId = await _documentService.CheckDocumentAsync(document, template, types);
-                    break;
-                case 3: // ����������
-                    resultDocumentId = await _documentService.EvaluateDocumentAsync(document, template, types);
+                case 2:
+                    await _documentService.CheckDocumentAsync(document, template, types);
                     break;
                 default:
-                    return BadRequest("����������� ��������");
+                    return BadRequest("Unknown action.");
             }
 
             return RedirectToAction("Index");

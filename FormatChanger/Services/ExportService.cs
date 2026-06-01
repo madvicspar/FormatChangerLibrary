@@ -82,8 +82,11 @@ namespace FormatChanger.Services
 
         private Task<IActionResult> ExportToTelegram(DocumentModel document)
         {
-            // TODO: экспорт документа в Telegram
-            throw new NotImplementedException();
+            IActionResult result = new ObjectResult("Telegram export is not yet available")
+            {
+                StatusCode = 501
+            };
+            return Task.FromResult(result);
         }
     }
 }

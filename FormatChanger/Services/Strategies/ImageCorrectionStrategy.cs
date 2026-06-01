@@ -45,9 +45,5 @@ namespace FormatChanger.Services.Strategies
                 new KeepNext { Val = settings.KeepWithNext });
         }
 
-        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -21,9 +21,5 @@ namespace FormatChanger.Services.Strategies
             ApplyToStyle(styles, "Normal", runProps, paraProps);
         }
 
-        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

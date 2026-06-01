@@ -24,9 +24,5 @@ namespace FormatChanger.Services.Strategies
             ApplyToStyle(styles, ParagraphTypes.ImageCaption.ToString(), runProps, paraProps);
         }
 
-        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

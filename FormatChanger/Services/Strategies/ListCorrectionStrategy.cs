@@ -71,9 +71,5 @@ namespace FormatChanger.Services.Strategies
             }
         }
 
-        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
