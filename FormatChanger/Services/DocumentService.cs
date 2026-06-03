@@ -69,9 +69,9 @@ namespace FormatChanger.Services
             return document;
         }
 
-        public async Task<DocumentModel> EvaluateDocumentAsync(DocumentModel document, FormattingTemplateModel template, string[] types)
+        public Task<DocumentModel> EvaluateDocumentAsync(DocumentModel document, FormattingTemplateModel template, string[] types)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Document evaluation is not yet implemented.");
         }
     }
 }

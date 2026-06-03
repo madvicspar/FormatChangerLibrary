@@ -20,8 +20,12 @@ services:
     ports:
       - "8080:8080"
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__DefaultConnection: ${CONNECTION_STRING}
+      SmtpSettings__Host: ${SMTP_HOST}
+      SmtpSettings__Port: ${SMTP_PORT}
+      SmtpSettings__Username: ${SMTP_USERNAME}
+      SmtpSettings__Password: ${SMTP_PASSWORD}
     volumes:
       - ./uploads:/app/uploads
 

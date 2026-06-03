@@ -14,7 +14,7 @@ namespace FormatChanger.Services.Strategies
 
         public virtual List<string> CheckFormatting(ParagraphStyleProperties actual, FormattingTemplateModel template)
         {
-            throw new NotImplementedException();
+            return new List<string>();
         }
 
         protected RunProperties CreateRunProperties(TextSettingsModel settings)

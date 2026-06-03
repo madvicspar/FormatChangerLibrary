@@ -39,16 +39,22 @@ namespace FormatChanger.Utilities.Data
         public DbSet<CellSettingsModel> CellSettings { get; set; } = null!;
         public DbSet<HeaderSettingsModel> HeaderSettings { get; set; } = null!;
         public DbSet<DocumentSettingsModel> DocumentSettings { get; set; } = null!;
-        public async Task ClearAndSeed(ApplicationDbContext _context, IServiceProvider serviceProvider,
+        public async Task InitializeAsync(bool isDevelopment, IServiceProvider serviceProvider,
             UserManager<UserModel> userManager, RoleManager<IdentityRole> roleManager)
         {
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            if (isDevelopment)
             {
-                _context.Database.EnsureDeleted();
-                _context.Database.EnsureCreated();
+                Database.EnsureDeleted();
+                Database.EnsureCreated();
+            }
+            else
+            {
+                Database.Migrate();
             }
 
-            SeedService.SeedData(_context);
+            if (!FormattingTemplates.Any())
+                SeedService.SeedData(this);
+
             await SeedService.Initialize(serviceProvider, userManager, roleManager);
         }
     }

@@ -92,9 +92,5 @@ namespace FormatChanger.Services.Strategies
             spacing.Before = spaceAfter.ToString();
         }
 
-        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

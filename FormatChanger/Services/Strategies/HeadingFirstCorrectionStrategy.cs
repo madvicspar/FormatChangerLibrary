@@ -23,11 +23,35 @@ namespace FormatChanger.Services.Strategies
             ApplyRecursiveStyleCorrection(stylePart.Styles, settings, level: 1);
         }
 
-		public override List<string> CheckFormatting(ParagraphStyleProperties actual, FormattingTemplateModel template)
-		{
-			var expected = GetSettings(template);
-			return FormattingChecker.Check(actual, expected.TextSettings);
-		}
+        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
+        {
+            var issues = new List<string>();
+            var settings = GetSettings(template);
+
+            var runProps = CreateRunProperties(settings.TextSettings);
+            var paraProps = CreateHeadingParagraphProperties(settings);
+
+            var actualRunProps = paragraph.Descendants<RunProperties>().FirstOrDefault();
+            var actualParaProps = paragraph.ParagraphProperties;
+
+            string styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val;
+            Style style = null;
+            StyleRunProperties styleRunProps = null;
+            StyleParagraphProperties styleParagraphProps = null;
+
+            IEnumerable<Style> styles = new List<Style>();
+            var document = paragraph.Ancestors<Document>().FirstOrDefault();
+            if (document != null)
+            {
+                var stylePart = document.MainDocumentPart?.StyleDefinitionsPart;
+                if (stylePart != null)
+                {
+                    styles = stylePart.Styles.Elements<Style>();
+                    style = stylePart.Styles.Elements<Style>().FirstOrDefault(s => s.StyleId == styleId);
+                    styleRunProps = style?.StyleRunProperties;
+                    styleParagraphProps = style?.StyleParagraphProperties;
+                }
+            }
 
 		private void ApplyRecursiveStyleCorrection(Styles styles, HeadingSettingsModel settings, int level)
         {
