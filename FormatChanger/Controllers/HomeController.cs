@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace FormatChanger.Controllers
 {
-
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -15,14 +15,16 @@ namespace FormatChanger.Controllers
         private readonly ITemplateService _templateService;
         private readonly IExportService _exportService;
         private readonly IScoringService _scoringService;
+        private readonly IEvaluationReportService _evaluationReportService;
 
-        public HomeController(ILogger<HomeController> logger, IDocumentService documentService, ITemplateService templateService, IExportService exportService, IScoringService scoringService)
+        public HomeController(ILogger<HomeController> logger, IDocumentService documentService, ITemplateService templateService, IExportService exportService, IScoringService scoringService, IEvaluationReportService evaluationReportService)
         {
             _logger = logger;
             _documentService = documentService;
             _templateService = templateService;
             _exportService = exportService;
             _scoringService = scoringService;
+            _evaluationReportService = evaluationReportService;
         }
 
         [AllowAnonymous]
@@ -163,6 +165,23 @@ namespace FormatChanger.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportEvaluationReport(long scoringId, long templateId)
+        {
+            var scoring = await _scoringService.GetScoringByIdAsync(scoringId);
+            if (scoring == null)
+                return NotFound("Система оценивания не найдена.");
+
+            FormattingTemplateModel template = null;
+            if (templateId > 0)
+                template = await _templateService.GetTemplateByIdAsync(templateId);
+
+            var bytes = _evaluationReportService.GenerateReport(scoring, template);
+            var fileName = $"evaluation_{scoring.Title?.Replace(" ", "_") ?? "report"}_{DateTime.Now:yyyyMMdd_HHmmss}.docx";
+
+            return File(bytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
 		[HttpPost, ValidateAntiForgeryToken]

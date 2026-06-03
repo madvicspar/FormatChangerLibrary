@@ -152,6 +152,17 @@ function deleteTemplateFromModal(id) {
 function startFormattingProcess() {
     var selectedTemplateId = document.getElementById('selectedTemplateId').value;
     var selectedActionId = document.getElementById('actionSelect').value;
+
+    if (selectedActionId === '3') {
+        var selectedScoringId = document.getElementById('selectedScoringId').value;
+        if (!selectedScoringId || selectedScoringId === '0') {
+            alert('Выберите систему оценивания.');
+            return;
+        }
+        window.location.href = `/Home/ExportEvaluationReport?scoringId=${selectedScoringId}&templateId=${selectedTemplateId}`;
+        return;
+    }
+
     const paragraphData = getParagraphTypes();
 
     fetch(`/Home/StartFormattingProcess?templateId=${selectedTemplateId}&actionId=${selectedActionId}`, {
