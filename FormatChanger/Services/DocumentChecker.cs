@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using FormatChanger.Models.FormattingModels;
 using FormatChanger.Models.Helpers;
 using FormatChanger.Services.Interfaces;
+using FormatChanger.Services.Strategies;
 
 namespace FormatChanger.Services
 {
@@ -10,14 +11,22 @@ namespace FormatChanger.Services
     {
 		private readonly FormattingResolver _resolver;
 		private readonly IElementCorrectionStrategy<HeadingSettingsModel> _headingStrategy;
+		private readonly ImageCorrectionStrategy _imageStrategy;
 		private readonly IElementCorrectionStrategy<ImageCaptionSettingsModel> _imageCaptionStrategy;
 		private readonly IElementCorrectionStrategy<TableCaptionSettingsModel> _tableCaptionStrategy;
 		private readonly IElementCorrectionStrategy<TextSettingsModel> _textStrategy;
 
-        public DocumentChecker(IElementCorrectionStrategy<HeadingSettingsModel> headingStrategy, IElementCorrectionStrategy<ImageCaptionSettingsModel> imageCaptionStrategy, IElementCorrectionStrategy<TableCaptionSettingsModel> tableCaptionStrategy, IElementCorrectionStrategy<TextSettingsModel> textStrategy, FormattingResolver resolver)
+        public DocumentChecker(
+			IElementCorrectionStrategy<HeadingSettingsModel> headingStrategy,
+			ImageCorrectionStrategy imageStrategy,
+			IElementCorrectionStrategy<ImageCaptionSettingsModel> imageCaptionStrategy,
+			IElementCorrectionStrategy<TableCaptionSettingsModel> tableCaptionStrategy,
+			IElementCorrectionStrategy<TextSettingsModel> textStrategy,
+			FormattingResolver resolver)
         {
 			_resolver = resolver;
 			_headingStrategy = headingStrategy;
+			_imageStrategy = imageStrategy;
             _imageCaptionStrategy = imageCaptionStrategy;
             _tableCaptionStrategy = tableCaptionStrategy;
             _textStrategy = textStrategy;
@@ -56,6 +65,24 @@ namespace FormatChanger.Services
 					AddComment(paragraphModel.Paragraph, issues);
 				}
 			}
+			// Отдельный проход по параграфам с рисунками (они исключены из paragraphList).
+			// Используем CheckParagraph, который читает свойства напрямую — так же как ApplyCorrection их записывает.
+			var imageSettings = _imageStrategy.GetSettings(template);
+			var imageParagraphs = doc.MainDocumentPart?.Document?.Body?
+				.Descendants<Paragraph>()
+				.Where(p => p.Descendants<Drawing>().Any() && !p.Ancestors<TableCell>().Any())
+				.ToList() ?? [];
+
+			foreach (var imgPara in imageParagraphs)
+			{
+				var issues = _imageStrategy.CheckParagraph(imgPara, imageSettings);
+				if (issues.Count != 0)
+				{
+					issues.Insert(0, "Тип: Рисунок");
+					AddComment(imgPara, issues);
+				}
+			}
+
 			doc.Save();
         }
 

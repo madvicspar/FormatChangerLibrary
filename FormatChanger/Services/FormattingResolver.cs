@@ -135,7 +135,14 @@ namespace FormatChanger.Services
 
 			if (val != null) return Normalize(val, div);
 
-			return Normalize(GetFromStyle(p, styles, s => s?.SpacingBetweenLines == null ? null : selector(s.SpacingBetweenLines)), div);
+			var fromStyle = GetFromStyle(p, styles, s => s?.SpacingBetweenLines == null ? null : selector(s.SpacingBetweenLines));
+			if (fromStyle != null) return Normalize(fromStyle, div);
+
+			var docDefault = GetDocDefaultParagraphProps(p);
+			if (docDefault?.SpacingBetweenLines != null)
+				return Normalize(selector(docDefault.SpacingBetweenLines), div);
+
+			return null;
 		}
 
 		private static string GetFirstLineIndent(Paragraph p, IEnumerable<Style> styles)
@@ -157,9 +164,16 @@ namespace FormatChanger.Services
 				if (val != null) return val;
 			}
 
-			return TraverseStyleHierarchy(p, styles, style =>
+			var fromStyle = TraverseStyleHierarchy(p, styles, style =>
 				style.StyleParagraphProperties?.Indentation == null ? null
 				: FromIndentation(style.StyleParagraphProperties.Indentation));
+			if (fromStyle != null) return fromStyle;
+
+			var docDefault = GetDocDefaultParagraphProps(p);
+			if (docDefault?.Indentation != null)
+				return FromIndentation(docDefault.Indentation);
+
+			return null;
 		}
 
 		private static string GetIndent(Paragraph p, IEnumerable<Style> styles,
@@ -171,7 +185,14 @@ namespace FormatChanger.Services
 
 			if (val != null) return Normalize(val, INDENT_DIVISOR);
 
-			return Normalize(GetFromStyle(p, styles, s => s?.Indentation == null ? null : selector(s.Indentation)), INDENT_DIVISOR);
+			var fromStyle = GetFromStyle(p, styles, s => s?.Indentation == null ? null : selector(s.Indentation));
+			if (fromStyle != null) return Normalize(fromStyle, INDENT_DIVISOR);
+
+			var docDefault = GetDocDefaultParagraphProps(p);
+			if (docDefault?.Indentation != null)
+				return Normalize(selector(docDefault.Indentation), INDENT_DIVISOR);
+
+			return null;
 		}
 
 		private static string GetFromStyle(Paragraph p, IEnumerable<Style> styles,
@@ -186,9 +207,28 @@ namespace FormatChanger.Services
 			if (p.ParagraphProperties?.Justification?.Val != null)
 				return JustificationConverter.Parse(p.ParagraphProperties.Justification.Val.Value);
 
-			return TraverseStyleHierarchy(p, styles, style =>
+			var fromStyle = TraverseStyleHierarchy(p, styles, style =>
 				style.StyleParagraphProperties?.Justification?.Val == null ? null
 				: JustificationConverter.Parse(style.StyleParagraphProperties.Justification.Val.Value));
+			if (fromStyle != null) return fromStyle;
+
+			var docDefault = GetDocDefaultParagraphProps(p);
+			if (docDefault?.Justification?.Val != null)
+				return JustificationConverter.Parse(docDefault.Justification.Val.Value);
+
+			return null;
+		}
+
+		private static ParagraphPropertiesBaseStyle GetDocDefaultParagraphProps(Paragraph p)
+		{
+			return p.Ancestors<Document>()
+				.FirstOrDefault()?
+				.MainDocumentPart?
+				.StyleDefinitionsPart?
+				.Styles?
+				.DocDefaults?
+				.ParagraphPropertiesDefault?
+				.ParagraphPropertiesBaseStyle;
 		}
 		#endregion
 
@@ -196,7 +236,8 @@ namespace FormatChanger.Services
 		private static T TraverseStyleHierarchy<T>(Paragraph p, IEnumerable<Style> styles,
 			Func<Style, T> selector)
 		{
-			var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val;
+			// Если стиль не задан явно, Word использует «Normal» по умолчанию
+			var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val?.Value ?? "Normal";
 
 			while (!string.IsNullOrEmpty(styleId))
 			{
@@ -206,7 +247,7 @@ namespace FormatChanger.Services
 				var val = selector(style);
 				if (val != null) return val;
 
-				styleId = style.BasedOn?.Val;
+				styleId = style.BasedOn?.Val?.Value;
 			}
 
 			return default;
@@ -215,7 +256,7 @@ namespace FormatChanger.Services
 		private static bool GetBoolFromStyle(Paragraph p, IEnumerable<Style> styles,
 		Func<Style, OpenXmlElement> selector)
 		{
-			var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val;
+			var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val?.Value ?? "Normal";
 
 			while (!string.IsNullOrEmpty(styleId))
 			{
@@ -225,7 +266,7 @@ namespace FormatChanger.Services
 				var el = selector(style);
 				if (el != null) return true;
 
-				styleId = style.BasedOn?.Val;
+				styleId = style.BasedOn?.Val?.Value;
 			}
 
 			return false;

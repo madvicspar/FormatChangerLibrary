@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using FormatChanger.Models;
 using FormatChanger.Models.FormattingModels;
 
 namespace FormatChanger.Services.Strategies
@@ -45,9 +46,50 @@ namespace FormatChanger.Services.Strategies
                 new KeepNext { Val = settings.KeepWithNext });
         }
 
-        public List<string> CheckFormatting(Paragraph paragraph, FormattingTemplateModel template)
+        public override List<string> CheckFormatting(ParagraphStyleProperties actual, FormattingTemplateModel template)
         {
-            throw new NotImplementedException();
+            var expected = GetSettings(template);
+            return FormattingChecker.CheckImage(actual, expected);
+        }
+
+        /// <summary>
+        /// Проверяет форматирование параграфа с рисунком, читая свойства напрямую —
+        /// точно так же, как GetParagraphProperties их записывает (сырые значения, без иерархии стилей).
+        /// </summary>
+        public List<string> CheckParagraph(Paragraph p, ImageSettingsModel settings)
+        {
+            var issues = new List<string>();
+            var pp = p.ParagraphProperties;
+            var spacing = pp?.SpacingBetweenLines;
+            var indent = pp?.Indentation;
+            var just = pp?.Justification;
+
+            CompareRaw("Междустрочный интервал", spacing?.Line?.Value, settings.LineSpacing, 240.0, issues);
+            CompareRaw("Интервал перед", spacing?.Before?.Value, settings.BeforeSpacing, 20.0, issues);
+            CompareRaw("Интервал после", spacing?.After?.Value, settings.AfterSpacing, 20.0, issues);
+            CompareRaw("Отступ слева", indent?.Left?.Value, settings.Left, 567.0, issues);
+            CompareRaw("Отступ справа", indent?.Right?.Value, settings.Right, 567.0, issues);
+            CompareRaw("Отступ первой строки", indent?.FirstLine?.Value, settings.FirstLine, 567.0, issues);
+
+            var expectedJust = JustificationConverter.Parse(settings.Justification).ToString().ToLowerInvariant();
+            var actualJust = just?.Val?.Value.ToString()?.ToLowerInvariant();
+            if ((actualJust ?? "") != (expectedJust ?? ""))
+                issues.Add($"Выравнивание: {actualJust ?? "не задано"}, должно быть {expectedJust ?? "не задано"}");
+
+            return issues;
+        }
+
+        private static void CompareRaw(string name, string actualRaw, float expectedRaw, double divisor, List<string> issues)
+        {
+            var expectedNorm = Math.Round(expectedRaw / divisor, 2);
+            if (expectedNorm == 0 && actualRaw == null) return;
+
+            double? actualNorm = null;
+            if (actualRaw != null && double.TryParse(actualRaw, out var v))
+                actualNorm = Math.Round(v / divisor, 2);
+
+            if (actualNorm == null || actualNorm != expectedNorm)
+                issues.Add($"{name}: {(actualNorm.HasValue ? actualNorm.ToString() : "не задан")}, должен быть {expectedNorm}");
         }
     }
 }

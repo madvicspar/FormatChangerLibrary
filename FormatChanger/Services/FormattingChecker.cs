@@ -103,6 +103,29 @@ namespace FormatChanger.Services
 			}
 		}
 
+		public static List<string> CheckImage(ParagraphStyleProperties actual, ImageSettingsModel expected)
+		{
+			var issues = new List<string>();
+
+			CompareProperty("Междустрочный интервал", actual.SpacingLine,
+				NormalizeRaw(expected.LineSpacing, 240.0), issues);
+			CompareProperty("Интервал перед", actual.SpacingBefore,
+				NormalizeRaw(expected.BeforeSpacing, 20.0), issues);
+			CompareProperty("Интервал после", actual.SpacingAfter,
+				NormalizeRaw(expected.AfterSpacing, 20.0), issues);
+			CompareProperty("Отступ первой строки", actual.IndentFirstLine,
+				NormalizeRaw(expected.FirstLine, 567.0), issues);
+			CompareProperty("Отступ слева", actual.IndentLeft,
+				NormalizeRaw(expected.Left, 567.0), issues);
+			CompareProperty("Отступ справа", actual.IndentRight,
+				NormalizeRaw(expected.Right, 567.0), issues);
+
+			if (!CompareNullable(actual.Justification, expected.Justification))
+				issues.Add($"Выравнивание: {actual.Justification ?? "не задано"}, должно быть {expected.Justification}");
+
+			return issues;
+		}
+
 		private static bool CompareNullable(string actual, string expected)
 		{
 			return (actual ?? "") == (expected ?? "");
