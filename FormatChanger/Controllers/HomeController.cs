@@ -14,13 +14,15 @@ namespace FormatChanger.Controllers
         private readonly IDocumentService _documentService;
         private readonly ITemplateService _templateService;
         private readonly IExportService _exportService;
+        private readonly IScoringService _scoringService;
 
-        public HomeController(ILogger<HomeController> logger, IDocumentService documentService, ITemplateService templateService, IExportService exportService)
+        public HomeController(ILogger<HomeController> logger, IDocumentService documentService, ITemplateService templateService, IExportService exportService, IScoringService scoringService)
         {
             _logger = logger;
             _documentService = documentService;
             _templateService = templateService;
             _exportService = exportService;
+            _scoringService = scoringService;
         }
 
         [AllowAnonymous]
@@ -39,9 +41,8 @@ namespace FormatChanger.Controllers
 
         public void SetTemplates()
         {
-            // TODO: ������ �� ����� �������, ���� �� �� ������ ����, ����� ���� �������� ������ �������������
-            var templates = _templateService.GetTemplatesAsync();
-            ViewBag.Templates = templates.Result;
+            ViewBag.Templates = _templateService.GetTemplatesAsync().Result;
+            ViewBag.Scorings = _scoringService.GetScoringsAsync().Result;
         }
 
         [HttpPost]
@@ -181,6 +182,43 @@ namespace FormatChanger.Controllers
 					model.HeadingLevelsEdit = FlattenHeadings(model.HeadingSettings);
 			}
 			return PartialView("_FormattingTemplateForm", model);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetScoringForEdit(long id)
+		{
+			EvaluationSystemModel model;
+			if (id == 0)
+			{
+				model = new EvaluationSystemModel
+				{
+					TextWeight = 35,
+					HeaderWeight = 25,
+					ListWeight = 15,
+					ImageWeight = 10,
+					TableWeight = 15,
+				};
+			}
+			else
+			{
+				model = await _scoringService.GetScoringByIdAsync(id);
+				if (model == null) return NotFound();
+			}
+			return PartialView("_EvaluationSystemForm", model);
+		}
+
+		[HttpPost, ValidateAntiForgeryToken]
+		public async Task<IActionResult> SaveScoring(EvaluationSystemModel model)
+		{
+			var id = await _scoringService.SaveScoringAsync(model);
+			return Json(new { success = true, id });
+		}
+
+		[HttpPost, ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteScoring(long id)
+		{
+			await _scoringService.DeleteScoringAsync(id);
+			return Json(new { success = true });
 		}
 
 		private static FormattingTemplateModel CreateDefaultModel() => new()
