@@ -3,6 +3,7 @@
 	public class ParagraphStyleProperties
 	{
 		public string StyleId { get; set; }
+		public string InnerText { get; set; }
 		public RunStyleProperties RunStyle { get; set; }
 
 		public string SpacingLine { get; set; }

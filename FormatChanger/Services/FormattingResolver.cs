@@ -24,6 +24,7 @@ namespace FormatChanger.Services
 			return new ParagraphStyleProperties
 			{
 				StyleId = p.ParagraphProperties?.ParagraphStyleId?.Val,
+				InnerText = p.InnerText,
 				RunStyle = ResolveRun(p, styles),
 
 				SpacingLine = GetSpacing(p, styles, x => x.Line?.Value, LINE_SPACING_DIVISOR),

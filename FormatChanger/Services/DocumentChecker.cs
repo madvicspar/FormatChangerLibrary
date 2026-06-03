@@ -1,12 +1,8 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-
 using FormatChanger.Models.FormattingModels;
 using FormatChanger.Models.Helpers;
 using FormatChanger.Services.Interfaces;
-
-using NuGet.DependencyResolver;
 
 namespace FormatChanger.Services
 {
@@ -29,8 +25,9 @@ namespace FormatChanger.Services
 
         public async Task CheckAndCommentAsync(WordprocessingDocument doc, FormattingTemplateModel template, List<ParagraphModel> paragraphList, string[] types)
         {
-			foreach (var paragraphModel in paragraphList)
+			for (int i = 0; i < paragraphList.Count; i++)
 			{
+				var paragraphModel = paragraphList[i];
                 if (paragraphModel.Paragraph == null)
                     continue;
 
@@ -41,9 +38,15 @@ namespace FormatChanger.Services
                 if (paragraphModel.Type == ParagraphTypes.FirstH.ToString())
                     issues = _headingStrategy.CheckFormatting(resolved, template);
                 else if (paragraphModel.Type == ParagraphTypes.ImageCaption.ToString())
+				{
                     issues = _imageCaptionStrategy.CheckFormatting(resolved, template);
+					CheckCaptionPosition(paragraphList, i, template.ImageSettings?.CaptionSettings, CaptionPosition.Below, issues);
+				}
 				else if (paragraphModel.Type == ParagraphTypes.TableCaption.ToString())
+				{
 					issues = _tableCaptionStrategy.CheckFormatting(resolved, template);
+					CheckCaptionPosition(paragraphList, i, template.TableSettings?.CaptionSettings, CaptionPosition.Above, issues);
+				}
 				else
                     issues = _textStrategy.CheckFormatting(resolved, template);
 
@@ -55,6 +58,18 @@ namespace FormatChanger.Services
 			}
 			doc.Save();
         }
+
+		// actualPosition — положение подписи, определённое из документа (Above/Below)
+		private static void CheckCaptionPosition(List<ParagraphModel> list, int index, ICaptionSettingsModel settings, CaptionPosition actualPosition, List<string> issues)
+		{
+			if (settings == null) return;
+			if (settings.Position != actualPosition)
+			{
+				var expectedLabel = settings.Position == CaptionPosition.Above ? "над" : "под";
+				var actualLabel = actualPosition == CaptionPosition.Above ? "над" : "под";
+				issues.Add($"Положение подписи: фактически {actualLabel} элементом, должно быть {expectedLabel}");
+			}
+		}
         private static string GetTypeName(string type) => type switch
         {
             "FirstH" => "Заголовок первого уровня",

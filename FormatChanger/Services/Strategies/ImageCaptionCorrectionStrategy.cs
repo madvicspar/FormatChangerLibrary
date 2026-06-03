@@ -27,7 +27,9 @@ namespace FormatChanger.Services.Strategies
         public override List<string> CheckFormatting(ParagraphStyleProperties actual, FormattingTemplateModel template)
         {
 			var expected = GetSettings(template);
-			return FormattingChecker.Check(actual, expected.TextSettings);
+			var issues = FormattingChecker.Check(actual, expected.TextSettings);
+			issues.AddRange(FormattingChecker.CheckCaptionContent(actual, expected));
+			return issues;
 		}
 	}
 }

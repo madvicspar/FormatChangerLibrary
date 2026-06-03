@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using FormatChanger.Models;
 using FormatChanger.Models.FormattingModels;
 
@@ -5,6 +6,40 @@ namespace FormatChanger.Services
 {
 	public static class FormattingChecker
 	{
+		/// <summary>
+		/// Проверяет соответствие текста подписи шаблону и разделителю.
+		/// TextTemplate может содержать «N» как плейсхолдер для номера, например «Таблица N».
+		/// </summary>
+		public static List<string> CheckCaptionContent(ParagraphStyleProperties actual, ICaptionSettingsModel expected)
+		{
+			var issues = new List<string>();
+			var text = actual.InnerText ?? string.Empty;
+
+			if (!string.IsNullOrWhiteSpace(expected.TextTemplate))
+			{
+				// Строим regex: «N» → \d+, остальное экранируем
+				var rawTemplate = expected.TextTemplate;
+				var regexPattern = "^" + Regex.Escape(rawTemplate).Replace("N", @"\d+");
+
+				if (!string.IsNullOrWhiteSpace(expected.Separator))
+					regexPattern += Regex.Escape(expected.Separator);
+
+				if (!Regex.IsMatch(text, regexPattern))
+				{
+					var expectedPattern = string.IsNullOrWhiteSpace(expected.Separator)
+						? rawTemplate
+						: rawTemplate + expected.Separator + "...";
+					issues.Add($"Текст подписи не соответствует шаблону. Ожидается начало: «{expectedPattern}», фактически: «{text}»");
+				}
+			}
+			else if (!string.IsNullOrWhiteSpace(expected.Separator))
+			{
+				if (!text.Contains(expected.Separator))
+					issues.Add($"Отсутствует разделитель «{expected.Separator}» в тексте подписи");
+			}
+
+			return issues;
+		}
 		public static List<string> Check(ParagraphStyleProperties actual, TextSettingsModel expected)
 		{
 			var issues = new List<string>();

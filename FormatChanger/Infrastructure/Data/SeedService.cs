@@ -136,7 +136,7 @@ namespace FormatChanger.Utilities.Data
                 LineSpacing = 240,
                 BeforeSpacing = 120,
                 AfterSpacing = 0,
-                Justification = "Both",
+                Justification = "Left",
                 Left = 0,
                 Right = 0,
                 FirstLine = 0,
@@ -273,9 +273,10 @@ namespace FormatChanger.Utilities.Data
             var tableCaptionSettings = new TableCaptionSettingsModel
             {
                 TextSettings = textSettings_tableCaption,
-                TextTemplate = "Таблица\\s+(\\d+)",
-                Separator = "-"
-            };
+                TextTemplate = "Таблица N ",
+                Separator = "– ",
+                Position = CaptionPosition.Above
+			};
 
             context.CaptionSettings.Add(tableCaptionSettings);
             context.SaveChanges();
@@ -284,9 +285,10 @@ namespace FormatChanger.Utilities.Data
             var imageCaptionSettings = new ImageCaptionSettingsModel
             {
                 TextSettings = textSettings_imageCaption,
-                TextTemplate = "Рисунок\\s+(\\d+)",
-                Separator = "-"
-            };
+                TextTemplate = "Рисунок N ",
+                Separator = "– ",
+                Position = CaptionPosition.Below
+			};
 
             context.CaptionSettings.Add(imageCaptionSettings);
             context.SaveChanges();
