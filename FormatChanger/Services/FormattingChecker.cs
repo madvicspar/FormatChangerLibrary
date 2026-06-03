@@ -1,4 +1,4 @@
-﻿using FormatChanger.Models;
+using FormatChanger.Models;
 using FormatChanger.Models.FormattingModels;
 
 namespace FormatChanger.Services
@@ -19,22 +19,44 @@ namespace FormatChanger.Services
 					? "Должен быть курсивом"
 					: "Не должен быть курсивом");
 
+			if (actual.RunStyle.Underline != expected.IsUnderscore)
+				issues.Add(expected.IsUnderscore
+					? "Должен быть подчёркнутым"
+					: "Не должен быть подчёркнутым");
+
 			if (!CompareNullable(actual.RunStyle.Color, expected.Color))
-				issues.Add($"Цвет текста должен быть {expected.Color}");
+				issues.Add($"Цвет текста: {actual.RunStyle.Color ?? "не задан"}, должен быть {expected.Color}");
 
 			if (!CompareNullable(actual.RunStyle.FontSize, expected.FontSize.ToString()))
-				issues.Add($"Размер шрифта должен быть {expected.FontSize}");
+				issues.Add($"Размер шрифта: {actual.RunStyle.FontSize ?? "не задан"}, должен быть {expected.FontSize}");
 
-			CompareProperty("Междустрочный интервал", actual.SpacingLine, expected.LineSpacing.ToString(), issues);
-			CompareProperty("Интервал перед", actual.SpacingBefore, expected.BeforeSpacing.ToString(), issues);
-			CompareProperty("Интервал после", actual.SpacingAfter, expected.AfterSpacing.ToString(), issues);
+			if (!CompareNullable(actual.RunStyle.Font, expected.Font))
+				issues.Add($"Шрифт: {actual.RunStyle.Font ?? "не задан"}, должен быть {expected.Font}");
+
+			// Модель хранит сырые значения OpenXML: 240 = одинарный, 360 = полуторный (для интервала строк)
+			// Resolver нормализует: делит на 240. Приводим ожидаемое к тем же единицам.
+			CompareProperty("Междустрочный интервал", actual.SpacingLine,
+				NormalizeRaw(expected.LineSpacing, 240.0), issues);
+
+			// Интервалы до/после: 20 единиц OpenXML = 1 пт
+			CompareProperty("Интервал перед", actual.SpacingBefore,
+				NormalizeRaw(expected.BeforeSpacing, 20.0), issues);
+			CompareProperty("Интервал после", actual.SpacingAfter,
+				NormalizeRaw(expected.AfterSpacing, 20.0), issues);
 
 			CompareProperty("Отступ первой строки", actual.IndentFirstLine, expected.FirstLine.ToString(), issues);
 			CompareProperty("Отступ слева", actual.IndentLeft, expected.Left.ToString(), issues);
 			CompareProperty("Отступ справа", actual.IndentRight, expected.Right.ToString(), issues);
 
+			if (!CompareNullable(actual.Justification, expected.Justification))
+				issues.Add($"Выравнивание: {actual.Justification ?? "не задано"}, должно быть {expected.Justification}");
+
 			return issues;
 		}
+
+		// Нормализует raw-значение OpenXML к той же шкале, что и FormattingResolver.Normalize
+		private static string NormalizeRaw(float rawValue, double divisor) =>
+			Math.Round(rawValue / divisor, 2).ToString();
 
 		private static void CompareProperty(string name, string actual, string expected, List<string> issues)
 		{

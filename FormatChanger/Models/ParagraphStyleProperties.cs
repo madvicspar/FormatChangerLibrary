@@ -12,5 +12,7 @@
 		public string IndentFirstLine { get; set; }
 		public string IndentLeft { get; set; }
 		public string IndentRight { get; set; }
+
+		public string Justification { get; set; }
 	}
 }

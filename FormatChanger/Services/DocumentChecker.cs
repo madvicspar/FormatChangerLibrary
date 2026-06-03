@@ -1,8 +1,12 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+
 using FormatChanger.Models.FormattingModels;
 using FormatChanger.Models.Helpers;
 using FormatChanger.Services.Interfaces;
+
+using NuGet.DependencyResolver;
 
 namespace FormatChanger.Services
 {
@@ -31,11 +35,9 @@ namespace FormatChanger.Services
                     continue;
 
 				var paragraph = paragraphModel.Paragraph;
-				var issues = new List<string>();
 				var resolved = _resolver.ResolveParagraph(paragraph);
+				List<string> issues;
 
-				//if (paragraphModel.Paragraph == null)
-    //                issues.Add("Как может не быть абзаца?"); // TODO: такая ситуация вообще мб?
                 if (paragraphModel.Type == ParagraphTypes.FirstH.ToString())
                     issues = _headingStrategy.CheckFormatting(resolved, template);
                 else if (paragraphModel.Type == ParagraphTypes.ImageCaption.ToString())
@@ -46,10 +48,26 @@ namespace FormatChanger.Services
                     issues = _textStrategy.CheckFormatting(resolved, template);
 
 				if (issues.Count != 0)
+				{
+					issues.Insert(0, $"Тип: {GetTypeName(paragraphModel.Type)}");
 					AddComment(paragraphModel.Paragraph, issues);
+				}
 			}
 			doc.Save();
         }
+        private static string GetTypeName(string type) => type switch
+        {
+            "FirstH" => "Заголовок первого уровня",
+			"SecondH" => "Заголовок первого уровня",
+			"ThirdH" => "Заголовок первого уровня",
+			"ImageCaption" => "Подпись к рисунку",
+            "TableCaption" => "Подпись к таблице",
+			"Period" => "Элемент списка",
+			"Bracket" => "Элемент списка",
+			"Dash" => "Элемент списка",
+			_ => "Обычный текст",
+        };
+
         private static void AddComment(Paragraph paragraph, List<string> commentText)
         {
             // TODO: мэтчится со стилем обычного текста, что логично, но может быть неправильным (например, как в тестовом примере - красный текст)
