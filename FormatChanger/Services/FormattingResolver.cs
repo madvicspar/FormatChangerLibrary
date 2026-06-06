@@ -13,10 +13,8 @@ namespace FormatChanger.Services
 		private const double FONT_SIZE_DIVISOR = 2.0;
 
 		/// <summary>
-		/// Получить форматирование абзаца
+		/// Resolves the effective formatting of a paragraph.
 		/// </summary>
-		/// <param name="p"></param>
-		/// <returns></returns>
 		public ParagraphStyleProperties ResolveParagraph(Paragraph p)
 		{
 			var styles = GetStyles(p);
@@ -32,7 +30,7 @@ namespace FormatChanger.Services
 				SpacingAfter = GetSpacing(p, styles, x => x.After?.Value, SPACING_DIVISOR),
 
 				IndentFirstLine = GetFirstLineIndent(p, styles),
-				IndentLeft = GetIndent(p, styles, x => x.Left?.Value),
+				IndentLeft = GetEffectiveLeft(p, styles),
 				IndentRight = GetIndent(p, styles, x => x.Right?.Value),
 
 				Justification = GetJustification(p, styles),
@@ -97,7 +95,7 @@ namespace FormatChanger.Services
 			if (!string.IsNullOrEmpty(styleColor) && styleColor != "auto")
 				return styleColor;
 
-			// Последний fallback — настройки документа по умолчанию
+			// Last fallback — document-level default settings
 			return p.Ancestors<Document>()
 				.FirstOrDefault()?
 				.MainDocumentPart?
@@ -135,13 +133,20 @@ namespace FormatChanger.Services
 
 			if (val != null) return Normalize(val, div);
 
-			return Normalize(GetFromStyle(p, styles, s => s?.SpacingBetweenLines == null ? null : selector(s.SpacingBetweenLines)), div);
+			var fromStyle = GetFromStyle(p, styles, s => s?.SpacingBetweenLines == null ? null : selector(s.SpacingBetweenLines));
+			if (fromStyle != null) return Normalize(fromStyle, div);
+
+			var docDefault = GetDocDefaultParagraphProps(p);
+			if (docDefault?.SpacingBetweenLines != null)
+				return Normalize(selector(docDefault.SpacingBetweenLines), div);
+
+			return null;
 		}
 
 		private static string GetFirstLineIndent(Paragraph p, IEnumerable<Style> styles)
 		{
-			// FirstLine (обычный отступ) и Hanging (выступ, хранится как положительное число)
-			// разные XML-атрибуты; Hanging → отрицательное значение в сантиметрах
+			// FirstLine (regular indent) and Hanging (stored as a positive number in XML)
+			// are different XML attributes; Hanging is represented as a negative value in centimetres
 			static string FromIndentation(Indentation indent)
 			{
 				if (indent.FirstLine?.Value != null)
@@ -157,9 +162,16 @@ namespace FormatChanger.Services
 				if (val != null) return val;
 			}
 
-			return TraverseStyleHierarchy(p, styles, style =>
+			var fromStyle = TraverseStyleHierarchy(p, styles, style =>
 				style.StyleParagraphProperties?.Indentation == null ? null
 				: FromIndentation(style.StyleParagraphProperties.Indentation));
+			if (fromStyle != null) return fromStyle;
+
+			var docDefault = GetDocDefaultParagraphProps(p);
+			if (docDefault?.Indentation != null)
+				return FromIndentation(docDefault.Indentation);
+
+			return null;
 		}
 
 		private static string GetIndent(Paragraph p, IEnumerable<Style> styles,
@@ -171,7 +183,53 @@ namespace FormatChanger.Services
 
 			if (val != null) return Normalize(val, INDENT_DIVISOR);
 
-			return Normalize(GetFromStyle(p, styles, s => s?.Indentation == null ? null : selector(s.Indentation)), INDENT_DIVISOR);
+			var fromStyle = GetFromStyle(p, styles, s => s?.Indentation == null ? null : selector(s.Indentation));
+			if (fromStyle != null) return Normalize(fromStyle, INDENT_DIVISOR);
+
+			var docDefault = GetDocDefaultParagraphProps(p);
+			if (docDefault?.Indentation != null)
+				return Normalize(selector(docDefault.Indentation), INDENT_DIVISOR);
+
+			return null;
+		}
+
+		/// <summary>
+		/// Returns the effective left indent: left - hanging (as Word shows in the paragraph dialog).
+		/// If there is no hanging indent, returns left as-is.
+		/// </summary>
+		private static string GetEffectiveLeft(Paragraph p, IEnumerable<Style> styles)
+		{
+			var left = GetRawIndent(p, styles, x => x.Left?.Value);
+			if (left == null) return null;
+
+			// If a positive first-line indent (w:firstLine) exists, there is no hanging — leave left as-is
+			var firstLine = GetRawIndent(p, styles, x => x.FirstLine?.Value);
+			if (firstLine != null && double.TryParse(firstLine, out var fl) && fl > 0)
+				return Normalize(left, INDENT_DIVISOR);
+
+			// If w:hanging is present, subtract it from left (matching Word's paragraph dialog display)
+			var hanging = GetRawIndent(p, styles, x => x.Hanging?.Value);
+			if (hanging == null) return Normalize(left, INDENT_DIVISOR);
+
+			if (double.TryParse(left, out var l) && double.TryParse(hanging, out var h))
+				return Math.Round((l - h) / INDENT_DIVISOR, 2).ToString();
+
+			return Normalize(left, INDENT_DIVISOR);
+		}
+
+		private static string GetRawIndent(Paragraph p, IEnumerable<Style> styles,
+			Func<Indentation, string> selector)
+		{
+			var val = p.ParagraphProperties?.Indentation != null
+				? selector(p.ParagraphProperties.Indentation)
+				: null;
+			if (val != null) return val;
+
+			var fromStyle = GetFromStyle(p, styles, s => s?.Indentation == null ? null : selector(s.Indentation));
+			if (fromStyle != null) return fromStyle;
+
+			var docDefault = GetDocDefaultParagraphProps(p);
+			return docDefault?.Indentation != null ? selector(docDefault.Indentation) : null;
 		}
 
 		private static string GetFromStyle(Paragraph p, IEnumerable<Style> styles,
@@ -186,9 +244,28 @@ namespace FormatChanger.Services
 			if (p.ParagraphProperties?.Justification?.Val != null)
 				return JustificationConverter.Parse(p.ParagraphProperties.Justification.Val.Value);
 
-			return TraverseStyleHierarchy(p, styles, style =>
+			var fromStyle = TraverseStyleHierarchy(p, styles, style =>
 				style.StyleParagraphProperties?.Justification?.Val == null ? null
 				: JustificationConverter.Parse(style.StyleParagraphProperties.Justification.Val.Value));
+			if (fromStyle != null) return fromStyle;
+
+			var docDefault = GetDocDefaultParagraphProps(p);
+			if (docDefault?.Justification?.Val != null)
+				return JustificationConverter.Parse(docDefault.Justification.Val.Value);
+
+			return null;
+		}
+
+		private static ParagraphPropertiesBaseStyle GetDocDefaultParagraphProps(Paragraph p)
+		{
+			return p.Ancestors<Document>()
+				.FirstOrDefault()?
+				.MainDocumentPart?
+				.StyleDefinitionsPart?
+				.Styles?
+				.DocDefaults?
+				.ParagraphPropertiesDefault?
+				.ParagraphPropertiesBaseStyle;
 		}
 		#endregion
 
@@ -196,7 +273,8 @@ namespace FormatChanger.Services
 		private static T TraverseStyleHierarchy<T>(Paragraph p, IEnumerable<Style> styles,
 			Func<Style, T> selector)
 		{
-			var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val;
+			var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val?.Value
+				?? GetDefaultParagraphStyleId(styles);
 
 			while (!string.IsNullOrEmpty(styleId))
 			{
@@ -206,7 +284,7 @@ namespace FormatChanger.Services
 				var val = selector(style);
 				if (val != null) return val;
 
-				styleId = style.BasedOn?.Val;
+				styleId = style.BasedOn?.Val?.Value;
 			}
 
 			return default;
@@ -215,7 +293,8 @@ namespace FormatChanger.Services
 		private static bool GetBoolFromStyle(Paragraph p, IEnumerable<Style> styles,
 		Func<Style, OpenXmlElement> selector)
 		{
-			var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val;
+			var styleId = p.ParagraphProperties?.ParagraphStyleId?.Val?.Value
+				?? GetDefaultParagraphStyleId(styles);
 
 			while (!string.IsNullOrEmpty(styleId))
 			{
@@ -225,11 +304,20 @@ namespace FormatChanger.Services
 				var el = selector(style);
 				if (el != null) return true;
 
-				styleId = style.BasedOn?.Val;
+				styleId = style.BasedOn?.Val?.Value;
 			}
 
 			return false;
 		}
+
+		/// <summary>
+		/// Returns the styleId of the default paragraph style (w:default="1").
+		/// This can be "Normal", "a0", "a", etc. depending on the document.
+		/// </summary>
+		private static string GetDefaultParagraphStyleId(IEnumerable<Style> styles) =>
+			styles.FirstOrDefault(s =>
+				s.Type?.Value == StyleValues.Paragraph &&
+				(s.Default?.Value ?? false))?.StyleId?.Value ?? "Normal";
 
 		private static IEnumerable<Style> GetStyles(Paragraph p)
 		{
